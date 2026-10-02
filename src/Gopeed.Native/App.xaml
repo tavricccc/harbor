@@ -14,17 +14,13 @@
             <Style x:Key="RowActionButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Padding" Value="8,8"/>
+                <Setter Property="Padding" Value="8,6"/>
                 <Setter Property="MinWidth" Value="0"/>
                 <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
             </Style>
-            <Style x:Key="RowPrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
-                <Setter Property="Padding" Value="8,8"/>
-                <Setter Property="MinWidth" Value="0"/>
-            </Style>
             <Style x:Key="CompactPageTitleStyle" TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource HeadingFontFamily}"/>
-                <Setter Property="FontSize" Value="22"/>
+                <Setter Property="FontSize" Value="20"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
             </Style>
             <Style x:Key="CompactSectionTitleStyle" TargetType="TextBlock">
@@ -33,7 +29,7 @@
                 <Setter Property="FontWeight" Value="SemiBold"/>
             </Style>
             <Style x:Key="SecondaryTextBlockStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
             </Style>
             <Style x:Key="DownloadSurfaceStyle" TargetType="Grid">
@@ -43,7 +39,7 @@
                 <Setter Property="BorderThickness" Value="0,1,0,0"/>
                 <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}"/>
                 <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}"/>
-                <Setter Property="Padding" Value="28,16"/>
+                <Setter Property="Padding" Value="24,14"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

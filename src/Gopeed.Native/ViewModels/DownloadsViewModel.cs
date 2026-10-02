@@ -23,6 +23,9 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<DownloadItem> Selection { get; private set; } = [];
     public bool CanPauseSelected => Selection.Any(x => x.CanPause);
     public bool CanResumeSelected => Selection.Any(x => x.CanResume);
+    public bool CanPauseAll => IsConnected && items.Values.Any(x => x.CanPause);
+    public bool CanResumeAll => IsConnected && items.Values.Any(x => x.CanResume);
+    public bool CanClearCompleted => items.Values.Any(x => x.IsComplete && !x.Uploading && !x.IsProcessing);
     public bool HasSelection => Selection.Count > 0;
     public bool HasSingleSelection => Selected is not null;
     public bool CanOpenSelected => Selected?.IsComplete == true;
@@ -31,8 +34,8 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public string PrimaryActionGlyph => Selected?.PrimaryActionGlyph ?? PrimaryActionKey switch { "pause" => "\uE769", "continue" => "\uE768", "folder" => "\uE8B7", _ => "\uE896" };
     public bool CanActSelected => PrimaryActionKey != "none";
     public bool CanEditSource => Selected?.CanEditSource == true;
-    public string EmptyTitle => items.Count == 0 ? "開始第一個下載" : "沒有符合條件的下載";
-    public string EmptyHint => items.Count == 0 ? "新增連結、從剪貼簿貼上，或拖入網址與 torrent 檔案。" : "試著清除搜尋，或切換為全部下載。";
+    public string EmptyTitle => items.Count == 0 ? "還沒有下載" : "沒有符合條件的下載";
+    public string EmptyHint => items.Count == 0 ? "貼上網址開始下載，也可以一次加入多個連結。" : "試著清除搜尋，或切換為全部下載。";
     partial void OnSelectedChanged(DownloadItem? oldValue, DownloadItem? newValue)
     {
         if (oldValue is not null) oldValue.PropertyChanged -= SelectionUpdated;
@@ -41,7 +44,7 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasSelection));
         OnPropertyChanged(nameof(HasSingleSelection)); OnPropertyChanged(nameof(CanEditSource));
     }
-    public void SetSelection(IEnumerable<DownloadItem> values) { Selection = values.ToList(); Selected = Selection.Count == 1 ? Selection[0] : null; SelectionUpdated(this, new(null)); OnPropertyChanged(nameof(HasSelection)); }
+    public void SetSelection(IEnumerable<DownloadItem> values) { Selection = values.ToList(); Selected = Selection.Count == 1 ? Selection[0] : null; SelectionUpdated(this, new(null)); OnPropertyChanged(nameof(HasSelection)); UpdateSummary(); }
     private void SelectionUpdated(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(CanPauseSelected)); OnPropertyChanged(nameof(CanResumeSelected));
@@ -68,8 +71,6 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
             }
             foreach (var id in items.Keys.Where(id => !ids.Contains(id)).ToList()) items.Remove(id);
             ApplyFilter();
-            var active = items.Values.Count(i => i.Status == "running");
-            Summary = $"{items.Count} 個下載 · {active} 個進行中 · {DownloadItem.FormatBytes(items.Values.Where(i => i.Status == "running").Sum(i => i.Speed))}/s";
         }
         catch (Exception e) { Error = UserError.Message(e); }
     }
@@ -87,7 +88,15 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
         }
         if (Selected is not null && !VisibleItems.Contains(Selected)) Selected = null;
         SelectionUpdated(this, new(null));
+        OnPropertyChanged(nameof(CanPauseAll)); OnPropertyChanged(nameof(CanResumeAll)); OnPropertyChanged(nameof(CanClearCompleted));
+        UpdateSummary();
         OnPropertyChanged(nameof(EmptyTitle)); OnPropertyChanged(nameof(EmptyHint));
+    }
+    private void UpdateSummary()
+    {
+        var active = items.Values.Count(i => i.Status == "running");
+        var speed = DownloadItem.FormatBytes(items.Values.Where(i => i.Status == "running").Sum(i => i.Speed));
+        Summary = $"{VisibleItems.Count} / {items.Count} 個下載 · {active} 個進行中 · {speed}/s · 已選取 {Selection.Count} 個";
     }
     public async Task ActAsync(string action, IEnumerable<DownloadItem> targets, bool deleteFiles = false)
     {
