@@ -24,6 +24,7 @@ internal sealed class MirrorsEditor : StackPanel
     {
         Spacing = 16;
         AutomationProperties.SetName(type, "鏡像類型"); AutomationProperties.SetName(url, "鏡像網址");
+        list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                 <Grid Padding="4,8" ColumnSpacing="16">

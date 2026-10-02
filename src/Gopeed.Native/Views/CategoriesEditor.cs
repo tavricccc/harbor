@@ -21,6 +21,7 @@ internal sealed class CategoriesEditor : StackPanel
     {
         Spacing = 20;
         AutomationProperties.SetName(name, "分類名稱"); AutomationProperties.SetName(path, "儲存位置");
+        list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                 <Grid Padding="4,8" ColumnSpacing="16">

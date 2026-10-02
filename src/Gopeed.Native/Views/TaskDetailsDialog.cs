@@ -78,6 +78,7 @@ public sealed class TaskDetailsDialog : ContentDialog
     {
         var entries = ReadFiles(item);
         var list = new ListView { ItemsSource = entries, MaxHeight = 244, SelectionMode = ListViewSelectionMode.Single };
+        list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                 <Grid Padding="4,8" ColumnSpacing="16">
