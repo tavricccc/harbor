@@ -5,7 +5,7 @@
     <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
         <StackPanel x:Name="FormContent" Spacing="14">
             <InfoBar x:Name="Message" Severity="Error" IsOpen="False" IsClosable="False" Visibility="Collapsed"/>
-            <Grid RowSpacing="14" ColumnSpacing="16">
+            <Grid ColumnSpacing="16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="52"/>
                 <ColumnDefinition Width="*"/>
@@ -20,9 +20,9 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="檔名" VerticalAlignment="Center"
+            <TextBlock Text="檔名" VerticalAlignment="Center" Margin="0,0,0,14"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <Grid Grid.Column="1" ColumnSpacing="10">
+            <Grid Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Border VerticalAlignment="Center" CornerRadius="4" Padding="6,2"
                         Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
@@ -33,35 +33,35 @@
                 <TextBox x:Name="FileName" Grid.Column="1" PlaceholderText="使用來源提供的名稱"
                          AutomationProperties.Name="檔名"/>
             </Grid>
-            <TextBlock Grid.Row="1" Text="來源" VerticalAlignment="Top" Margin="0,8,0,0"
+            <TextBlock Grid.Row="1" Text="來源" VerticalAlignment="Top" Margin="0,8,0,14"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             <TextBox x:Name="Links" Grid.Row="1" Grid.Column="1" PlaceholderText="貼上網址；批次下載請每行一個"
-                     AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" MaxHeight="120"
+                     AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" MaxHeight="120" Margin="0,0,0,14"
                      AutomationProperties.AutomationId="DownloadLinks" AutomationProperties.Name="來源網址" TextChanged="InputChanged"/>
-            <TextBlock Grid.Row="2" Text="大小" VerticalAlignment="Center"
+            <TextBlock Grid.Row="2" Text="大小" VerticalAlignment="Center" Margin="0,0,0,14"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <Grid Grid.Row="2" Grid.Column="1" ColumnSpacing="10">
+            <Grid Grid.Row="2" Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBlock x:Name="Preview" Text="檢查連結後顯示" TextWrapping="Wrap" VerticalAlignment="Center"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                 <ProgressRing x:Name="Busy" Grid.Column="1" IsActive="False" Width="16" Height="16"
                               Visibility="Collapsed" AutomationProperties.Name="正在檢查連結"/>
             </Grid>
-            <TextBlock x:Name="CategoryLabel" Grid.Row="3" Text="分類" VerticalAlignment="Center"
+            <TextBlock x:Name="CategoryLabel" Grid.Row="3" Text="分類" VerticalAlignment="Center" Margin="0,0,0,14"
                        Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <ComboBox x:Name="Category" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch"
+            <ComboBox x:Name="Category" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,14"
                       Visibility="Collapsed" SelectionChanged="CategoryChanged" AutomationProperties.Name="下載分類"/>
-            <TextBlock Grid.Row="4" Text="存到" VerticalAlignment="Center"
+            <TextBlock Grid.Row="4" Text="存到" VerticalAlignment="Center" Margin="0,0,0,14"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            <Grid Grid.Row="4" Grid.Column="1" ColumnSpacing="10">
+            <Grid Grid.Row="4" Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBox x:Name="Destination" AutomationProperties.AutomationId="DownloadDestination"
                          AutomationProperties.Name="儲存資料夾"/>
                 <Button Grid.Column="1" Content="瀏覽…" Click="PickFolder" AutomationProperties.Name="選擇資料夾"/>
             </Grid>
-            <CheckBox x:Name="DirectDownload" Grid.Row="5" Grid.Column="1" Content="直接開始下載"
+            <CheckBox x:Name="DirectDownload" Grid.Row="5" Grid.Column="1" Content="直接開始下載" Margin="0,0,0,14"
                       Checked="DirectChanged" Unchecked="DirectChanged"/>
-            <StackPanel x:Name="ManualActions" Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <StackPanel x:Name="ManualActions" Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,14">
                 <Button x:Name="AdvancedButton" Style="{ThemeResource SubtleButtonStyle}"
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                         AutomationProperties.Name="這次下載的設定" ToolTipService.ToolTip="這次下載的設定">
