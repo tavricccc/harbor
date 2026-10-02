@@ -12,7 +12,7 @@ public sealed partial class SettingsPage : Page
     private readonly DownloadsViewModel vm;
     private readonly nint windowHandle;
     private readonly SettingsFields fields = new();
-    private readonly InfoBar message = new() { IsClosable = true };
+    private readonly InfoBar message = new() { IsClosable = true, Visibility = Visibility.Collapsed };
     private readonly Pivot sections = new();
     private readonly ComboBox theme = new() { Header = "佈景主題", HorizontalAlignment = HorizontalAlignment.Stretch, Items = { "跟隨 Windows", "淺色", "深色" }, SelectedIndex = 0 };
     private readonly CheckBox remember = new() { Content = "記住上次使用的下載位置" };
@@ -37,18 +37,19 @@ public sealed partial class SettingsPage : Page
 
         var surface = new Grid { Padding = new Thickness(24, 16, 24, 20), RowSpacing = 16 };
         surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         surface.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        surface.Children.Add(new TextBlock { Text = "設定", Style = (Style)Application.Current.Resources["TitleTextBlockStyle"] });
-        Grid.SetRow(message, 1); surface.Children.Add(message);
-        Grid.SetRow(sections, 2); surface.Children.Add(sections);
+        var header = new StackPanel { Spacing = 16 };
+        header.Children.Add(new TextBlock { Text = "設定", Style = (Style)Application.Current.Resources["TitleTextBlockStyle"] });
+        header.Children.Add(message); surface.Children.Add(header);
+        message.RegisterPropertyChangedCallback(InfoBar.IsOpenProperty, (_, _) => message.Visibility = message.IsOpen ? Visibility.Visible : Visibility.Collapsed);
+        Grid.SetRow(sections, 1); surface.Children.Add(sections);
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };
         var cancel = NativeButtons.Create("取消", "\uE711"); cancel.Click += (_, _) => CloseRequested?.Invoke();
         var save = NativeButtons.Create("儲存", "\uE74E", true); save.Click += Save;
         actions.Children.Add(cancel); actions.Children.Add(save);
-        Grid.SetRow(actions, 3); surface.Children.Add(actions);
+        Grid.SetRow(actions, 2); surface.Children.Add(actions);
         Content = surface; Loaded += Load;
     }
 
