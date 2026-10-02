@@ -78,6 +78,7 @@ public sealed partial class DownloadForm : UserControl
    (link.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || link.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase)) ? "BT" : "檔案";
   Files.Visibility = Visibility.Collapsed;
   FileSelectionActions.Visibility = Visibility.Collapsed;
+  FilesSurface.Visibility = Visibility.Collapsed;
   Preview.Text = DirectDownload.IsChecked == true ? "開始下載後才會知道" : "檢查連結後顯示";
  }
  private void DirectChanged(object sender, RoutedEventArgs e) { if (Files is not null) InvalidateResolution(); }
@@ -157,7 +158,7 @@ public sealed partial class DownloadForm : UserControl
    Preview.Text = size > 0 ? DownloadItem.FormatBytes(size) : "由來源於下載時提供";
    Files.Items.Clear(); var index = 0;
    foreach (var file in resource["files"]!.AsArray()) Files.Items.Add(new ResolvedFile(index++, Path.Combine(file!["path"]?.GetValue<string>() ?? "", file["name"]!.GetValue<string>()), file["size"]!.GetValue<long>()));
-   Files.SelectAll(); Files.Visibility = Files.Items.Count > 1 ? Visibility.Visible : Visibility.Collapsed; FileSelectionActions.Visibility = Files.Visibility;
+   Files.SelectAll(); Files.Visibility = Files.Items.Count > 1 ? Visibility.Visible : Visibility.Collapsed; FileSelectionActions.Visibility = FilesSurface.Visibility = Files.Visibility;
    if (initial?["opts"]?["selectFiles"] is JsonArray selected && selected.Count > 0) { var indexes = selected.Select(x => x!.GetValue<int>()).ToHashSet(); foreach (var file in Files.SelectedItems.Cast<ResolvedFile>().ToList()) if (!indexes.Contains(file.Index)) Files.SelectedItems.Remove(file); }
    if (initial is not null && Files.Items.Count == 1 && FileName.Text.Length == 0) FileName.Text = displayName;
    SetAction("開始下載");

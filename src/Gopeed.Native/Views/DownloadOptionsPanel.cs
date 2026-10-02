@@ -45,7 +45,7 @@ internal sealed class DownloadOptionsPanel : StackPanel
         foreach (var control in controls) section.Children.Add(control);
         return section;
     }
-    private static Grid Pair(UIElement first, UIElement second)
+    private static Grid Pair(FrameworkElement first, FrameworkElement second)
     {
         var row = new Grid { ColumnSpacing = 12 };
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
