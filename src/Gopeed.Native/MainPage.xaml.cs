@@ -15,11 +15,12 @@ public sealed partial class MainPage : Page
  public DownloadsViewModel ViewModel { get; } = new();
  private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
  private bool refreshing;
+ private SettingsWindow? settingsWindow;
  private readonly TaskCompletionSource ready = new();
  public MainPage()
  {
   InitializeComponent(); Loaded += Start;
-  Unloaded += (_, _) => { timer.Stop(); ViewModel.Dispose(); };
+  Unloaded += (_, _) => { timer.Stop(); settingsWindow?.Close(); ViewModel.Dispose(); };
   ViewModel.VisibleItems.CollectionChanged += (_, _) => EmptyState.Visibility = ViewModel.VisibleItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
   ViewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(ViewModel.Error) && ViewModel.Error.Length > 0) { ErrorBar.Message = ViewModel.Error; ErrorBar.IsOpen = true; } };
   timer.Tick += async (_, _) => { if (refreshing || !ViewModel.IsConnected) return; refreshing = true; await ViewModel.RefreshAsync(); refreshing = false; };
@@ -122,6 +123,12 @@ public sealed partial class MainPage : Page
  private async void RefreshShortcut(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { await ViewModel.RefreshAsync(); e.Handled = true; }
  private void OpenSection(Page page) { DownloadsSurface.Visibility = Visibility.Collapsed; DownloadsCommands.Visibility = Visibility.Collapsed; SettingsFrame.Content = page; SettingsFrame.Visibility = Visibility.Visible; BackToDownloads.Visibility = Visibility.Visible; }
  private void ShowDownloads(object sender, RoutedEventArgs args) { SettingsFrame.Content = null; SettingsFrame.Visibility = Visibility.Collapsed; DownloadsSurface.Visibility = Visibility.Visible; DownloadsCommands.Visibility = Visibility.Visible; BackToDownloads.Visibility = Visibility.Collapsed; }
- private void ShowSettings(object sender, RoutedEventArgs args) => OpenSection(new SettingsPage(ViewModel));
+ private void ShowSettings(object sender, RoutedEventArgs args)
+ {
+  if (settingsWindow is not null) { settingsWindow.Activate(); return; }
+  settingsWindow = new SettingsWindow(ViewModel);
+  settingsWindow.Closed += (_, _) => settingsWindow = null;
+  settingsWindow.Activate();
+ }
  private void ShowExtensions(object sender, RoutedEventArgs args) => OpenSection(new ExtensionsPage(ViewModel));
 }

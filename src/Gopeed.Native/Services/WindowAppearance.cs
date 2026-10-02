@@ -28,17 +28,9 @@ public static class WindowAppearance
 
     private static void SyncTitleBar(Window window, FrameworkElement root)
     {
-        var foreground = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
-            ? new Windows.UI.ViewManagement.UISettings().GetColorValue(Windows.UI.ViewManagement.UIColorType.Foreground)
-            : root.ActualTheme == ElementTheme.Dark ? Microsoft.UI.Colors.White : Microsoft.UI.Colors.Black;
-        var bar = window.AppWindow.TitleBar;
-        bar.ButtonForegroundColor = foreground;
-        bar.ButtonInactiveForegroundColor = foreground;
-        bar.ButtonHoverForegroundColor = foreground;
-        bar.ButtonPressedForegroundColor = foreground;
-        bar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
-        bar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
-        bar.ButtonHoverBackgroundColor = root.ActualTheme == ElementTheme.Dark ? Microsoft.UI.Colors.DarkGray : Microsoft.UI.Colors.LightGray;
+        var dark = !new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
+            && root.ActualTheme == ElementTheme.Dark ? 1 : 0;
+        DwmSetWindowAttribute(WinRT.Interop.WindowNative.GetWindowHandle(window), 20, ref dark, sizeof(int));
     }
 
     [DllImport("dwmapi.dll")]

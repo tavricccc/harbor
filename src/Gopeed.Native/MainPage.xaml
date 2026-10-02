@@ -141,11 +141,13 @@
                             <TextBlock Grid.Column="3" Text="{x:Bind SpeedText, Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
                                 <Button Tag="{x:Bind Id}" Click="RowPrimary" Style="{StaticResource RowActionButtonStyle}"
+                                        Visibility="{x:Bind ActionVisibility, Mode=OneWay}"
                                         IsEnabled="{x:Bind CanAct, Mode=OneWay}" AutomationProperties.Name="{x:Bind PrimaryActionLabel, Mode=OneWay}"
                                         ToolTipService.ToolTip="{x:Bind PrimaryActionLabel, Mode=OneWay}">
                                     <FontIcon Glyph="{x:Bind PrimaryActionGlyph, Mode=OneWay}" FontSize="14"/>
                                 </Button>
                                 <Button Tag="{x:Bind Id}" Click="RowFolder" Style="{StaticResource RowActionButtonStyle}"
+                                        Visibility="{x:Bind FolderVisibility, Mode=OneWay}"
                                         AutomationProperties.Name="在資料夾中顯示" ToolTipService.ToolTip="在資料夾中顯示">
                                     <FontIcon Glyph="&#xE838;" FontSize="14"/>
                                 </Button>

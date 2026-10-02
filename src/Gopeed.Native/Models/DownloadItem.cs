@@ -45,6 +45,8 @@ public sealed class DownloadItem : ObservableObject
     public string FileGlyph => Data["meta"]?["res"]?["name"]?.GetValue<string>() is { Length: > 0 } ? "\uE8B7" : DownloadPresentation.FileGlyph(Name);
     public bool CanEditSource => Protocol == "HTTP" && (Status is "pause" or "error");
     public bool CanAct => PrimaryAction.Key != "none";
+    public Microsoft.UI.Xaml.Visibility ActionVisibility => CanAct ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Microsoft.UI.Xaml.Visibility FolderVisibility => IsComplete && !IsProcessing ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
     public string FilePath
     {
         get

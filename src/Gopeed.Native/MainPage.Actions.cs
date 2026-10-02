@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using System.Net.Http;
 using System.Text.Json.Nodes;
 using Gopeed_Native.Models;
 using Gopeed_Native.Services;
@@ -46,27 +45,8 @@ public sealed partial class MainPage
     private async void ContextEditSource(object sender, RoutedEventArgs args) { if (ContextItem(sender) is { CanEditSource: true } item) await EditSource(item); }
     private async Task EditSource(DownloadItem item)
     {
-        var source = new TextBox { Header = "來源網址", Text = item.Url }; var headers = new TextBox { Header = "HTTP 標頭", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 100, MaxHeight = 200 };
-        var request = item.Data["meta"]!["req"]!.DeepClone().AsObject();
-        if (request["extra"]?["header"] is JsonObject values) headers.Text = string.Join("\n", values.Select(x => $"{x.Key}: {x.Value}"));
-        var resume = new CheckBox { Content = "更新後繼續下載", IsChecked = true };
-        var message = new InfoBar { Severity = InfoBarSeverity.Error };
-        var panel = new StackPanel { Spacing = 12, Children = { message, source, headers, resume } };
-        var dialog = new ContentDialog { Title = "修改下載來源", Content = panel, PrimaryButtonText = "更新", CloseButtonText = "取消" };
-        dialog.PrimaryButtonClick += async (_, click) =>
-        {
-            var deferral = click.GetDeferral();
-            try
-            {
-                if (!Uri.TryCreate(source.Text.Trim(), UriKind.Absolute, out var url) || url.Scheme is not ("http" or "https")) throw new FormatException("請輸入有效的 HTTP 或 HTTPS 來源網址。");
-                request["url"] = url.AbsoluteUri; request["extra"] ??= new JsonObject(); request["extra"]!["header"] = HttpHeaders.Parse(headers.Text);
-                await ViewModel.Core.SendAsync(HttpMethod.Patch, "tasks/" + item.Id, new JsonObject { ["req"] = request.DeepClone() });
-                if (resume.IsChecked == true) await ViewModel.Core.SendAsync(HttpMethod.Put, "tasks/" + item.Id + "/continue");
-            }
-            catch (Exception error) { click.Cancel = true; message.Message = UserError.Message(error); message.IsOpen = true; }
-            finally { deferral.Complete(); }
-        };
-        await NativeDialogs.ShowAsync(dialog, XamlRoot); await ViewModel.RefreshAsync();
+        await NativeDialogs.ShowAsync(new DownloadSourceDialog(ViewModel.Core, item), XamlRoot);
+        await ViewModel.RefreshAsync();
     }
     private async void ContextDetails(object sender, RoutedEventArgs args) { if (ContextItem(sender) is { } item) await NativeDialogs.ShowAsync(new TaskDetailsDialog(ViewModel.Core, item), XamlRoot); }
     private void ContextListenSource(object sender, RoutedEventArgs args)
