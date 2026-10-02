@@ -14,13 +14,14 @@ public sealed partial class DownloadConfirmationPage : Page
     public double PreferredHeight(double width)
     {
         Footer.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity));
-        return form.MeasureContentHeight(width - 56) + 48 + Footer.DesiredSize.Height;
+        return form.MeasureContentHeight(width - 48) + 36 + Footer.DesiredSize.Height;
     }
     public DownloadConfirmationPage(CoreClient core, JsonObject request, nint owner, bool compact = true)
     {
         InitializeComponent();
         form = new DownloadForm(core, request, owner, compact);
         FormHost.Content = form;
+        Actions.Children.Insert(0, form.DetachOptionsButton());
         form.StateChanged += () => { StartButton.Content = form.ActionText; StartButton.IsEnabled = !form.IsBusy; };
         form.LayoutChanged += () => LayoutChanged?.Invoke();
     }

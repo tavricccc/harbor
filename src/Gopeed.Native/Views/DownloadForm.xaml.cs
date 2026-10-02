@@ -15,7 +15,6 @@ public sealed partial class DownloadForm : UserControl
  private readonly JsonObject? initial;
  private readonly nint owner;
  private string lastInput = "";
- private readonly bool compact;
  private readonly DownloadOptionsPanel requestOptions = new();
  public string? CreatedTaskId { get; private set; }
  public string ActionText { get; private set; } = "檢查連結";
@@ -25,12 +24,12 @@ public sealed partial class DownloadForm : UserControl
  public double MeasureContentHeight(double width) { FormContent.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity)); return FormContent.DesiredSize.Height; }
  public DownloadForm(CoreClient core, JsonObject? initial = null, nint? owner = null, bool compact = false)
  {
-  this.core = core; this.initial = initial; this.owner = owner ?? App.WindowHandle; this.compact = compact; InitializeComponent();
+  this.core = core; this.initial = initial; this.owner = owner ?? App.WindowHandle; InitializeComponent();
   OptionsSurface.Children.Add(requestOptions);
   requestOptions.RequestChanged += InvalidateResolution;
   Headers.TextChanged += (_, _) => InvalidateResolution();
   FormContent.SizeChanged += (_, _) => LayoutChanged?.Invoke();
-  if (compact) { Links.AcceptsReturn = false; Links.TextWrapping = TextWrapping.NoWrap; Links.MinHeight = 36; Links.MaxHeight = double.PositiveInfinity; ManualActions.Visibility = Visibility.Collapsed; }
+  if (compact) { Links.AcceptsReturn = false; Links.TextWrapping = TextWrapping.NoWrap; Links.MinHeight = 32; Links.MaxHeight = double.PositiveInfinity; ManualActions.Visibility = Visibility.Collapsed; }
   Loaded += InitializeForm;
  }
  private async void InitializeForm(object sender, RoutedEventArgs e)
@@ -42,7 +41,7 @@ public sealed partial class DownloadForm : UserControl
    requestOptions.Load(initial, config); Connections.Value = config["protocolConfig"]?["http"]?["connections"]?.GetValue<int>() ?? 8;
    DirectDownload.IsChecked = config["extra"]?["defaultDirectDownload"]?.GetValue<bool>() == true;
    foreach (var category in CategoriesEditor.Read(config)) Category.Items.Add(new ComboBoxItem { Content = category.Name, Tag = category.Path });
-   Category.Visibility = Category.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+   CategoryLabel.Visibility = Category.Visibility = Category.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
    var prefs = UiPreferences.Load();
    if (prefs.RememberDownloadDirectory && prefs.LastDownloadDirectory.Length > 0) Destination.Text = prefs.LastDownloadDirectory;
    if (Destination.Text.Length == 0) Destination.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
@@ -64,8 +63,23 @@ public sealed partial class DownloadForm : UserControl
   if (initial["opts"]?["extra"]?["connections"] is JsonValue connections) Connections.Value = connections.GetValue<int>();
   if (initial["req"]?["extra"]?["header"] is JsonObject headers) Headers.Text = string.Join("\n", headers.Select(pair => $"{pair.Key}: {pair.Value}"));
  }
+ public Button DetachOptionsButton()
+ {
+  ManualActions.Children.Remove(AdvancedButton);
+  return AdvancedButton;
+ }
  private void InputChanged(object s, TextChangedEventArgs e) { if (Files is null || lastInput == Links.Text) return; lastInput = Links.Text; InvalidateResolution(); }
- private void InvalidateResolution() { resolved = null; var count = ConfigJson.Lines(Links.Text).Length; SetAction(count > 1 ? $"開始 {count} 個下載" : DirectDownload.IsChecked == true ? "開始下載" : "檢查連結"); Files.Visibility = Visibility.Collapsed; FileSelectionActions.Visibility = Visibility.Collapsed; Preview.Text = ""; }
+ private void InvalidateResolution()
+ {
+  resolved = null;
+  var links = ConfigJson.Lines(Links.Text);
+  SetAction(links.Length > 1 ? $"開始 {links.Length} 個下載" : DirectDownload.IsChecked == true ? "開始下載" : "檢查連結");
+  KindLabel.Text = links.Length > 1 ? "批次" : links.FirstOrDefault() is { } link &&
+   (link.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || link.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase)) ? "BT" : "檔案";
+  Files.Visibility = Visibility.Collapsed;
+  FileSelectionActions.Visibility = Visibility.Collapsed;
+  Preview.Text = DirectDownload.IsChecked == true ? "開始下載後才會知道" : "檢查連結後顯示";
+ }
  private void DirectChanged(object sender, RoutedEventArgs e) { if (Files is not null) InvalidateResolution(); }
  private void CategoryChanged(object sender, SelectionChangedEventArgs e) { if (Category.SelectedItem is ComboBoxItem item) Destination.Text = (string)item.Tag; }
  private async void PickFolder(object s, RoutedEventArgs e)

@@ -7,12 +7,12 @@ namespace Gopeed_Native.Views;
 
 internal sealed class DownloadOptionsPanel : StackPanel
 {
-    private readonly ComboBox method = new() { Header = "HTTP 方法", IsEditable = true, Items = { "GET", "POST", "PUT", "HEAD" }, SelectedIndex = 0 };
-    private readonly TextBox body = new() { Header = "請求內容", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 80, MaxHeight = 160 };
+    private readonly ComboBox method = new() { Header = "方法", IsEditable = true, Items = { "GET", "POST", "PUT", "HEAD" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+    private readonly TextBox body = new() { Header = "請求內容", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 64, MaxHeight = 160 };
     private readonly CheckBox skipCert = new() { Content = "略過 HTTPS 憑證驗證" };
-    private readonly TextBox trackers = new() { Header = "BT Tracker（每行一個）", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 80, MaxHeight = 160 };
-    private readonly ComboBox proxyMode = new() { Header = "代理伺服器", Items = { "使用預設值", "直接連線", "自訂" }, SelectedIndex = 0 };
-    private readonly ComboBox scheme = new() { Header = "代理協定", Items = { "http", "https", "socks5" }, SelectedIndex = 0 };
+    private readonly TextBox trackers = new() { Header = "Tracker（每行一個）", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 64, MaxHeight = 160 };
+    private readonly ComboBox proxyMode = new() { Header = "連線方式", Items = { "使用預設值", "直接連線", "自訂" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+    private readonly ComboBox scheme = new() { Header = "協定", Items = { "http", "https", "socks5" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
     private readonly TextBox host = new() { Header = "主機與連接埠" };
     private readonly TextBox user = new() { Header = "使用者名稱" };
     private readonly PasswordBox password = new() { Header = "密碼" };
@@ -21,19 +21,41 @@ internal sealed class DownloadOptionsPanel : StackPanel
     private readonly ComboBox extract = Choice("自動解壓縮");
     private readonly PasswordBox archivePassword = new() { Header = "壓縮檔密碼" };
     private readonly CheckBox deleteArchive = new() { Content = "解壓縮成功後刪除壓縮檔" };
+    private readonly StackPanel customProxy = new() { Spacing = 12, Visibility = Visibility.Collapsed };
     public event Action? RequestChanged;
     public DownloadOptionsPanel()
     {
-        Spacing = 12;
-        foreach (var control in new UIElement[] { method, body, skipCert, trackers, proxyMode, scheme, host, user, password, autoTorrent, deleteTorrent, extract, archivePassword, deleteArchive }) Children.Add(control);
+        Spacing = 20;
+        Children.Add(Section("HTTP", method, body, skipCert));
+        Children.Add(Section("BitTorrent", trackers, autoTorrent, deleteTorrent));
+        customProxy.Children.Add(Pair(scheme, host));
+        customProxy.Children.Add(Pair(user, password));
+        Children.Add(Section("代理伺服器", proxyMode, customProxy));
+        Children.Add(Section("解壓縮", Pair(extract, archivePassword), deleteArchive));
         method.SelectionChanged += (_, _) => RequestChanged?.Invoke(); method.TextSubmitted += (_, _) => RequestChanged?.Invoke();
         body.TextChanged += (_, _) => RequestChanged?.Invoke(); trackers.TextChanged += (_, _) => RequestChanged?.Invoke();
-        proxyMode.SelectionChanged += (_, _) => { var custom = proxyMode.SelectedIndex == 2; foreach (var field in new Control[] { scheme, host, user, password }) field.IsEnabled = custom; RequestChanged?.Invoke(); };
-        foreach (var field in new Control[] { scheme, host, user, password }) field.IsEnabled = false;
+        proxyMode.SelectionChanged += (_, _) => { customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed; RequestChanged?.Invoke(); };
         host.TextChanged += (_, _) => RequestChanged?.Invoke(); user.TextChanged += (_, _) => RequestChanged?.Invoke(); password.PasswordChanged += (_, _) => RequestChanged?.Invoke(); scheme.SelectionChanged += (_, _) => RequestChanged?.Invoke();
         skipCert.Checked += (_, _) => RequestChanged?.Invoke(); skipCert.Unchecked += (_, _) => RequestChanged?.Invoke();
     }
-    private static ComboBox Choice(string title) => new() { Header = title, Items = { "使用預設值", "啟用", "停用" }, SelectedIndex = 0 };
+    private static StackPanel Section(string title, params UIElement[] controls)
+    {
+        var section = new StackPanel { Spacing = 12 };
+        section.Children.Add(new TextBlock { Text = title, Style = (Style)Application.Current.Resources["CompactSectionTitleStyle"], FontSize = 14 });
+        foreach (var control in controls) section.Children.Add(control);
+        return section;
+    }
+    private static Grid Pair(UIElement first, UIElement second)
+    {
+        var row = new Grid { ColumnSpacing = 12 };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.Children.Add(first);
+        Grid.SetColumn(second, 1);
+        row.Children.Add(second);
+        return row;
+    }
+    private static ComboBox Choice(string title) => new() { Header = title, Items = { "使用預設值", "啟用", "停用" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
     public void Load(JsonObject? initial, JsonNode config)
     {
         var req = initial?["req"]; method.Text = req?["extra"]?["method"]?.GetValue<string>() ?? "GET"; body.Text = req?["extra"]?["body"]?.GetValue<string>() ?? "";
