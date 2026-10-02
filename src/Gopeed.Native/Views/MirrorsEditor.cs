@@ -23,6 +23,7 @@ internal sealed class MirrorsEditor : StackPanel
     public MirrorsEditor()
     {
         Spacing = 16;
+        NativeInfoBars.CollapseWhenClosed(message);
         AutomationProperties.SetName(type, "鏡像類型"); AutomationProperties.SetName(url, "鏡像網址");
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""

@@ -20,6 +20,7 @@ public sealed class DownloadSourceDialog : ContentDialog
 
     public DownloadSourceDialog(CoreClient core, DownloadItem item)
     {
+        NativeInfoBars.CollapseWhenClosed(error);
         this.core = core;
         this.item = item;
         request = item.Data["meta"]!["req"]!.DeepClone().AsObject();

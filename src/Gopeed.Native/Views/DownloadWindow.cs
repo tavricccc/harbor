@@ -72,6 +72,7 @@ public sealed class DownloadWindow : Window
         {
             var item = new Gopeed_Native.Models.DownloadItem((await core.GetAsync("tasks/" + Uri.EscapeDataString(pending)))!.AsObject());
             var error = new InfoBar { Severity = InfoBarSeverity.Error };
+            NativeInfoBars.CollapseWhenClosed(error);
             var panel = new StackPanel { Spacing = 12, Children = { error, new TextBlock { Text = item.Name, TextWrapping = TextWrapping.Wrap }, new TextBlock { Text = request["req"]?["url"]?.GetValue<string>() ?? "", TextWrapping = TextWrapping.Wrap } } };
             var dialog = new ContentDialog { Title = "用此連結繼續原本的下載？", Content = panel, PrimaryButtonText = "更新並繼續", IsPrimaryButtonEnabled = item.CanEditSource, SecondaryButtonText = "建立新下載", CloseButtonText = "取消" };
             dialog.PrimaryButtonClick += async (_, click) => { var deferral = click.GetDeferral(); try { await core.SendAsync(System.Net.Http.HttpMethod.Patch, "tasks/" + pending, new JsonObject { ["req"] = request["req"]!.DeepClone() }); await core.SendAsync(System.Net.Http.HttpMethod.Put, "tasks/" + pending + "/continue"); } catch (Exception failure) { click.Cancel = true; error.Message = UserError.Message(failure); error.IsOpen = true; } finally { deferral.Complete(); } };

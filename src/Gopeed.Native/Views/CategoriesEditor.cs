@@ -20,6 +20,7 @@ internal sealed class CategoriesEditor : StackPanel
     public CategoriesEditor(nint windowHandle)
     {
         Spacing = 20;
+        NativeInfoBars.CollapseWhenClosed(message);
         AutomationProperties.SetName(name, "分類名稱"); AutomationProperties.SetName(path, "儲存位置");
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""

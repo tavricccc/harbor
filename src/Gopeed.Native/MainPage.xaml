@@ -56,7 +56,7 @@
             </CommandBar>
         </Grid>
 
-        <InfoBar x:Name="ErrorBar" Margin="20,0" IsOpen="False" Severity="Error" IsClosable="True"/>
+        <InfoBar x:Name="ErrorBar" Margin="20,0" IsOpen="False" Severity="Error" IsClosable="True" Visibility="Collapsed"/>
         </StackPanel>
         <Grid x:Name="DownloadsSurface" Grid.Row="1" RowSpacing="8">
             <Grid.RowDefinitions>

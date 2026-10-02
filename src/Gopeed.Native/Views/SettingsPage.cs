@@ -42,7 +42,7 @@ public sealed partial class SettingsPage : Page
         var header = new StackPanel { Spacing = 16 };
         header.Children.Add(new TextBlock { Text = "設定", Style = (Style)Application.Current.Resources["TitleTextBlockStyle"] });
         header.Children.Add(message); surface.Children.Add(header);
-        message.RegisterPropertyChangedCallback(InfoBar.IsOpenProperty, (_, _) => message.Visibility = message.IsOpen ? Visibility.Visible : Visibility.Collapsed);
+        NativeInfoBars.CollapseWhenClosed(message);
         Grid.SetRow(sections, 1); surface.Children.Add(sections);
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };

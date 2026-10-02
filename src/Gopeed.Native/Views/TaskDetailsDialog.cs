@@ -19,6 +19,7 @@ public sealed class TaskDetailsDialog : ContentDialog
     public TaskDetailsDialog(CoreClient core, DownloadItem item)
     {
         Title = "下載詳情"; CloseButtonText = "關閉";
+        NativeInfoBars.CollapseWhenClosed(errorBar);
         var tabs = new Pivot { MaxHeight = 440, MinWidth = 460 };
         tabs.Items.Add(new PivotItem { Header = "資訊", Content = Scroll(Information(item)) });
         tabs.Items.Add(new PivotItem { Header = "檔案", Content = Scroll(Files(item)) });
