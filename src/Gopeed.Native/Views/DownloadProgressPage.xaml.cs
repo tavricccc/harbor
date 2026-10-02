@@ -43,32 +43,30 @@ public sealed partial class DownloadProgressPage : Page
         try
         {
             item = new DownloadItem((await core.GetAsync("tasks/" + id))!.AsObject());
-            NativeButtons.SetContent(Primary, item.PrimaryAction.Label, item.PrimaryAction.Glyph);
+            Primary.Content = item.PrimaryAction.Label;
             Primary.IsEnabled = item.CanAct;
             FileName.Text = item.Name; FileName.CanDrag = item.IsComplete && !item.IsProcessing;
-            FileIcon.Glyph = item.FileGlyph;
+            KindLabel.Text = item.Url.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || item.Url.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase) ? "BT" : "檔案";
             ToolTipService.SetToolTip(FileName, item.Name);
-            Folder.Text = item.Folder; ToolTipService.SetToolTip(Folder, item.Folder); Source.Text = item.Url;
-            TransferLabel.Text = item.IsComplete ? "檔案大小" : "已下載／總大小";
+            Folder.Text = $"存到：{item.Folder}"; ToolTipService.SetToolTip(Folder, item.Folder); Source.Text = item.Url;
             Transfer.Text = item.TransferSizeText;
-            SpeedLabel.Text = item.Uploading ? "上傳速度" : "下載速度";
-            Speed.Text = item.SpeedText;
+            Speed.Text = $"{(item.Uploading ? "上傳" : "下載")}：{item.SpeedText}";
             Remaining.Text = item.RemainingText == "—" ? item.Status == "pause" ? "已暫停" : "計算中" : item.RemainingText;
             var finished = item.IsComplete && !item.IsProcessing && !item.Uploading;
-            SpeedMetric.Visibility = finished ? Visibility.Collapsed : Visibility.Visible;
-            RemainingMetric.Visibility = item.IsComplete ? Visibility.Collapsed : Visibility.Visible;
-            Metrics.ColumnDefinitions[1].Width = finished ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+            Primary.Style = (Style)Application.Current.Resources[finished || item.Status == "error" ? "AccentButtonStyle" : "DefaultButtonStyle"];
+            Speed.Visibility = finished ? Visibility.Collapsed : Visibility.Visible;
+            Remaining.Visibility = item.IsComplete ? Visibility.Collapsed : Visibility.Visible;
+            Metrics.ColumnDefinitions[1].Width = finished ? new GridLength(0) : GridLength.Auto;
             Metrics.ColumnDefinitions[2].Width = item.IsComplete ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
             Status.Text = item.IsProcessing ? item.ExtractionText : item.ExtractionStatus == "error"
                 ? "解壓縮失敗，原始檔案仍可開啟。" : item.Uploading ? $"做種中 · 已上傳 {DownloadItem.FormatBytes(item.Uploaded)}" : item.StatusText;
-            ProgressSection.Visibility = finished && item.ExtractionStatus != "error" ? Visibility.Collapsed : Visibility.Visible;
             Percent.Text = item.Size > 0 && !item.IsComplete ? $"{item.Percent:0.0}%" : "";
             Progress.Value = item.IsProcessing ? item.Data["progress"]?["extractProgress"]?.GetValue<double>() ?? 0 : item.Percent;
-            Progress.Visibility = item.IsComplete && !item.IsProcessing || item.Size <= 0 ? Visibility.Collapsed : Visibility.Visible;
+            Progress.Visibility = item.IsProcessing || item.IsComplete || item.Size > 0 ? Visibility.Visible : Visibility.Collapsed;
             CloseAfterOpen.Visibility = finished ? Visibility.Visible : Visibility.Collapsed;
             Browse.Visibility = item.IsComplete ? Visibility.Visible : Visibility.Collapsed;
             StopSeed.Visibility = item.Uploading ? Visibility.Visible : Visibility.Collapsed;
-            TitleChanged?.Invoke(item.StatusText); LayoutChanged?.Invoke();
+            TitleChanged?.Invoke($"{item.Name} - {item.StatusText}"); LayoutChanged?.Invoke();
             if (finished) timer.Stop();
         }
         catch (Exception failure) { ShowError(failure); }

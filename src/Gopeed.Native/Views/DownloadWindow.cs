@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Gopeed_Native.Services;
 using System.Text.Json.Nodes;
 
@@ -10,7 +9,6 @@ public sealed class DownloadWindow : Window
 {
     private readonly Grid surface = new();
     private readonly Grid pageHost = new();
-    private readonly TitleBar header = new() { Title = "新增下載", Height = 48 };
     private readonly CoreClient core = new();
     private readonly JsonObject request;
     private readonly bool compact;
@@ -25,16 +23,11 @@ public sealed class DownloadWindow : Window
     public DownloadWindow(JsonObject request, bool compact = true)
     {
         this.request = request; this.compact = compact;
-        Title = "確認下載 · Gopeed Native";
+        Title = "新增下載";
         surface.RequestedTheme = WindowAppearance.Theme;
         surface.Style = (Style)Application.Current.Resources["DownloadSurfaceStyle"];
-        surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        surface.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        header.IconSource = new ImageIconSource { ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/Square44x44Logo.scale-200.png")) };
-        surface.Children.Add(header); Grid.SetRow(pageHost, 1); surface.Children.Add(pageHost);
+        surface.Children.Add(pageHost);
         Content = surface;
-        ExtendsContentIntoTitleBar = true; SetTitleBar(header);
-        AppWindow.TitleBar.PreferredHeightOption = Microsoft.UI.Windowing.TitleBarHeightOption.Tall;
         WindowAppearance.ApplyFrame(this, surface);
         var scale = GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
         var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
@@ -43,7 +36,7 @@ public sealed class DownloadWindow : Window
         if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
         {
             presenter.PreferredMinimumWidth = (int)(600 * scale);
-            presenter.PreferredMinimumHeight = (int)(240 * scale);
+            presenter.PreferredMinimumHeight = (int)(140 * scale);
             presenter.IsMaximizable = false;
             presenter.IsMinimizable = false;
             presenter.IsAlwaysOnTop = true;
@@ -98,12 +91,12 @@ public sealed class DownloadWindow : Window
 
     private void ShowProgress(string id)
     {
-        Title = "下載進度 · Gopeed Native";
+        Title = "下載進度";
         pageHost.Children.Clear();
         progress = new DownloadProgressPage(core, id, Close); pageHost.Children.Add(progress);
         preferredHeight = progress.PreferredHeight;
         progress.LayoutChanged += RequestFit;
-        progress.TitleChanged += title => { header.Title = title; Title = title + " · Gopeed Native"; };
+        progress.TitleChanged += title => Title = title;
         if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter) { presenter.IsAlwaysOnTop = false; presenter.IsMinimizable = true; }
         RequestFit();
     }
@@ -117,7 +110,7 @@ public sealed class DownloadWindow : Window
             var scale = surface.XamlRoot.RasterizationScale;
             var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
             var width = Math.Min(ContentWidth, area.Width / scale - 24);
-            var height = Math.Clamp(preferredHeight(width) + header.ActualHeight, 240, area.Height / scale - 48);
+            var height = Math.Clamp(preferredHeight(width), 140, area.Height / scale - 48);
             var size = new Windows.Graphics.SizeInt32((int)Math.Round(width * scale), (int)Math.Ceiling(height * scale));
             if (size.Width == lastClientSize.Width && size.Height == lastClientSize.Height) return;
             if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter) presenter.IsResizable = true;

@@ -5,56 +5,48 @@
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="Body" Padding="28,24" Spacing="20">
+            <StackPanel x:Name="Body" Padding="24,20,24,16" Spacing="12">
                 <InfoBar x:Name="Error" Severity="Error" Visibility="Collapsed" Closed="HideError"/>
-                <Grid ColumnSpacing="16">
+                <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <FontIcon x:Name="FileIcon" FontSize="24" VerticalAlignment="Top" Margin="0,3,0,0"
-                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <TextBlock x:Name="FileName" Grid.Column="1" FontFamily="{StaticResource HeadingFontFamily}"
-                               FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"
+                    <Border VerticalAlignment="Center" CornerRadius="4" Padding="6,2"
+                            Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
+                            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1">
+                        <TextBlock x:Name="KindLabel" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </Border>
+                    <TextBlock x:Name="FileName" Grid.Column="1" FontSize="14" VerticalAlignment="Center" MaxLines="1"
                                TextTrimming="CharacterEllipsis" DragStarting="DragFile"/>
                 </Grid>
-                <StackPanel Spacing="6">
-                    <TextBlock Text="儲存位置" Style="{StaticResource SecondaryTextBlockStyle}"/>
-                    <TextBlock x:Name="Folder" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
-                </StackPanel>
-                <Grid x:Name="Metrics" ColumnSpacing="24">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <StackPanel Spacing="6">
-                        <TextBlock x:Name="TransferLabel" Text="已下載／總大小" Style="{StaticResource SecondaryTextBlockStyle}"/>
-                        <TextBlock x:Name="Transfer" TextWrapping="Wrap" FontWeight="Medium"/>
-                    </StackPanel>
-                    <StackPanel x:Name="SpeedMetric" Grid.Column="1" Spacing="6">
-                        <TextBlock x:Name="SpeedLabel" Text="下載速度" Style="{StaticResource SecondaryTextBlockStyle}"/>
-                        <TextBlock x:Name="Speed" TextWrapping="Wrap" FontWeight="Medium"/>
-                    </StackPanel>
-                    <StackPanel x:Name="RemainingMetric" Grid.Column="2" Spacing="6">
-                        <TextBlock Text="剩餘時間" Style="{StaticResource SecondaryTextBlockStyle}"/>
-                        <TextBlock x:Name="Remaining" TextWrapping="Wrap" FontWeight="Medium"/>
-                    </StackPanel>
+                <TextBlock x:Name="Folder" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
+                <Grid x:Name="Metrics" ColumnSpacing="12" Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <TextBlock x:Name="Transfer" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock x:Name="Speed" Grid.Column="1" FontSize="12" HorizontalAlignment="Center" AutomationProperties.Name="下載速度"/>
+                    <TextBlock x:Name="Remaining" Grid.Column="2" FontSize="12" HorizontalAlignment="Right"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" AutomationProperties.Name="剩餘時間"/>
                 </Grid>
-                <StackPanel x:Name="ProgressSection" Spacing="10">
-                    <Grid ColumnSpacing="20">
+                <StackPanel x:Name="ProgressSection" Spacing="12">
+                    <ProgressBar x:Name="Progress" Maximum="100" IsIndeterminate="False" Margin="0,2,0,2" AutomationProperties.Name="下載進度"/>
+                    <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <TextBlock x:Name="Status" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="Percent" Grid.Column="1" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="Status" FontSize="12" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="Percent" Grid.Column="1" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     </Grid>
-                    <ProgressBar x:Name="Progress" Maximum="100" IsIndeterminate="False" AutomationProperties.Name="下載進度"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
         <Border x:Name="Footer" Grid.Row="1" Style="{StaticResource DownloadFooterStyle}">
-            <Grid ColumnSpacing="20">
+            <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <Button HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource SubtleButtonStyle}"
                         AutomationProperties.Name="更多選項" ToolTipService.ToolTip="更多選項">
-                    <FontIcon Glyph="&#xE712;" FontSize="16"/>
+                    <FontIcon Glyph="&#xE70D;" FontSize="12"/>
                     <Button.Flyout>
                         <Flyout Placement="TopEdgeAlignedLeft">
-                            <ScrollViewer Width="420" MaxHeight="300">
+                            <ScrollViewer Width="440" MaxHeight="300">
                                 <StackPanel Spacing="16">
-                                    <TextBlock Text="來源網址" FontWeight="SemiBold"/>
+                                    <TextBlock Text="來源網址"/>
                                     <TextBlock x:Name="Source" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
                                     <Button Content="複製網址" Click="CopySource" HorizontalAlignment="Left"/>
                                     <CheckBox x:Name="CloseAfterOpen" Content="開啟檔案後關閉此視窗"
@@ -64,12 +56,11 @@
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                    <Button x:Name="Primary" Style="{StaticResource AccentButtonStyle}" Content="正在連接…"
-                            MinHeight="36" MinWidth="112" IsEnabled="False" Click="PrimaryClick" AutomationProperties.AutomationId="ProgressPrimary"/>
-                    <Button x:Name="Browse" Content="開啟資料夾" MinHeight="36" Visibility="Collapsed" Click="BrowseClick"/>
-                    <Button x:Name="StopSeed" Content="停止做種" MinHeight="36" Visibility="Collapsed" Click="StopSeedClick"/>
-                    <Button Content="關閉" MinHeight="36" MinWidth="76" Click="CloseClick" AutomationProperties.AutomationId="CloseProgress"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="Browse" Content="開啟資料夾" Visibility="Collapsed" Click="BrowseClick"/>
+                    <Button x:Name="StopSeed" Content="停止做種" Visibility="Collapsed" Click="StopSeedClick"/>
+                    <Button x:Name="Primary" Content="正在連接…" IsEnabled="False" Click="PrimaryClick" AutomationProperties.AutomationId="ProgressPrimary"/>
+                    <Button Content="關閉" Click="CloseClick" AutomationProperties.AutomationId="CloseProgress"/>
                 </StackPanel>
             </Grid>
         </Border>
