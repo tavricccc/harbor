@@ -2,24 +2,48 @@
 
 # Harbor
 
+![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4)
+![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
+![Go 1.27](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)
+![Gopeed 1.9.3](https://img.shields.io/badge/Gopeed-1.9.3-123D42)
+![License GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22C55E)
+
 Harbor 是 Windows 下載管理員，使用 WinUI 3 介面與 [Gopeed](https://github.com/GopeedLab/gopeed) 下載引擎。支援瀏覽器下載接管、HTTP 中斷續傳、BitTorrent，以及稍後下載與定時開始。介面使用繁體中文，隨 Windows 切換明暗主題。
 
 這是社群維護的 Gopeed fork，並非 Gopeed 官方發行版。原名 Gopeed Native，從 0.6.0 起改名為 Harbor。
 
 ## 下載與安裝
 
-目前版本：[Harbor 0.6.0](https://github.com/tavricccc/harbor/releases/tag/v0.6.0)，Windows x64 預覽版。
+目前版本：[Harbor 0.6.1](https://github.com/tavricccc/harbor/releases/tag/v0.6.1)，Windows x64 預覽版。
 
 | 檔案 | 用途 |
 | --- | --- |
-| [Harbor-Setup-0.6.0-x64.exe](https://github.com/tavricccc/harbor/releases/download/v0.6.0/Harbor-Setup-0.6.0-x64.exe) | 安裝版。建立開始功能表捷徑，註冊瀏覽器接管與下載協定，不需管理員權限。 |
-| [Harbor-Portable-0.6.0-x64.zip](https://github.com/tavricccc/harbor/releases/download/v0.6.0/Harbor-Portable-0.6.0-x64.zip) | 完整解壓縮後執行 `Gopeed.Native.exe`。 |
-| [Harbor-Source-0.6.0.zip](https://github.com/tavricccc/harbor/releases/download/v0.6.0/Harbor-Source-0.6.0.zip) | 完整原始碼，含固定版本的上游核心。 |
-| [SHA256SUMS.txt](https://github.com/tavricccc/harbor/releases/download/v0.6.0/SHA256SUMS.txt) | 核對下載檔案的 SHA-256。 |
+| [Harbor-Setup-0.6.1-x64.exe](https://github.com/tavricccc/harbor/releases/download/v0.6.1/Harbor-Setup-0.6.1-x64.exe) | 安裝版。建立開始功能表捷徑，註冊瀏覽器接管與下載協定，不需管理員權限。 |
+| [Harbor-Portable-0.6.1-x64.zip](https://github.com/tavricccc/harbor/releases/download/v0.6.1/Harbor-Portable-0.6.1-x64.zip) | 完整解壓縮後執行 `Gopeed.Native.exe`。 |
+| [Harbor-Source-0.6.1.zip](https://github.com/tavricccc/harbor/releases/download/v0.6.1/Harbor-Source-0.6.1.zip) | 完整原始碼，含固定版本的上游核心。 |
+| [SHA256SUMS.txt](https://github.com/tavricccc/harbor/releases/download/v0.6.1/SHA256SUMS.txt) | 核對下載檔案的 SHA-256。 |
 
 已在 Windows 11 x64 建置與安裝。安裝包包含 .NET 與 Windows App SDK runtime；Windows 10 尚未完成實機驗證。
 
 從 Gopeed Native 升級可直接執行安裝包，原有任務、設定與下載檔案會保留。程式檔名仍為 `Gopeed.Native.exe`，資料仍放在 `%LOCALAPPDATA%\GopeedNative`。
+
+## 安裝官方瀏覽器擴充套件
+
+要把網站下載交給 Harbor，還需要在瀏覽器另外安裝 **Gopeed 官方擴充套件**。用要接管下載的瀏覽器，開啟對應商店：
+
+| 瀏覽器 | 官方安裝頁 |
+| --- | --- |
+| Chrome | [Chrome Web Store：Gopeed](https://chromewebstore.google.com/detail/gopeed/mijpgljlfcapndmchhjffkpckknofcnd) |
+| Edge | [Microsoft Edge Add-ons：Gopeed](https://microsoftedge.microsoft.com/addons/detail/dkajnckekendchdleoaenoophcobooce) |
+| Firefox | [Firefox Add-ons：Gopeed](https://addons.mozilla.org/firefox/addon/gopeed-extension) |
+
+1. 在商店加入 Gopeed，並確認擴充套件已啟用。
+2. 開啟 Harbor 的「瀏覽器接管」引導。安裝版會註冊本機接管；Portable 版需按「啟用本機接管」。
+3. 在 Gopeed 擴充套件設定中關閉「遠端下載」。回到網站嘗試下載一個檔案，出現 Harbor 確認視窗就表示接管生效。
+
+本機接管不用填伺服器位址或 Token。首次開啟主視窗會顯示「安裝與設定」提示，略過後仍可從工具列的更多選單「瀏覽器接管」，或設定的「連線」分頁開啟引導。
+
+Harbor 顯示「本機接管已註冊」只代表下載器端就緒，擴充套件是否安裝需在瀏覽器確認。其他 Gopeed 安裝若改寫註冊，可在引導重新啟用；Portable 啟用後請保留資料夾位置。排除問題見 [瀏覽器接管指南](docs/browser-integration.md)，商店連結來源見 [Gopeed 官方說明](https://github.com/GopeedLab/browser-extension)。
 
 ## 開始下載
 
@@ -40,16 +64,6 @@ HTTP 來源失效時，暫停後可修改網址；也可選「用下一次瀏覽
 關閉介面後，背景核心會繼續下載和處理排程。電腦關機期間到期的項目，會在下次核心啟動時補執行。排程啟動失敗會保留項目與錯誤原因，修正後可手動重試。
 
 目前排程是單次開始；多個命名佇列、週期排程和全域限速尚未提供。
-
-## 瀏覽器接管
-
-安裝 Harbor 與 [Gopeed 官方擴充套件](https://github.com/GopeedLab/browser-extension)，並在擴充套件關閉「遠端下載」。本機接管不需填伺服器位址或 Token，安裝包會替 Chrome、Edge 和 Firefox 註冊 Native Messaging host。
-
-瀏覽器送來的下載會先開啟獨立確認視窗。按「開始下載」才建立任務，也可選稍後下載或排程；取消不會下載。確認窗會置頂，開始傳輸後解除置頂，顯示進度與完成操作。
-
-Portable 版可在設定的「連線」分頁按「啟用瀏覽器下載接管」註冊。啟用後請保留 Portable 資料夾位置。其他 Gopeed 安裝若改寫接管註冊，也可用這個按鈕重新啟用。
-
-Harbor 接受官方 `gopeed://` 連結。遠端 HTTP 連線設定仍在「連線」分頁，供需要手動設定位址與 Token 的使用者使用。
 
 ## 快捷鍵
 
@@ -91,6 +105,8 @@ pwsh -File scripts/source.ps1
 ## 驗證狀態
 
 0.6.0 已通過核心測試、ProtocolChecks、WinUI Release publish、安裝包與 Portable 打包。測試包含 HTTP 暫停與重啟續傳、排程保存與到期處理，以及本機 Tracker／種子的 BT 選檔傳輸和 SHA-256 比對。打包後也檢查了核心重啟、排程修改與移除。
+
+0.6.1 補上瀏覽器安裝引導並重新建置與打包；商店連結依官方擴充套件 README 核對。本機 host 註冊、擴充套件安裝與實際下載接管是不同檢查，Harbor 只顯示自身的註冊狀態。
 
 瀏覽器前景焦點、新版原生視覺、Narrator、高對比、公開 BT 網路和 eD2k 傳輸尚待實機驗收。此版仍列為預覽版。詳細範圍見 [0.6.0 維護紀錄](docs/harbor-0.6.0.md)；遠端建置結果以 [GitHub Actions](https://github.com/tavricccc/harbor/actions) 為準。
 
