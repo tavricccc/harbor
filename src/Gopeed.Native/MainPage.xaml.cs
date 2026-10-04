@@ -21,6 +21,7 @@ public sealed partial class MainPage : Page
  {
   InitializeComponent(); Loaded += Start;
   NativeInfoBars.CollapseWhenClosed(ErrorBar);
+  InitializeBrowserSetupHint();
   Unloaded += (_, _) => { timer.Stop(); settingsWindow?.Close(); ViewModel.Dispose(); };
   ViewModel.VisibleItems.CollectionChanged += (_, _) => EmptyState.Visibility = ViewModel.VisibleItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
   ViewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(ViewModel.Error) && ViewModel.Error.Length > 0) { ErrorBar.Message = ViewModel.Error; ErrorBar.IsOpen = true; } };

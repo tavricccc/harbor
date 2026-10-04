@@ -21,14 +21,7 @@ public sealed partial class SettingsPage
 
         var github = SettingsFields.Group(panel, "GitHub 鏡像"); github.Children.Add(mirrors);
         var browser = SettingsFields.Group(panel, "官方瀏覽器擴充功能");
-        browser.Children.Add(new HyperlinkButton { Content = "取得官方瀏覽器擴充功能", NavigateUri = new Uri("https://github.com/GopeedLab/browser-extension"), Padding = new Thickness(0) });
-        var enable = NativeButtons.Create("啟用瀏覽器下載接管", "\uE774");
-        enable.Click += (_, _) =>
-        {
-            try { WindowsIntegration.InstallBrowserHost(); Success("已啟用。請在官方擴充功能關閉遠端下載，改用本機接管。"); }
-            catch (Exception error) { Report(error); }
-        };
-        browser.Children.Add(enable);
+        browser.Children.Add(new BrowserIntegrationGuide());
         var remote = SettingsFields.Group(panel, "遠端下載連線");
         remote.Children.Add(SettingsFields.Description("在官方擴充功能選擇 HTTP，填入以下伺服器位址與 Token。"));
         remote.Children.Add(new TextBox { Header = "伺服器位址", IsReadOnly = true, Text = new Uri(vm.Core.ApiAddress).Authority });

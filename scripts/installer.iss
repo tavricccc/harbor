@@ -1,4 +1,4 @@
-#define AppVersion "0.6.0"
+#define AppVersion "0.6.1"
 [Setup]
 AppId={{B652BEF3-0741-4B5E-9066-C6F3EBF18622}
 AppName=Harbor

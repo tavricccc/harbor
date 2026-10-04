@@ -53,11 +53,16 @@
                     <AppBarButton Icon="SelectAll" Label="選取全部" Click="SelectAll"/>
                     <AppBarButton Icon="Refresh" Label="重新整理" Click="RefreshClicked"/>
                     <AppBarSeparator/>
+                    <AppBarButton Label="瀏覽器接管" Icon="Globe" Click="OpenBrowserSetup"/>
                     <AppBarButton Label="擴充功能" Icon="AllApps" Click="ShowExtensions" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
 
+        <InfoBar x:Name="BrowserSetupHint" Margin="20,0" IsOpen="False" Severity="Informational" IsClosable="True" Visibility="Collapsed"
+                 Title="要接管瀏覽器下載？" Message="Gopeed 官方擴充套件需另行安裝。" Closed="BrowserSetupHintClosed">
+            <InfoBar.ActionButton><Button Content="安裝與設定" Click="OpenBrowserSetup"/></InfoBar.ActionButton>
+        </InfoBar>
         <InfoBar x:Name="ErrorBar" Margin="20,0" IsOpen="False" Severity="Error" IsClosable="True" Visibility="Collapsed"/>
         </StackPanel>
         <Grid x:Name="DownloadsSurface" Grid.Row="1" RowSpacing="8">
