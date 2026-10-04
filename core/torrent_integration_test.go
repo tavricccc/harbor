@@ -53,6 +53,9 @@ func TestLocalTorrentSelectedFileTransfer(t *testing.T) {
 	seedConfig := torrent.NewDefaultClientConfig()
 	seedConfig.DataDir = filepath.Dir(source)
 	seedConfig.ListenPort = 0
+	// This fixture serves peers over TCP; avoid allocating a paired UDP port,
+	// which can be excluded independently on hosted Windows runners.
+	seedConfig.DisableUTP = true
 	seedConfig.DisableIPv6 = true
 	seedConfig.NoDHT = true
 	seedConfig.DisableTrackers = true
