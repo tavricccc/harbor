@@ -64,6 +64,7 @@ public partial class App : Application
         var instance = AppInstance.FindOrRegisterForKey("GopeedNative.Main");
         if (!instance.IsCurrent)
         {
+            Services.WindowActivation.AllowRedirect(instance.ProcessId);
             await instance.RedirectActivationToAsync(AppInstance.GetCurrent().GetActivatedEventArgs());
             Exit(); return;
         }
@@ -120,7 +121,7 @@ public partial class App : Application
         var window = new Views.DownloadWindow(request, compact);
         downloadWindows.Add(window);
         window.Closed += (_, _) => { downloadWindows.Remove(window); ReleaseRegistration(); };
-        window.Activate();
+        Services.WindowActivation.ShowConfirmation(window);
     }
     private void ReleaseRegistration()
     {
