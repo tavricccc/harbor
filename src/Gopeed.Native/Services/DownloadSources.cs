@@ -4,6 +4,10 @@ namespace Gopeed_Native.Services;
 
 public static class DownloadSources
 {
+    public static bool IsTorrent(string value) => value.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase)
+        || (Uri.TryCreate(value, UriKind.Absolute, out var uri) ? uri.AbsolutePath : value).EndsWith(".torrent", StringComparison.OrdinalIgnoreCase);
+    public static bool IsSupported(string value) => File.Exists(value) && value.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase)
+        || Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme is "magnet" or "ed2k" or "http" or "https";
     public static string? FromArguments(string arguments)
     {
         foreach (Match match in Regex.Matches(arguments, "\"([^\"]+)\"|(\\S+)"))

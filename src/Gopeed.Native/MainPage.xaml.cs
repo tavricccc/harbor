@@ -59,19 +59,29 @@ public sealed partial class MainPage : Page
  private async void PauseSelected(object s, RoutedEventArgs e) => await ViewModel.ActAsync("pause", ViewModel.Selection.Where(x => x.CanPause));
  private async void ResumeSelected(object s, RoutedEventArgs e) => await ViewModel.ActAsync("continue", ViewModel.Selection.Where(x => x.CanResume));
  private async void PauseAll(object s, RoutedEventArgs e) => await ViewModel.ActAsync("pause", ViewModel.AllItems.Where(i => i.CanPause));
- private async void ResumeAll(object s, RoutedEventArgs e) => await ViewModel.ActAsync("continue", ViewModel.AllItems.Where(i => i.CanResume));
+ private async void ResumeAll(object s, RoutedEventArgs e) => await ViewModel.ActAsync("continue", ViewModel.AllItems.Where(i => i.CanResume && (!i.IsDeferred || i.ScheduledAt is null)));
  private async void RefreshClicked(object s, RoutedEventArgs e) => await ViewModel.RefreshAsync();
  private void OpenSelected(object s, RoutedEventArgs e) { try { if (ViewModel.Selected is { IsComplete: true } item) FileActions.Open(item.OpenPath); } catch (Exception ex) { ViewModel.Error = UserError.Message(ex); } }
  private void CopySelected(object s, RoutedEventArgs e) => FileActions.Copy(string.Join("\n", ViewModel.Selection.Select(x => x.Url)));
  private async void PasteDownload(object s, RoutedEventArgs e)
  {
-  try { var content = Clipboard.GetContent(); if (!content.Contains(StandardDataFormats.Text)) throw new FormatException("剪貼簿沒有文字連結。"); await AddText(await content.GetTextAsync()); }
+  try {
+   var content = Clipboard.GetContent();
+   if (content.Contains(StandardDataFormats.StorageItems)) {
+    var files = await content.GetStorageItemsAsync();
+    if (files.Count == 0 || files.Any(file => !file.Path.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))) throw new FormatException("請複製 Torrent 檔案或下載連結。");
+    await AddText(string.Join("\n", files.Select(file => file.Path)));
+   }
+   else if (content.Contains(StandardDataFormats.WebLink)) await AddText((await content.GetWebLinkAsync()).AbsoluteUri);
+   else if (content.Contains(StandardDataFormats.Text)) await AddText(await content.GetTextAsync());
+   else throw new FormatException("剪貼簿沒有下載連結或 Torrent 檔案。");
+  }
   catch (Exception ex) { ViewModel.Error = UserError.Message(ex); }
  }
  private async Task AddText(string text)
  {
-  var links = text.Split(['\r','\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-  if (links.Length == 0 || links.Any(link => !Uri.TryCreate(link, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https" or "magnet" or "ed2k" or "file"))) throw new FormatException("請貼上 HTTP、HTTPS、磁力或 eD2k 下載連結。");
+  var links = text.Split(['\r','\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(link => link.Trim('"')).ToArray();
+  if (links.Length == 0 || links.Any(link => !DownloadSources.IsSupported(link))) throw new FormatException("請貼上 HTTP、HTTPS、磁力、eD2k 下載連結或 Torrent 檔案路徑。");
   await AddDownloadAsync(new System.Text.Json.Nodes.JsonObject { ["req"] = new System.Text.Json.Nodes.JsonObject { ["url"] = string.Join("\n", links) } });
  }
  private void DownloadDragOver(object s, DragEventArgs e) { e.AcceptedOperation = e.DataView.Contains(StandardDataFormats.Text) || e.DataView.Contains(StandardDataFormats.WebLink) || e.DataView.Contains(StandardDataFormats.StorageItems) ? DataPackageOperation.Copy : DataPackageOperation.None; }

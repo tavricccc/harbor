@@ -24,7 +24,7 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public bool CanPauseSelected => Selection.Any(x => x.CanPause);
     public bool CanResumeSelected => Selection.Any(x => x.CanResume);
     public bool CanPauseAll => IsConnected && items.Values.Any(x => x.CanPause);
-    public bool CanResumeAll => IsConnected && items.Values.Any(x => x.CanResume);
+    public bool CanResumeAll => IsConnected && items.Values.Any(x => x.CanResume && (!x.IsDeferred || x.ScheduledAt is null));
     public bool CanClearCompleted => items.Values.Any(x => x.IsComplete && !x.Uploading && !x.IsProcessing);
     public bool HasSelection => Selection.Count > 0;
     public bool HasSingleSelection => Selected is not null;
@@ -35,7 +35,7 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public bool CanActSelected => PrimaryActionKey != "none";
     public bool CanEditSource => Selected?.CanEditSource == true;
     public string EmptyTitle => items.Count == 0 ? "還沒有下載" : "沒有符合條件的下載";
-    public string EmptyHint => items.Count == 0 ? "貼上網址開始下載，也可以一次加入多個連結。" : "試著清除搜尋，或切換為全部下載。";
+    public string EmptyHint => items.Count == 0 ? "貼上網址、磁力連結，或拖入 Torrent 檔案；也可以一次加入多個連結。" : "試著清除搜尋，或切換為全部下載。";
     partial void OnSelectedChanged(DownloadItem? oldValue, DownloadItem? newValue)
     {
         if (oldValue is not null) oldValue.PropertyChanged -= SelectionUpdated;
@@ -63,8 +63,9 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
         try
         {
             var data = (await Core.GetAsync("tasks"))!.AsArray();
+            var deferred = (await Core.GetAsync("native/queue"))!.AsArray();
             var ids = new HashSet<string>();
-            foreach (var node in data)
+            foreach (var node in data.Concat(deferred))
             {
                 var entry = node!.AsObject(); var id = entry["id"]!.GetValue<string>(); ids.Add(id);
                 if (items.TryGetValue(id, out var item)) item.Update(entry); else items[id] = new(entry);
@@ -76,7 +77,7 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     }
     public void ApplyFilter()
     {
-        var filtered = items.Values.Where(i => Filter switch { "active" => i.Status is "running" or "wait" or "ready", "done" => i.Status == "done", "pause" => i.Status == "pause", "error" => i.Status == "error", _ => true })
+        var filtered = items.Values.Where(i => Filter switch { "active" => i.Status is "running" or "wait" or "ready", "deferred" => i.IsDeferred, "done" => i.Status == "done", "pause" => i.Status == "pause", "error" => i.Status == "error" || i.IsDeferred && i.DeferredError.Length > 0, _ => true })
             .Where(i => i.Name.Contains(Search, StringComparison.OrdinalIgnoreCase) || i.Url.Contains(Search, StringComparison.OrdinalIgnoreCase));
         var ordered = Sort switch { "oldest" => filtered.OrderBy(x => x.CreatedAt), "name" => filtered.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase), "size" => filtered.OrderByDescending(x => x.Size), "progress" => filtered.OrderBy(x => x.Percent), _ => filtered.OrderByDescending(x => x.CreatedAt) };
         var visible = ordered.ToList();
@@ -103,8 +104,14 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
         try
         {
             var list = targets.ToList(); if (list.Count == 0) return;
-            var query = string.Join("&", list.Select(x => "id=" + Uri.EscapeDataString(x.Id)));
-            await Core.SendAsync(action == "delete" ? HttpMethod.Delete : HttpMethod.Put, action == "delete" ? $"tasks?{query}&force={deleteFiles.ToString().ToLowerInvariant()}" : $"tasks/{action}?{query}");
+            foreach (var item in list.Where(x => x.IsDeferred))
+                await Core.SendAsync(action == "delete" ? HttpMethod.Delete : HttpMethod.Put, $"native/queue/{Uri.EscapeDataString(item.Id)}" + (action == "delete" ? "" : "/start"));
+            var active = list.Where(x => !x.IsDeferred).ToList();
+            if (active.Count > 0)
+            {
+                var query = string.Join("&", active.Select(x => "id=" + Uri.EscapeDataString(x.Id)));
+                await Core.SendAsync(action == "delete" ? HttpMethod.Delete : HttpMethod.Put, action == "delete" ? $"tasks?{query}&force={deleteFiles.ToString().ToLowerInvariant()}" : $"tasks/{action}?{query}");
+            }
             await RefreshAsync();
         }
         catch (Exception e) { Error = UserError.Message(e); }

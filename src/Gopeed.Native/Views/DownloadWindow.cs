@@ -61,6 +61,7 @@ public sealed class DownloadWindow : Window
         page.LayoutChanged += RequestFit;
         page.Started += ShowProgress;
         page.Cancelled += Close;
+        page.Deferred += () => { ((App)Application.Current).ShowDeferredDownloads(); Close(); };
         pageHost.Children.Add(page);
         RequestFit();
     }

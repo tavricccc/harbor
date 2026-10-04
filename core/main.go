@@ -99,6 +99,37 @@ func main() {
 		return openDownloadRequest(*root, *ui, body)
 	})
 	api.Handler = localExtensions(api.Handler, token)
+	queue, err := loadDeferredDownloads(*root, func(request model.CreateTask) (string, error) {
+		// Recover a handoff interrupted after the engine saved the task but before
+		// the pending entry was removed, without creating a second download.
+		if id := request.Req.Labels["harborDeferredId"]; id != "" {
+			for _, task := range rest.Downloader.GetTasks() {
+				if task.Meta.Req.Labels["harborDeferredId"] == id {
+					return task.ID, nil
+				}
+			}
+		}
+		return rest.Downloader.CreateDirect(request.Req, request.Opts)
+	})
+	if err != nil {
+		panic(err)
+	}
+	api.Handler = queue.handler(api.Handler, token)
+	queueStop := make(chan struct{})
+	queueDone := make(chan struct{})
+	go func() {
+		defer close(queueDone)
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case now := <-ticker.C:
+				queue.runDue(now)
+			case <-queueStop:
+				return
+			}
+		}
+	}()
 	go api.Serve(apiListener)
 	lifecycle := trackLifecycle(rest.Downloader)
 	config, err := rest.Downloader.GetConfig()
@@ -154,6 +185,8 @@ func main() {
 	} else {
 		runTray(*ui, *icon, stop)
 	}
+	close(queueStop)
+	<-queueDone
 	if err := lifecycle.pauseAndWait(); err != nil {
 		rest.Downloader.Logger.Error().Err(err).Msg("save before shutdown failed")
 	}

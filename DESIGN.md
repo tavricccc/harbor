@@ -1,9 +1,10 @@
 ---
-name: Gopeed Native
+name: Harbor
 description: 對齊 Downlism 原生下載器的單列清單、分頁設定與內容量測下載視窗
 colors:
-  icon-blue: "#0067C0"
-  icon-white: "#FFFFFF"
+  icon-petrol: "#123D42"
+  icon-seafoam: "#64D9BF"
+  icon-white: "#F4FAF9"
 typography:
   title:
     fontFamily: Segoe UI Variable Display, Microsoft JhengHei UI
@@ -79,7 +80,7 @@ components:
     padding: 6dip 2dip
 ---
 
-# Design System: Gopeed Native
+# Design System: Harbor
 
 ## Overview
 

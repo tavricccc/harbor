@@ -74,8 +74,7 @@ public sealed partial class DownloadForm : UserControl
   resolved = null;
   var links = ConfigJson.Lines(Links.Text);
   SetAction(links.Length > 1 ? $"開始 {links.Length} 個下載" : DirectDownload.IsChecked == true ? "開始下載" : "檢查連結");
-  KindLabel.Text = links.Length > 1 ? "批次" : links.FirstOrDefault() is { } link &&
-   (link.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || link.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase)) ? "BT" : "檔案";
+  KindLabel.Text = links.Length > 1 ? "批次" : links.FirstOrDefault() is { } link && DownloadSources.IsTorrent(link) ? "BT" : "檔案";
   Files.Visibility = Visibility.Collapsed;
   FileSelectionActions.Visibility = Visibility.Collapsed;
   FilesSurface.Visibility = Visibility.Collapsed;
@@ -91,7 +90,7 @@ public sealed partial class DownloadForm : UserControl
  private async void PickTorrent(object s, RoutedEventArgs e)
  {
   var picker = new FileOpenPicker(); picker.FileTypeFilter.Add(".torrent"); WinRT.Interop.InitializeWithWindow.Initialize(picker, owner);
-  var file = await picker.PickSingleFileAsync(); if (file is not null) Links.Text = file.Path;
+  var files = await picker.PickMultipleFilesAsync(); if (files.Count > 0) Links.Text = string.Join("\n", files.Select(file => file.Path));
  }
  private JsonObject BuildRequest(string url)
  {
@@ -110,7 +109,7 @@ public sealed partial class DownloadForm : UserControl
   requestOptions.Apply(request);
   return request;
  }
- public async Task<bool> SubmitAsync()
+ public async Task<bool> SubmitAsync(bool defer = false, DateTimeOffset? startAt = null)
  {
   bool complete = false;
   SetBusy(true); Message.IsOpen = false; Message.Visibility = Visibility.Collapsed;
@@ -122,7 +121,19 @@ public sealed partial class DownloadForm : UserControl
    if (!Path.IsPathFullyQualified(Destination.Text.Trim())) throw new FormatException("請選擇完整的儲存路徑。");
    if (FileName.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) throw new FormatException("檔名含有無法使用的字元。");
    Directory.CreateDirectory(Destination.Text.Trim());
-   if (links.Length > 1)
+   if (defer)
+   {
+    if (links.Length > 1 && FileName.Text.Length > 0) throw new FormatException("批次下載請留空檔名，避免檔案名稱重複。");
+    var requests = new JsonArray(links.Select(link => (JsonNode?)BuildRequest(link)).ToArray());
+    if (links.Length == 1 && resolved is not null && DirectDownload.IsChecked != true)
+    {
+     if (Files.Items.Count > 1 && Files.SelectedItems.Count == 0) throw new FormatException("請至少選擇一個檔案。");
+     requests[0]!["opts"]!["selectFiles"] = new JsonArray(Files.SelectedItems.Cast<ResolvedFile>().Select(file => (JsonNode?)JsonValue.Create(file.Index)).ToArray());
+    }
+    await core.SendAsync(HttpMethod.Post, "native/queue", new JsonObject { ["reqs"] = requests, ["startAt"] = startAt?.ToString("O") });
+    complete = true;
+   }
+   else if (links.Length > 1)
    {
     if (FileName.Text.Length > 0) throw new FormatException("批次下載請留空檔名，避免檔案名稱重複。");
     var requests = new JsonArray(links.Select(link => (JsonNode?)BuildRequest(link)).ToArray());

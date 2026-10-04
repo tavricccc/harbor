@@ -6,6 +6,7 @@
       AllowDrop="True" DragOver="DownloadDragOver" Drop="DownloadDrop">
     <Page.KeyboardAccelerators>
         <KeyboardAccelerator Key="N" Modifiers="Control" Invoked="NewShortcut"/>
+        <KeyboardAccelerator Key="V" Modifiers="Control" Invoked="PasteShortcut"/>
         <KeyboardAccelerator Key="F" Modifiers="Control" Invoked="SearchShortcut"/>
         <KeyboardAccelerator Key="A" Modifiers="Control" Invoked="SelectAllShortcut"/>
         <KeyboardAccelerator Key="Delete" Invoked="DeleteShortcut"/>
@@ -33,6 +34,7 @@
                 <AppBarButton Label="貼上網址" Icon="Paste" Click="PasteDownload" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
                 <AppBarButton Label="新增下載" Icon="Add" Click="AddDownload"
                               IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}" AutomationProperties.AutomationId="AddDownload"/>
+                <AppBarButton Label="開啟 Torrent" Icon="OpenFile" Click="OpenTorrent" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
                 <AppBarSeparator/>
                 <AppBarButton Label="全部暫停" Icon="Pause" Click="PauseAll" IsEnabled="{x:Bind ViewModel.CanPauseAll, Mode=OneWay}"/>
                 <AppBarButton Label="全部繼續" Icon="Play" Click="ResumeAll" IsEnabled="{x:Bind ViewModel.CanResumeAll, Mode=OneWay}"/>
@@ -75,6 +77,7 @@
                           HorizontalAlignment="Stretch" AutomationProperties.Name="下載狀態篩選">
                     <ComboBoxItem Content="全部下載" Tag="all"/>
                     <ComboBoxItem Content="進行中" Tag="active"/>
+                    <ComboBoxItem Content="待下載／排程" Tag="deferred"/>
                     <ComboBoxItem Content="已暫停" Tag="pause"/>
                     <ComboBoxItem Content="已完成" Tag="done"/>
                     <ComboBoxItem Content="失敗" Tag="error"/>
@@ -161,11 +164,12 @@
                                     <MenuFlyoutItem Text="{x:Bind PrimaryActionLabel, Mode=OneWay}" Click="ContextPrimary" IsEnabled="{x:Bind CanAct, Mode=OneWay}" Tag="{x:Bind Id}">
                                         <MenuFlyoutItem.Icon><FontIcon Glyph="{x:Bind PrimaryActionGlyph, Mode=OneWay}"/></MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem Text="在資料夾中顯示" Icon="Folder" Click="ContextFolder" Tag="{x:Bind Id}"/>
+                                    <MenuFlyoutItem Text="在資料夾中顯示" Icon="Folder" Click="ContextFolder" Tag="{x:Bind Id}" IsEnabled="{x:Bind CanReveal, Mode=OneWay}"/>
                                     <MenuFlyoutItem Text="檔案與詳細資訊" Icon="Document" Click="ContextDetails" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutSeparator/>
                                     <MenuFlyoutItem Text="暫停／停止做種" Icon="Pause" Click="ContextPause" IsEnabled="{x:Bind CanPause, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutItem Text="繼續／重試" Icon="Play" Click="ContextResume" IsEnabled="{x:Bind CanResume, Mode=OneWay}" Tag="{x:Bind Id}"/>
+                                    <MenuFlyoutItem Text="調整排程" Icon="Calendar" Click="EditSchedule" IsEnabled="{x:Bind IsDeferred, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutItem Text="修改下載來源" Icon="Edit" Click="ContextEditSource" IsEnabled="{x:Bind CanEditSource, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutItem Text="用下一次瀏覽器連結更新來源" Icon="Link" Click="ContextListenSource" IsEnabled="{x:Bind CanEditSource, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutSeparator/>

@@ -22,6 +22,11 @@ public sealed class TaskDetailsDialog : ContentDialog
         NativeInfoBars.CollapseWhenClosed(errorBar);
         var tabs = new Pivot { MaxHeight = 440, MinWidth = 460 };
         tabs.Items.Add(new PivotItem { Header = "資訊", Content = Scroll(Information(item)) });
+        if (item.IsDeferred)
+        {
+            Content = new StackPanel { Spacing = 12, Children = { tabs, SettingsFields.Description(item.DeferredError.Length > 0 ? item.DeferredError : "尚未開始下載。可從清單按播放按鈕立即開始。") } };
+            return;
+        }
         tabs.Items.Add(new PivotItem { Header = "檔案", Content = Scroll(Files(item)) });
         var connections = new StackPanel { Spacing = 12, Padding = new Thickness(0, 12, 12, 16) };
         var loading = SettingsFields.Description("正在取得連線資訊…"); connections.Children.Add(loading);

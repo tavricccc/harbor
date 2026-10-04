@@ -20,4 +20,4 @@ Native controls, visible progress and recoverable errors. Separate engine, API m
 Use the user's own Downlism native application as the implementation reference across the download list, confirmation, progress, details and settings. Match its structure, spacing, typography and native window treatment. Keep Gopeed-specific functionality in that same system. Extension UI is excluded from this redesign; retain official browser extension integration.
 
 ## Assumptions delegated to implementation
-Working name Gopeed Native. Target Windows 10 1809 and Windows 11, x64 first. Scope is an independent frontend rather than changes to other installed download managers. Core updates are pinned and explicit.
+Product name Harbor. Identity uses a dock and incoming file mark in petrol and seafoam; native controls continue following Downlism. Target Windows 10 1809 and Windows 11, x64 first. Scope is an independent frontend rather than changes to other installed download managers. Core updates are pinned and explicit.

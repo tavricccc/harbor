@@ -7,3 +7,4 @@ work/
 *.cer
 core/gopeed-core.exe
 core/gopeed-browser-host.exe
+**/.torrent.bolt.db

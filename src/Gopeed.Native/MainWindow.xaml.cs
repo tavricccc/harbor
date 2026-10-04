@@ -27,4 +27,5 @@ public sealed partial class MainWindow : Window
     private static extern uint GetDpiForWindow(nint hwnd);
     public void OpenProtocol(string link) => ((MainPage)RootFrame.Content).OpenProtocol(link);
     public void ReportError(string message) => ((MainPage)RootFrame.Content).ViewModel.Error = message;
+    public void ShowDeferredDownloads() => ((MainPage)RootFrame.Content).ShowDeferredDownloads();
 }

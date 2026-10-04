@@ -23,7 +23,7 @@ public sealed partial class MainPage
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(new TextBlock { Text = targets.Count == 1 ? targets[0].Name : string.Join("\n", targets.Take(5).Select(x => x.Name)), TextWrapping = TextWrapping.Wrap });
         if (targets.Any(x => x.CanPause)) panel.Children.Add(new TextBlock { Text = "尚未結束的下載與做種將停止。", TextWrapping = TextWrapping.Wrap });
-        panel.Children.Add(files);
+        if (targets.Any(item => !item.IsDeferred)) panel.Children.Add(files);
         var dialog = new ContentDialog { Title = $"移除 {targets.Count} 個下載？", Content = panel, PrimaryButtonText = "移除", CloseButtonText = "取消", DefaultButton = ContentDialogButton.Close };
         if (await NativeDialogs.ShowAsync(dialog, XamlRoot) != ContentDialogResult.Primary) return;
         await ViewModel.ActAsync("delete", targets, files.IsChecked == true);

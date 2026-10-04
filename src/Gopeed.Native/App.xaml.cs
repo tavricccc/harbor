@@ -123,6 +123,12 @@ public partial class App : Application
         window.Closed += (_, _) => { downloadWindows.Remove(window); ReleaseRegistration(); };
         Services.WindowActivation.ShowConfirmation(window);
     }
+    internal void ShowDeferredDownloads()
+    {
+        var main = EnsureMainWindow();
+        main.Activate();
+        main.ShowDeferredDownloads();
+    }
     private void ReleaseRegistration()
     {
         if (Window is null && downloadWindows.Count == 0) registeredInstance?.UnregisterKey();
