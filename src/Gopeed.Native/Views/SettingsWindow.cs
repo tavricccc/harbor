@@ -10,7 +10,7 @@ public sealed class SettingsWindow : Window
 {
     public SettingsWindow(DownloadsViewModel viewModel)
     {
-        Title = "Gopeed Native 設定";
+        Title = "Harbor 設定";
         var handle = WinRT.Interop.WindowNative.GetWindowHandle(this);
         var root = new Grid { RequestedTheme = WindowAppearance.Theme };
         var page = new SettingsPage(viewModel, handle);

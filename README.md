@@ -1,6 +1,10 @@
-# Gopeed Native
+# Harbor
 
 [Gopeed](https://github.com/GopeedLab/gopeed) 的 Windows 原生前端，使用 **WinUI 3 + Go 下載引擎**，提供繁體中文介面、系統主題與獨立下載視窗。這是社群 fork，並非 Gopeed 官方發行版。
+
+本分支從 0.6.0 更名為 **Harbor**。圖示以港口與匯入檔案為概念，採深墨綠與海沫綠；可編輯原稿位於 `src/Gopeed.Native/Assets/Harbor.svg`，執行 `python scripts/create_icon.py` 產生 Windows 各尺寸資產（需 Pillow）。沿用既有程式檔名、資料位置與協定，升級可保留原有任務與設定。
+
+本機新版安裝包使用 `Harbor-Setup-0.6.0-x64.exe` 與 `Harbor-Portable-0.6.0-x64.zip`；下方連結仍是先前公開發行的版本。
 
 本專案維護在 **`winui-native` 分支**；`main` 保留上游內容。前端不用 Flutter 或 WebView，下載引擎固定在 Gopeed v1.9.3。
 

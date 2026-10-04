@@ -17,7 +17,7 @@
   <mp:PhoneIdentity PhoneProductId="E612D966-BF91-4AFB-8B94-E99E96457208" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Gopeed Native</DisplayName>
+    <DisplayName>Harbor</DisplayName>
     <PublisherDisplayName>Tavric</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
@@ -39,7 +39,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="Gopeed Native"
+        DisplayName="Harbor"
         Description="WinUI 3 原生下載管理器"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"

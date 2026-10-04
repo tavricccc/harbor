@@ -8,4 +8,4 @@ if (!(Test-Path -LiteralPath $compiler)) { $compiler = (Get-Command ISCC.exe -Er
 if ($LASTEXITCODE) { throw 'Installer compilation failed' }
 $project = [xml](Get-Content -LiteralPath (Join-Path $repo 'src/Gopeed.Native/Gopeed.Native.csproj'))
 $version = $project.SelectSingleNode('/Project/PropertyGroup/Version').InnerText
-Compress-Archive -Path (Join-Path $repo 'artifacts/portable/*') -DestinationPath (Join-Path $repo "artifacts/GopeedNative-Portable-$version-x64.zip") -Force
+Compress-Archive -Path (Join-Path $repo 'artifacts/portable/*') -DestinationPath (Join-Path $repo "artifacts/Harbor-Portable-$version-x64.zip") -Force

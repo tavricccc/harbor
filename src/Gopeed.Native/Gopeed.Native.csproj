@@ -14,7 +14,10 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
+    <Product>Harbor</Product>
+    <Title>Harbor</Title>
+    <Description>Windows 原生下載管理員，使用 Gopeed 下載引擎</Description>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <SelfContained>true</SelfContained>
@@ -31,6 +34,7 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\AppIcon.ico" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\Harbor.svg" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,16 +1,16 @@
-#define AppVersion "0.5.0"
+#define AppVersion "0.6.0"
 [Setup]
 AppId={{B652BEF3-0741-4B5E-9066-C6F3EBF18622}
-AppName=Gopeed Native
+AppName=Harbor
 AppVersion={#AppVersion}
 AppPublisher=Tavric
 DefaultDirName={localappdata}\Programs\Gopeed Native
-DefaultGroupName=Gopeed Native
+DefaultGroupName=Harbor
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\artifacts
-OutputBaseFilename=GopeedNative-Setup-{#AppVersion}-x64
+OutputBaseFilename=Harbor-Setup-{#AppVersion}-x64
 SetupIconFile=..\src\Gopeed.Native\Assets\AppIcon.ico
 UninstallDisplayIcon={app}\Gopeed.Native.exe
 Compression=lzma2
@@ -24,11 +24,15 @@ LicenseFile=..\upstream\LICENSE
 Source: "..\artifacts\portable\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Gopeed Native"; Filename: "{app}\Gopeed.Native.exe"
-Name: "{autodesktop}\Gopeed Native"; Filename: "{app}\Gopeed.Native.exe"; Tasks: desktopicon
+Name: "{group}\Harbor"; Filename: "{app}\Gopeed.Native.exe"
+Name: "{autodesktop}\Harbor"; Filename: "{app}\Gopeed.Native.exe"; Tasks: desktopicon
+
+[InstallDelete]
+Type: files; Name: "{userprograms}\Gopeed Native\Gopeed Native.lnk"
+Type: files; Name: "{autodesktop}\Gopeed Native.lnk"
 
 [Registry]
-Root: HKCU; Subkey: "Software\Classes\gopeed"; ValueType: string; ValueName: ""; ValueData: "URL:Gopeed Native Protocol"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\gopeed"; ValueType: string; ValueName: ""; ValueData: "URL:Harbor Protocol"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\gopeed"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
 Root: HKCU; Subkey: "Software\Classes\gopeed\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Gopeed.Native.exe,0"
 Root: HKCU; Subkey: "Software\Classes\gopeed\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Gopeed.Native.exe"" ""%1"""
@@ -38,7 +42,7 @@ Name: "desktopicon"; Description: "建立桌面捷徑"; Flags: unchecked
 
 [Run]
 Filename: "{app}\Gopeed.Native.exe"; Parameters: "--register-integrations"; Flags: runhidden waituntilterminated
-Filename: "{app}\Gopeed.Native.exe"; Description: "開啟 Gopeed Native"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Gopeed.Native.exe"; Description: "開啟 Harbor"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: "{app}\Gopeed.Native.exe"; Parameters: "--unregister-integrations"; Flags: runhidden waituntilterminated; RunOnceId: "RemoveNativeIntegration"

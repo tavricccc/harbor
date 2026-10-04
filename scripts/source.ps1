@@ -8,7 +8,7 @@ if (!$Version) {
 $work = [IO.Path]::GetFullPath((Join-Path $repo 'work'))
 $stage = Join-Path $work ('source-' + [Guid]::NewGuid().ToString('N'))
 $source = Join-Path $stage 'source'
-$output = Join-Path $repo "artifacts/GopeedNative-Source-$Version.zip"
+$output = Join-Path $repo "artifacts/Harbor-Source-$Version.zip"
 [IO.Directory]::CreateDirectory($stage) | Out-Null
 try {
     $nativeArchive = Join-Path $stage 'native.zip'

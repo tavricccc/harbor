@@ -30,7 +30,7 @@ public static class WindowsIntegration
         for (var index = 0; index < BrowserKeys.Length; index++)
         {
             var file = Path.Combine(CoreClient.DataDirectory, index == 2 ? "browser-host-firefox.json" : "browser-host.json");
-            var manifest = new JsonObject { ["name"] = HostName, ["description"] = "Gopeed Native", ["path"] = host, ["type"] = "stdio" };
+            var manifest = new JsonObject { ["name"] = HostName, ["description"] = "Harbor", ["path"] = host, ["type"] = "stdio" };
             if (index == 2) manifest["allowed_extensions"] = ConfigJson.Array(["{c5d69a8f-2ed0-46a7-afa4-b3a00dc58088}"]);
             else manifest["allowed_origins"] = ConfigJson.Array(["chrome-extension://mijpgljlfcapndmchhjffkpckknofcnd/", "chrome-extension://dkajnckekendchdleoaenoophcobooce/"]);
             File.WriteAllText(file, manifest.ToJsonString());
@@ -39,13 +39,13 @@ public static class WindowsIntegration
     }
     public static void RegisterFileTypes()
     {
-        using var capability = Registry.CurrentUser.CreateSubKey(@"Software\GopeedNative\Capabilities"); capability.SetValue("ApplicationName", "Gopeed Native"); capability.SetValue("ApplicationDescription", "下載管理員");
+        using var capability = Registry.CurrentUser.CreateSubKey(@"Software\GopeedNative\Capabilities"); capability.SetValue("ApplicationName", "Harbor"); capability.SetValue("ApplicationDescription", "下載管理員");
         using var files = capability.CreateSubKey("FileAssociations"); files.SetValue(".torrent", "GopeedNative.Torrent");
         using var links = capability.CreateSubKey("URLAssociations"); links.SetValue("magnet", "GopeedNative.Magnet"); links.SetValue("ed2k", "GopeedNative.Ed2k");
         using var registered = Registry.CurrentUser.CreateSubKey("Software\\RegisteredApplications"); registered.SetValue("GopeedNative", @"Software\GopeedNative\Capabilities");
         foreach (var name in new[] { "Torrent", "Magnet", "Ed2k" })
         {
-            using var type = Registry.CurrentUser.CreateSubKey("Software\\Classes\\GopeedNative." + name); type.SetValue("", "Gopeed Native");
+            using var type = Registry.CurrentUser.CreateSubKey("Software\\Classes\\GopeedNative." + name); type.SetValue("", "Harbor");
             if (name != "Torrent") type.SetValue("URL Protocol", "");
             using var icon = type.CreateSubKey("DefaultIcon"); icon.SetValue("", Path.Combine(AppContext.BaseDirectory, "Gopeed.Native.exe") + ",0");
             using var command = type.CreateSubKey(@"shell\open\command"); command.SetValue("", $"\"{Path.Combine(AppContext.BaseDirectory, "Gopeed.Native.exe")}\" \"%1\"");

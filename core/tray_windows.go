@@ -14,8 +14,8 @@ func runTray(ui, iconPath string, stop chan os.Signal) {
 		if err == nil {
 			systray.SetIcon(icon)
 		}
-		systray.SetTooltip("Gopeed Native — 背景下載")
-		open := systray.AddMenuItem("開啟 Gopeed Native", "檢視下載佇列")
+		systray.SetTooltip("Harbor — 背景下載")
+		open := systray.AddMenuItem("開啟 Harbor", "檢視下載佇列")
 		systray.AddSeparator()
 		quit := systray.AddMenuItem("停止下載並結束", "保存進度並停止核心")
 		go func() {

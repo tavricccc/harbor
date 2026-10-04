@@ -69,7 +69,7 @@ public sealed partial class SettingsPage
     private void BuildAbout()
     {
         var panel = Section("關於");
-        panel.Children.Add(new TextBlock { Text = $"Gopeed Native {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"] });
+        panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"] });
         panel.Children.Add(checkUpdates);
         var update = NativeButtons.Create("檢查更新", "\uE72C");
         update.Click += async (_, _) =>
