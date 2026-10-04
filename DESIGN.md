@@ -98,9 +98,9 @@ components:
 - 設定另開六分頁視窗，進階下載選項放在底列箭頭 Flyout。
 - 窄視窗隱藏大小欄，完整來源、路徑與檔案清單按需開啟。
 
-本文件同步 2026-10-03 尚未發布的介面修改，安裝版本仍為已發布的 0.5.0。設計權威是 `C:/Users/Tavric/projects/downlism/src/Downlism.App` 的 MainWindow、NewDownloadWindow 與 SettingsWindow；既有 Downlism 截圖只供參考，網站版面不作為原生介面依據。SDK 控制項基準為 `Microsoft.WindowsAppSDK.WinUI` 2.3.9 的 `generic.xaml`。
+本文件記錄 Harbor 0.6.0 的原生介面。版面依照 Downlism 原始碼的 MainWindow、NewDownloadWindow 與 SettingsWindow；控制項基準為 `Microsoft.WindowsAppSDK.WinUI` 2.3.9 的 `generic.xaml`。
 
-本次已完成原始碼審查、Release win-x64 publish 與既有 ProtocolChecks；審查發現的關閉 InfoBar 殘留間距已修正，輸出位於 `artifacts/downlism-ui/`。沒有啟動或控制原生介面，也沒有本次有效原生截圖，因此尚未確認實際字級、對比、裁切或參考一致性。舊 Gopeed 截圖、空白截圖與歷史操作紀錄不列為本次視覺驗收。擴充功能頁本次未重做。
+0.6.0 已通過 Release win-x64 publish、核心測試、ProtocolChecks 與本機升級。新版尚無有效原生截圖，實際字級、對比與裁切仍待互動桌面驗收；檢查範圍見 [維護紀錄](docs/harbor-0.6.0.md)。
 
 ## Colors
 
@@ -109,7 +109,7 @@ components:
 - **系統重點色**：確認開始、完成開啟、重試、儲存及擴充功能安裝使用 `AccentButtonStyle`；進度條與焦點沿用平台資源。主清單列操作使用透明的 `RowActionButtonStyle`，依任務狀態顯示。
 - **主要與次要文字**：主要文字沿用控制項前景；欄名、路徑、摘要與說明使用 `TextFillColorSecondaryBrush`。
 - **背景與分隔**：下載內容透明；底列使用 `LayerFillColorDefaultBrush` 與 `DividerStrokeColorDefaultBrush`。CommandBar 背景透明，清單保留原生選取與 hover。
-- **圖示藍與白**：只用於程式生成的下載箭頭圖示，按鈕不硬編碼成圖示藍。
+- **圖示色彩**：深墨綠、海沫綠與白只用於 Harbor 標記，按鈕沿用系統重點色。
 
 **The Theme Resource Rule.** 沿用平台資源及完整狀態範本，不從截圖取色覆蓋控制項。所有 ContentDialog 經 NativeDialogs 同步視窗實際主題。
 

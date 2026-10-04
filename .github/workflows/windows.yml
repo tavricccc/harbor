@@ -34,9 +34,9 @@ jobs:
           ./scripts/source.ps1
       - uses: actions/upload-artifact@v7.0.1
         with:
-          name: GopeedNative-windows-x64
+          name: Harbor-windows-x64
           path: |
-            artifacts/GopeedNative-Portable-*-x64.zip
-            artifacts/GopeedNative-Setup-*-x64.exe
-            artifacts/GopeedNative-Source-*.zip
+            artifacts/Harbor-Portable-*-x64.zip
+            artifacts/Harbor-Setup-*-x64.exe
+            artifacts/Harbor-Source-*.zip
           compression-level: 0

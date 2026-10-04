@@ -7,7 +7,7 @@ public static class UpdateService
 {
     public static async Task<AvailableUpdate?> CheckAsync(CoreClient core)
     {
-        var releases = JsonNode.Parse(await core.FetchTextAsync("https://api.github.com/repos/tavricccc/gopeed-winui/releases?per_page=10"))!.AsArray();
+        var releases = JsonNode.Parse(await core.FetchTextAsync("https://api.github.com/repos/tavricccc/harbor/releases?per_page=10"))!.AsArray();
         var current = typeof(App).Assembly.GetName().Version!;
         foreach (var release in releases.Where(x => x?["draft"]?.GetValue<bool>() != true))
         {

@@ -81,8 +81,8 @@ public sealed partial class SettingsPage
         };
         panel.Children.Add(update);
         var links = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 20 };
-        links.Children.Add(new HyperlinkButton { Content = "專案首頁", NavigateUri = new Uri("https://github.com/tavricccc/gopeed-winui"), Padding = new Thickness(0) });
-        links.Children.Add(new HyperlinkButton { Content = "授權與致謝", NavigateUri = new Uri("https://github.com/tavricccc/gopeed-winui/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
+        links.Children.Add(new HyperlinkButton { Content = "專案首頁", NavigateUri = new Uri("https://github.com/tavricccc/harbor"), Padding = new Thickness(0) });
+        links.Children.Add(new HyperlinkButton { Content = "授權與致謝", NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
         panel.Children.Add(links);
         var logs = NativeButtons.Create("開啟記錄資料夾", "\uE8B7");
         logs.Click += (_, _) => FileActions.Open(Path.Combine(CoreClient.DataDirectory, "logs")); panel.Children.Add(logs);

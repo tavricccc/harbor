@@ -6,7 +6,7 @@
 
 - 本機 `scripts/build.ps1 -Test` 通過：Go 核心建立／暫停／重啟續傳、確認入口、單一服務 ownership、鏡像轉換、官方 native host 訊息；C# 協定、UTF-8、HTTP 標頭 CR／LF／CRLF 和狀態操作檢查通過。
 - 原生前端 Release build 為 0 個警告、0 個錯誤；完整自包含部署含前端、Go 核心、Native Messaging host、圖示與平台 runtime。
-- Windows CI 的 build、tests、Inno installer、portable ZIP 及 artifact upload 均通過：[功能版](https://github.com/tavricccc/gopeed-winui/actions/runs/36803181218)、[最後確認窗修正版](https://github.com/tavricccc/gopeed-winui/actions/runs/36804011217)。這與本機安裝測試分開記錄。
+- Windows CI 的 build、tests、Inno installer、portable ZIP 及 artifact upload 均通過：[功能版](https://github.com/tavricccc/harbor/actions/runs/36803181218)、[最後確認窗修正版](https://github.com/tavricccc/harbor/actions/runs/36804011217)。這與本機安裝測試分開記錄。
 - 可執行程式對應程式碼 commit `00de39aac468603631d5ce0a139b9829b96dee22`；後續文件與截圖 commit 不改程式碼。上游仍為 v1.9.3 固定 submodule。
 
 ## 實際安裝、解除安裝與資料

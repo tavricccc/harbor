@@ -14,7 +14,7 @@
 
 ## 建置與記憶體
 
-[Windows CI 修正版建置](https://github.com/tavricccc/gopeed-winui/actions/runs/36767708750) 已通過，來源 commit 為 `5fee56b`。本機最後安裝版也對應該程式碼，安裝程式回傳成功，前端／核心／ICO 雜湊比對通過。
+[Windows CI 修正版建置](https://github.com/tavricccc/harbor/actions/runs/36767708750) 已通過，來源 commit 為 `5fee56b`。本機最後安裝版也對應該程式碼，安裝程式回傳成功，前端／核心／ICO 雜湊比對通過。
 
 2026-10-01 本機閒置快照，保留三個已完成任務，沒有進行中的下載：
 

@@ -21,7 +21,7 @@ try {
     Expand-Archive -LiteralPath (Join-Path $stage 'upstream.zip') -DestinationPath (Join-Path $source 'upstream')
     $revision = git -C $repo rev-parse HEAD
     $upstream = git -C (Join-Path $repo 'upstream') rev-parse HEAD
-    [IO.File]::WriteAllText((Join-Path $source 'SOURCE-REVISION.txt'), "Gopeed Native: $revision`nGopeed upstream: $upstream`n")
+    [IO.File]::WriteAllText((Join-Path $source 'SOURCE-REVISION.txt'), "Harbor: $revision`nGopeed upstream: $upstream`n")
     Compress-Archive -Path (Join-Path $source '*') -DestinationPath $output -Force
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $archive = [IO.Compression.ZipFile]::OpenRead($output)
