@@ -6,6 +6,7 @@ AppVersion={#AppVersion}
 AppPublisher=Tavric
 DefaultDirName={localappdata}\Programs\Gopeed Native
 DefaultGroupName=Harbor
+UsePreviousGroup=no
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -29,6 +30,7 @@ Name: "{autodesktop}\Harbor"; Filename: "{app}\Gopeed.Native.exe"; Tasks: deskto
 
 [InstallDelete]
 Type: files; Name: "{userprograms}\Gopeed Native\Gopeed Native.lnk"
+Type: files; Name: "{userprograms}\Gopeed Native\Harbor.lnk"
 Type: files; Name: "{autodesktop}\Gopeed Native.lnk"
 
 [Registry]
