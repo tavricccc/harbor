@@ -11,6 +11,10 @@ Windows 原生下載管理員。使用 WinUI 3 介面與 [Gopeed](https://github
 
 Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方發行版。
 
+![Harbor 下載清單](docs/images/harbor-main.jpg)
+
+[觀看操作示範](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-demo.mp4)
+
 ## 下載
 
 **[下載 Harbor 0.7.0](https://github.com/tavricccc/harbor/releases/tag/v0.7.0)** · Windows x64 預覽版
