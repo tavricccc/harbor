@@ -60,7 +60,7 @@
                     <Button x:Name="Browse" Content="開啟資料夾" Visibility="Collapsed" Click="BrowseClick"/>
                     <Button x:Name="StopSeed" Content="停止做種" Visibility="Collapsed" Click="StopSeedClick"/>
                     <Button x:Name="Primary" Content="正在連接…" IsEnabled="False" Click="PrimaryClick" AutomationProperties.AutomationId="ProgressPrimary"/>
-                    <Button Content="關閉" Click="CloseClick" AutomationProperties.AutomationId="CloseProgress"/>
+                    <Button x:Name="Cancel" Content="取消" IsEnabled="False" Click="CancelClick" AutomationProperties.AutomationId="CancelProgress"/>
                 </StackPanel>
             </Grid>
         </Border>

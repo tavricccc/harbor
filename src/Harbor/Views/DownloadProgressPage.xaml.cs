@@ -16,6 +16,7 @@ public sealed partial class DownloadProgressPage : Page
     private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
     private DownloadItem? item;
     private bool refreshing;
+    private bool cancelling;
     public event Action? LayoutChanged;
     public event Action<string>? TitleChanged;
 
@@ -44,7 +45,7 @@ public sealed partial class DownloadProgressPage : Page
         {
             item = new DownloadItem((await core.GetAsync("tasks/" + id))!.AsObject());
             Primary.Content = item.PrimaryAction.Label;
-            Primary.IsEnabled = item.CanAct;
+            Primary.IsEnabled = item.CanAct && !cancelling;
             FileName.Text = item.Name; FileName.CanDrag = item.IsComplete && !item.IsProcessing;
             KindLabel.Text = item.Url.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || item.Url.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase) ? "BT" : "檔案";
             ToolTipService.SetToolTip(FileName, item.Name);
@@ -53,6 +54,9 @@ public sealed partial class DownloadProgressPage : Page
             Speed.Text = $"{(item.Uploading ? "上傳" : "下載")}：{item.SpeedText}";
             Remaining.Text = item.RemainingText == "—" ? item.Status == "pause" ? "已暫停" : "計算中" : item.RemainingText;
             var finished = item.IsComplete && !item.IsProcessing && !item.Uploading;
+            Cancel.Content = finished ? "關閉" : "取消";
+            Cancel.IsEnabled = !cancelling;
+            ToolTipService.SetToolTip(Cancel, finished ? "關閉此視窗" : "停止並移除下載任務，保留已下載的檔案");
             Primary.Style = (Style)Application.Current.Resources[finished || item.Status == "error" ? "AccentButtonStyle" : "DefaultButtonStyle"];
             Speed.Visibility = finished ? Visibility.Collapsed : Visibility.Visible;
             Remaining.Visibility = item.IsComplete ? Visibility.Collapsed : Visibility.Visible;
@@ -94,7 +98,30 @@ public sealed partial class DownloadProgressPage : Page
         try { await core.SendAsync(HttpMethod.Put, $"tasks/{id}/pause"); await Refresh(); }
         catch (Exception failure) { ShowError(failure); }
     }
-    private void CloseClick(object sender, RoutedEventArgs args) => close();
+    private async void CancelClick(object sender, RoutedEventArgs args)
+    {
+        if (item is null || cancelling) return;
+        if (item.IsComplete && !item.IsProcessing && !item.Uploading) { close(); return; }
+        cancelling = true;
+        Cancel.IsEnabled = false;
+        Primary.IsEnabled = false;
+        StopSeed.IsEnabled = false;
+        timer.Stop();
+        try
+        {
+            await core.SendAsync(HttpMethod.Delete, $"tasks?id={Uri.EscapeDataString(id)}&force=false");
+            close();
+        }
+        catch (Exception failure)
+        {
+            cancelling = false;
+            Cancel.IsEnabled = true;
+            StopSeed.IsEnabled = true;
+            ShowError(failure);
+            timer.Start();
+            await Refresh();
+        }
+    }
     private void CopySource(object sender, RoutedEventArgs args) { if (item is not null) FileActions.Copy(item.Url); }
     private void SaveClosePreference(object sender, RoutedEventArgs args)
     {
