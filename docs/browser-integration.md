@@ -16,7 +16,7 @@ Harbor 負責保存與下載檔案，Gopeed 官方擴充套件負責把瀏覽器
 
 在 Harbor 主視窗按工具列的更多選單，選「瀏覽器接管」，或到設定的「連線」分頁。0.6.1 首次開啟主視窗也會顯示「安裝與設定」提示；關閉提示後，入口仍會保留。
 
-安裝版會自動註冊本機 Native Messaging host。Portable 版需按「啟用本機接管」，之後請保留 Portable 資料夾位置。
+Harbor 僅提供安裝版，安裝時會自動註冊本機 Native Messaging host，啟動時也會補上缺少的註冊，不需手動啟用。
 
 引導顯示「Harbor 的本機接管已註冊」時，代表 Chrome、Edge 和 Firefox 的 host 註冊都指向目前這份 Harbor。它不會檢查或替瀏覽器安裝擴充套件，也不代表一次下載已成功接管。
 
@@ -30,8 +30,8 @@ Harbor 負責保存與下載檔案，Gopeed 官方擴充套件負責把瀏覽器
 
 ## 沒有出現確認視窗
 
-先確認 Gopeed 擴充套件已啟用，且「遠端下載」關閉。回到 Harbor 引導按「重新啟用本機接管」，再重新開啟瀏覽器並測試。
+先確認 Gopeed 擴充套件已啟用，且「遠端下載」關閉。重新開啟 Harbor 自動補上註冊，再重新開啟瀏覽器並測試。
 
-若同時安裝官方 Gopeed 或其他 fork，它們可能改寫共用的 `com.gopeed.gopeed` host 註冊。要改由 Harbor 接管，再從 Harbor 重新啟用即可。Portable 資料夾移動後也需重新註冊。
+若同時安裝官方 Gopeed 或其他 fork，它們可能改寫共用的 `com.gopeed.gopeed` host 註冊。要改由 Harbor 接管，重新開啟 Harbor 即可。
 
 網站資源嗅探由官方擴充套件處理，能否解析仍取決於網站與擴充套件的能力。手動貼上 HTTP、magnet 或 Torrent 檔案可獨立使用 Harbor。

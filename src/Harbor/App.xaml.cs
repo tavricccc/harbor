@@ -62,6 +62,7 @@ public partial class App : Application
         Services.LegacyMigration.Run();
         if (commandLine.Contains("--register-integrations")) { Services.WindowsIntegration.InstallBrowserHost(); Services.WindowsIntegration.RegisterFileTypes(); Exit(); return; }
         if (commandLine.Contains("--unregister-integrations")) { Services.WindowsIntegration.Unregister(); Exit(); return; }
+        if (!Services.WindowsIntegration.IsBrowserHostRegistered()) Services.WindowsIntegration.InstallBrowserHost();
         var profileKey = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Services.CoreClient.DataDirectory.ToUpperInvariant())));
         var instance = AppInstance.FindOrRegisterForKey("Harbor.Main." + profileKey);
         if (!instance.IsCurrent)

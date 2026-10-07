@@ -22,7 +22,6 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 | 檔案 | 用途 |
 | --- | --- |
 | [安裝版](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Setup-0.7.0-x64.exe) | 一般使用者選這個。包含執行環境，安裝到使用者目錄，不需管理員權限。 |
-| [Portable](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Portable-0.7.0-x64.zip) | 完整解壓縮後執行 `Harbor.exe`。 |
 | [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Source-0.7.0.zip) | 包含此版本使用的 Gopeed 核心。 |
 | [SHA-256](https://github.com/tavricccc/harbor/releases/download/v0.7.0/SHA256SUMS.txt) | 下載檔案校驗碼。 |
 
@@ -49,7 +48,7 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 | [Chrome Web Store](https://chromewebstore.google.com/detail/gopeed/mijpgljlfcapndmchhjffkpckknofcnd) | [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/dkajnckekendchdleoaenoophcobooce) | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/gopeed-extension) |
 
 1. 確認擴充套件已啟用。
-2. 開啟 Harbor 的「瀏覽器接管」引導。安裝版會註冊本機接管；Portable 版按「啟用本機接管」。
+2. 安裝 Harbor 即會自動註冊本機接管；啟動時也會補上缺少的註冊，不需手動啟用。
 3. 在 Gopeed 擴充套件設定中關閉「遠端下載」，再嘗試下載一個檔案。出現 Harbor 確認視窗就表示接管生效。
 
 本機接管不用填伺服器位址或 Token。詳細設定與排除問題見 [瀏覽器接管指南](docs/browser-integration.md)。

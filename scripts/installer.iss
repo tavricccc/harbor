@@ -23,7 +23,7 @@ RestartApplications=no
 LicenseFile=..\upstream\LICENSE
 
 [Files]
-Source: "..\artifacts\portable\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\artifacts\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\Harbor"; Filename: "{app}\Harbor.exe"
@@ -39,7 +39,6 @@ Root: HKCU; Subkey: "Software\Classes\gopeed\shell\open\command"; ValueType: str
 Name: "desktopicon"; Description: "建立桌面捷徑"; Flags: unchecked
 
 [Run]
-Filename: "{app}\Harbor.exe"; Parameters: "--register-integrations"; Flags: runhidden waituntilterminated
 Filename: "{app}\Harbor.exe"; Description: "開啟 Harbor"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
@@ -48,6 +47,22 @@ Filename: "{app}\Engine\harbor-core.exe"; Parameters: "--data ""{localappdata}\H
 
 [Code]
 #include "migration.iss"
+procedure CurStepChanged(CurStep: TSetupStep);
+var Code: Integer; Manifest: String;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    if not Exec(ExpandConstant('{app}\Harbor.exe'), '--register-integrations', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+      RaiseException('無法啟動 Harbor 完成瀏覽器接管註冊。');
+    if Code <> 0 then
+      RaiseException('Harbor 瀏覽器接管註冊失敗，代碼：' + IntToStr(Code));
+    if not RegQueryStringValue(HKCU, 'Software\Google\Chrome\NativeMessagingHosts\com.gopeed.gopeed', '', Manifest) then
+      RaiseException('Harbor 瀏覽器接管註冊未完成。');
+    if not FileExists(Manifest) then
+      RaiseException('Harbor 瀏覽器接管設定檔不存在。');
+  end;
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var Code: Integer; Command, Description, Icon: String;
 begin

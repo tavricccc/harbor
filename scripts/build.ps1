@@ -15,11 +15,11 @@ if ($Test) {
     dotnet run --project (Join-Path $repo 'tests/Harbor.ProtocolChecks/ProtocolCheck.csproj')
     if ($LASTEXITCODE) { throw 'Gopeed protocol verification failed' }
 }
-$portable = [IO.Path]::GetFullPath((Join-Path $repo 'artifacts/portable'))
-if ($portable -ne "$repo\artifacts\portable") { throw 'Unexpected publish path' }
-if (Test-Path -LiteralPath $portable) { Get-ChildItem -LiteralPath $portable -Force | Remove-Item -Recurse -Force }
-dotnet publish (Join-Path $repo 'src/Harbor/Harbor.csproj') -c Release -r win-x64 -p:Platform=x64 -o $portable
+$app = [IO.Path]::GetFullPath((Join-Path $repo 'artifacts/app'))
+if ($app -ne "$repo\artifacts\app") { throw 'Unexpected publish path' }
+if (Test-Path -LiteralPath $app) { Get-ChildItem -LiteralPath $app -Force | Remove-Item -Recurse -Force }
+dotnet publish (Join-Path $repo 'src/Harbor/Harbor.csproj') -c Release -r win-x64 -p:Platform=x64 -o $app
 if ($LASTEXITCODE) { throw 'WinUI publish failed' }
 foreach ($asset in @('Assets/AppIcon.ico', 'Assets/Square44x44Logo.scale-200.png')) {
-    if (!(Test-Path -LiteralPath (Join-Path $portable $asset))) { throw "Missing published icon: $asset" }
+    if (!(Test-Path -LiteralPath (Join-Path $app $asset))) { throw "Missing published icon: $asset" }
 }
