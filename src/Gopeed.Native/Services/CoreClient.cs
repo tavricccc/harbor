@@ -7,7 +7,8 @@ namespace Gopeed_Native.Services;
 
 public sealed class CoreClient : IDisposable
 {
-    public static string DataDirectory { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GopeedNative");
+    public static string DataDirectory { get; } = Path.GetFullPath(Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY")
+        ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GopeedNative"));
     private readonly HttpClient http = new() { Timeout = TimeSpan.FromSeconds(60) };
     private JsonObject session = null!;
     public string ApiAddress => $"http://127.0.0.1:{session["port"]}";

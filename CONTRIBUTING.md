@@ -13,3 +13,5 @@ Core 更新需明確改變 submodule commit，檢查 API 與 browser integration
 Windows 核心使用 anacrolix 的 `classic` 檔案 I/O，避免 mmap 長期鎖住未選取的 Torrent 檔案。建置腳本會設定測試環境；直接執行 Go 測試時，請先設定 `$env:TORRENT_STORAGE_DEFAULT_FILE_IO = 'classic'`。
 
 安裝版資料位於 `%LOCALAPPDATA%\GopeedNative`。測試只能移除自己建立的任務與檔案，請保護使用者既有下載。
+
+實機測試或錄製示範時，可用 `HARBOR_DATA_DIRECTORY` 指定獨立資料目錄。不同目錄使用獨立介面實例；請在該目錄的 `preferences.json` 設定不同的 `ApiPort`，避免與日常使用的核心衝突。
