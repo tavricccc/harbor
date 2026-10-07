@@ -1,4 +1,4 @@
-#define AppVersion "0.7.0"
+#define AppVersion "0.7.2"
 [Setup]
 AppId={{B652BEF3-0741-4B5E-9066-C6F3EBF18622}
 AppName=Harbor
@@ -47,8 +47,19 @@ Filename: "{app}\Engine\harbor-core.exe"; Parameters: "--data ""{localappdata}\H
 
 [Code]
 #include "migration.iss"
+procedure VerifyBrowserHost(BrowserKey, ManifestName: String);
+var Manifest: String;
+begin
+  if not RegQueryStringValue(HKCU, BrowserKey + '\com.gopeed.gopeed', '', Manifest) then
+    RaiseException('Harbor 瀏覽器接管註冊未完成：' + BrowserKey);
+  if CompareText(Manifest, ExpandConstant('{localappdata}\Harbor\' + ManifestName)) <> 0 then
+    RaiseException('瀏覽器接管仍指向舊的設定檔：' + Manifest);
+  if not FileExists(Manifest) then
+    RaiseException('Harbor 瀏覽器接管設定檔不存在。');
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
-var Code: Integer; Manifest: String;
+var Code: Integer;
 begin
   if CurStep = ssPostInstall then
   begin
@@ -56,10 +67,9 @@ begin
       RaiseException('無法啟動 Harbor 完成瀏覽器接管註冊。');
     if Code <> 0 then
       RaiseException('Harbor 瀏覽器接管註冊失敗，代碼：' + IntToStr(Code));
-    if not RegQueryStringValue(HKCU, 'Software\Google\Chrome\NativeMessagingHosts\com.gopeed.gopeed', '', Manifest) then
-      RaiseException('Harbor 瀏覽器接管註冊未完成。');
-    if not FileExists(Manifest) then
-      RaiseException('Harbor 瀏覽器接管設定檔不存在。');
+    VerifyBrowserHost('Software\Google\Chrome\NativeMessagingHosts', 'browser-host.json');
+    VerifyBrowserHost('Software\Microsoft\Edge\NativeMessagingHosts', 'browser-host.json');
+    VerifyBrowserHost('Software\Mozilla\NativeMessagingHosts', 'browser-host-firefox.json');
   end;
 end;
 
