@@ -128,4 +128,19 @@ func TestDownloadPauseRestartResume(t *testing.T) {
 	if _, err = os.Stat(filepath.Join(destination, "verified.bin")); err != nil {
 		t.Fatal("remove task unexpectedly deleted file")
 	}
+	created = call("POST", "tasks", map[string]any{"req": map[string]any{"url": fixture.URL + "/fixture.bin"}, "opts": map[string]any{"path": destination, "name": "cancelled.bin", "extra": map[string]any{"connections": 1}}})
+	json.Unmarshal(created, &id)
+	wait(func(task *download.Task) bool { return task.Progress != nil && task.Progress.Downloaded > 10000 && task.Status == base.DownloadStatusRunning })
+	call("DELETE", "tasks?id="+id+"&force=false", nil)
+	var remaining []*download.Task
+	json.Unmarshal(call("GET", "tasks", nil), &remaining)
+	for _, current := range remaining {
+		if current.ID == id {
+			t.Fatal("cancelled download is still in the task list")
+		}
+	}
+	files, err := filepath.Glob(filepath.Join(destination, "cancelled.bin*"))
+	if err != nil || len(files) == 0 {
+		t.Fatal("cancel unexpectedly removed the partial download")
+	}
 }
