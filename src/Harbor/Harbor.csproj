@@ -42,7 +42,7 @@
     <Manifest Include="$(ApplicationManifest)" />
     <Content Include="..\..\core\harbor-core.exe" Link="Engine\harbor-core.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\core\harbor-browser-host.exe" Link="Engine\harbor-browser-host.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="..\..\upstream\LICENSE" Link="LICENSE-Gopeed.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\core\LICENSE-Gopeed.txt" Link="LICENSE-Gopeed.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!--

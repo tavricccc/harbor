@@ -9,6 +9,8 @@ PRODUCT.md
 *.cer
 core/harbor-core.exe
 core/harbor-browser-host.exe
+core/LICENSE-Gopeed.txt
+upstream/
 core/gopeed-core.exe
 core/gopeed-browser-host.exe
 **/.torrent.bolt.db

@@ -74,20 +74,28 @@ HTTP 來源失效時，可修改網址，或選「用下一次瀏覽器連結更
 
 ## 建置
 
-需要 Windows、PowerShell 7、Go 1.27 與 .NET 10 SDK。安裝包另需 Inno Setup 6。
+需要 Windows、PowerShell 7、Go 1.27 與 .NET 10 SDK。安裝包另需 Inno Setup 6。Go 會下載核心相依套件。
 
 ```powershell
- git clone --branch winui-native --recurse-submodules https://github.com/tavricccc/harbor.git
- cd harbor
- pwsh -File scripts/build.ps1 -Test
- pwsh -File scripts/package.ps1 -SkipBuild
- pwsh -File scripts/source.ps1
+git clone --branch winui-native https://github.com/tavricccc/harbor.git
+cd harbor
+pwsh -File scripts/build.ps1 -Test
+pwsh -File scripts/package.ps1 -SkipBuild
+pwsh -File scripts/source.ps1
 ```
 
-`core/` 是背景服務；`src/Harbor/` 是 WinUI 前端；`upstream/` 固定 Gopeed 核心版本。0.7.2 使用 Gopeed 2.0 開發版本 `224b4880871f8d7a87c16a3d4daca31546f0ca80`。參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
+`core/` 是背景服務；`src/Harbor/` 是 WinUI 前端。下載引擎直接引用官方 Gopeed Go module，版本與校驗碼由 `go.mod`／`go.sum` 管理。`core/upstream.json` 記錄對應的官方 release，建置時自動使用該版本名稱。
+
+跟進上游版本時執行：
+
+```powershell
+pwsh -File scripts/update-core.ps1 -Channel preview -Test
+```
+
+`preview` 包含正式版及預覽版，目前用於 Gopeed 2.0；`stable` 只選正式版。完整更新與回復步驟見 [核心維護](docs/core-updates.md)，參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 致謝與授權
 
 感謝 [GopeedLab 與 Gopeed 貢獻者](https://github.com/GopeedLab/gopeed/graphs/contributors)開源並持續維護下載引擎。Harbor 的核心能力建立在 Gopeed 之上；WinUI 3 介面另行實作。
 
-依 [GPL-3.0](LICENSE) 發布，保留上游授權與來源。Release 附加的完整原始碼包含 submodule；GitHub 自動產生的 Source code ZIP 不包含，請下載附加檔或遞迴 clone。
+依 [GPL-3.0](LICENSE) 發布，保留上游授權與來源。Release 附加的完整原始碼在 `third_party/gopeed/` 包含使用的官方核心來源，以及 release、module 版本與校驗碼。GitHub 自動產生的 Source code ZIP 可透過 Go 下載相依套件；要取得隨發行版附上的核心原始碼，請下載 Harbor-Source 附加檔。

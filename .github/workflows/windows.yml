@@ -5,6 +5,12 @@ on:
   pull_request:
     branches: [winui-native]
   workflow_dispatch:
+    inputs:
+      core-channel:
+        description: 'Gopeed release channel (locked keeps go.mod)'
+        type: choice
+        options: [locked, preview, stable]
+        default: locked
 permissions:
   contents: read
 jobs:
@@ -12,8 +18,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7.0.1
-        with:
-          submodules: recursive
       - uses: actions/setup-go@v7.0.0
         with:
           go-version: '1.27.0'
@@ -21,6 +25,12 @@ jobs:
       - uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: '10.0.x'
+      - name: Follow Gopeed release
+        if: github.event_name == 'workflow_dispatch' && inputs.core-channel != 'locked'
+        shell: pwsh
+        env:
+          CORE_CHANNEL: ${{ inputs.core-channel }}
+        run: ./scripts/update-core.ps1 -Channel $env:CORE_CHANNEL
       - name: Build and verify
         shell: pwsh
         run: ./scripts/build.ps1 -Test

@@ -20,7 +20,7 @@ SolidCompression=yes
 WizardStyle=modern
 CloseApplications=yes
 RestartApplications=no
-LicenseFile=..\upstream\LICENSE
+LicenseFile=..\artifacts\app\LICENSE-Gopeed.txt
 
 [Files]
 Source: "..\artifacts\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
