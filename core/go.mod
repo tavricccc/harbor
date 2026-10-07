@@ -1,4 +1,4 @@
-module gopeed-native/core
+module harbor/core
 
 go 1.25.4
 

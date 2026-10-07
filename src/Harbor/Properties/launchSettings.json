@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Harbor (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Harbor (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

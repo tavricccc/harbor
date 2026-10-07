@@ -2,7 +2,7 @@ param([string]$Version)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 if (!$Version) {
-    $project = [xml][IO.File]::ReadAllText((Join-Path $repo 'src/Gopeed.Native/Gopeed.Native.csproj'))
+    $project = [xml][IO.File]::ReadAllText((Join-Path $repo 'src/Harbor/Harbor.csproj'))
     $Version = @($project.Project.PropertyGroup.Version | Where-Object { $_ })[0]
 }
 $work = [IO.Path]::GetFullPath((Join-Path $repo 'work'))

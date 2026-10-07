@@ -2,7 +2,7 @@
 from pathlib import Path
 from PIL import Image, ImageDraw
 
-assets = Path(__file__).resolve().parents[1] / 'src' / 'Gopeed.Native' / 'Assets'
+assets = Path(__file__).resolve().parents[1] / 'src' / 'Harbor' / 'Assets'
 
 def draw_icon(size):
     scale = 8

@@ -192,7 +192,7 @@ func main() {
 	}
 	startExtras(rest.Downloader, port, token)
 	defer func() { api.Close(); rest.Stop(); os.Remove(sessionPath) }()
-	fmt.Println("Gopeed Native core ready")
+	fmt.Println("Harbor core ready")
 	if *ui == "" {
 		<-stop
 	} else {

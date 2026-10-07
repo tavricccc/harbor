@@ -32,7 +32,7 @@ type session struct {
 }
 
 var client = &http.Client{Timeout: 60 * time.Second}
-var dataDir = filepath.Join(os.Getenv("LOCALAPPDATA"), "GopeedNative")
+var dataDir = filepath.Join(os.Getenv("LOCALAPPDATA"), "Harbor")
 
 func current() (*session, error) {
 	b, err := os.ReadFile(filepath.Join(dataDir, "session.json"))
@@ -87,7 +87,8 @@ func ensureCore() error {
 			return err
 		}
 	}
-	command := exec.Command(filepath.Join(engine, "gopeed-core.exe"), "--data", dataDir, "--ui", filepath.Join(root, "Gopeed.Native.exe"), "--icon", filepath.Join(root, "Assets", "AppIcon.ico"), "--port", fmt.Sprint(preferences.ApiPort))
+	command := exec.Command(filepath.Join(engine, "harbor-core.exe"), "--data", dataDir, "--ui", filepath.Join(root, "Harbor.exe"), "--icon", filepath.Join(root, "Assets", "AppIcon.ico"), "--port", fmt.Sprint(preferences.ApiPort))
+	command.Env = append(os.Environ(), "TORRENT_STORAGE_DEFAULT_FILE_IO=classic")
 	command.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	if err = command.Start(); err != nil {
 		return err
@@ -100,7 +101,7 @@ func ensureCore() error {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
-	return fmt.Errorf("Gopeed could not start")
+	return fmt.Errorf("Harbor could not start")
 }
 func handle(m message) (any, error) {
 	if m.Method == "ping" {
@@ -115,7 +116,7 @@ func handle(m message) (any, error) {
 			if err != nil {
 				return nil, err
 			}
-			command := exec.Command(filepath.Join(filepath.Dir(filepath.Dir(exe)), "Gopeed.Native.exe"))
+			command := exec.Command(filepath.Join(filepath.Dir(filepath.Dir(exe)), "Harbor.exe"))
 			if err = command.Start(); err != nil {
 				return nil, err
 			}

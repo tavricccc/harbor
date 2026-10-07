@@ -29,7 +29,7 @@ func (w pacedWriter) Write(p []byte) (int, error) {
 // One integration test protects the API contract, pause/resume, disk persistence,
 // and final bytes. It uses a local server, not an unreliable public endpoint.
 func TestDownloadPauseRestartResume(t *testing.T) {
-	payload := bytes.Repeat([]byte("Gopeed Native download verification\n"), 200000)
+	payload := bytes.Repeat([]byte("Harbor download verification\n"), 200000)
 	fixture := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeContent(pacedWriter{w}, r, "fixture.bin", time.Unix(0, 0), bytes.NewReader(payload))
 	}))

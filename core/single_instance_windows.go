@@ -15,7 +15,7 @@ func acquireCore(root string) (func(), bool) {
 	if err != nil {
 		panic(err)
 	}
-	name, err := syscall.UTF16PtrFromString(fmt.Sprintf("Local\\GopeedNative.%x", sha256.Sum256([]byte(strings.ToLower(absolute)))))
+	name, err := syscall.UTF16PtrFromString(fmt.Sprintf("Local\\Harbor.%x", sha256.Sum256([]byte(strings.ToLower(absolute)))))
 	if err != nil {
 		panic(err)
 	}

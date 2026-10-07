@@ -1,4 +1,4 @@
-<img src="src/Gopeed.Native/Assets/Harbor.png" width="72" height="72" alt="Harbor 圖示">
+<img src="src/Harbor/Assets/Harbor.png" width="72" height="72" alt="Harbor 圖示">
 
 # Harbor
 
@@ -18,7 +18,7 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 | 檔案 | 用途 |
 | --- | --- |
 | [安裝版](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Setup-0.7.0-x64.exe) | 一般使用者選這個。包含執行環境，安裝到使用者目錄，不需管理員權限。 |
-| [Portable](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Portable-0.7.0-x64.zip) | 完整解壓縮後執行 `Gopeed.Native.exe`。 |
+| [Portable](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Portable-0.7.0-x64.zip) | 完整解壓縮後執行 `Harbor.exe`。 |
 | [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Source-0.7.0.zip) | 包含此版本使用的 Gopeed 核心。 |
 | [SHA-256](https://github.com/tavricccc/harbor/releases/download/v0.7.0/SHA256SUMS.txt) | 下載檔案校驗碼。 |
 
@@ -67,7 +67,7 @@ HTTP 來源失效時，可修改網址，或選「用下一次瀏覽器連結更
 
 ## 資料與解除安裝
 
-任務、設定與 API Token 放在 `%LOCALAPPDATA%\GopeedNative`。解除安裝會移除程式與整合註冊，保留任務資料和下載檔案。回報問題時，請勿附上 Token、Cookie 或私人下載連結。
+任務、設定與 API Token 放在 `%LOCALAPPDATA%\Harbor`。解除安裝會移除程式與整合註冊，保留任務資料和下載檔案。回報問題時，請勿附上 Token、Cookie 或私人下載連結。
 
 ## 建置
 
@@ -81,7 +81,7 @@ HTTP 來源失效時，可修改網址，或選「用下一次瀏覽器連結更
  pwsh -File scripts/source.ps1
 ```
 
-`core/` 是背景服務；`src/Gopeed.Native/` 是 WinUI 前端；`upstream/` 固定 Gopeed 核心版本。0.7.0 使用 Gopeed 2.0 開發版本 `224b4880871f8d7a87c16a3d4daca31546f0ca80`。參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
+`core/` 是背景服務；`src/Harbor/` 是 WinUI 前端；`upstream/` 固定 Gopeed 核心版本。0.7.0 使用 Gopeed 2.0 開發版本 `224b4880871f8d7a87c16a3d4daca31546f0ca80`。參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 致謝與授權
 
