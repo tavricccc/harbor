@@ -12,7 +12,7 @@ public sealed record DownloadCategory(string Name, string Path) { public overrid
 
 internal sealed class CategoriesEditor : StackPanel
 {
-    private readonly ListView list = new() { MinHeight = 128, MaxHeight = 220, SelectionMode = ListViewSelectionMode.Single };
+    private readonly ListView list = new() { MaxHeight = 220, SelectionMode = ListViewSelectionMode.Single };
     private readonly TextBox name = new();
     private readonly TextBox path = new();
     private readonly InfoBar message = new() { Severity = InfoBarSeverity.Error, IsClosable = true };
@@ -32,7 +32,8 @@ internal sealed class CategoriesEditor : StackPanel
                 </Grid>
             </DataTemplate>
             """);
-        var table = new StackPanel { Spacing = 8 };
+        var table = new StackPanel { Spacing = 8, Visibility = Visibility.Collapsed };
+        list.Items.VectorChanged += (_, _) => table.Visibility = list.Items.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         var heading = new Grid { Padding = new Thickness(16, 0, 16, 0), ColumnSpacing = 16 };
         heading.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(104) });
         heading.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });

@@ -10,7 +10,7 @@ namespace Harbor.Views;
 internal sealed class MirrorsEditor : StackPanel
 {
     private readonly CheckBox enabled = new() { Content = "使用 GitHub 鏡像" };
-    private readonly ListView list = new() { MinHeight = 96, MaxHeight = 184, SelectionMode = ListViewSelectionMode.Single };
+    private readonly ListView list = new() { MaxHeight = 184, SelectionMode = ListViewSelectionMode.Single, Visibility = Visibility.Collapsed };
     private readonly ComboBox type = new() { HorizontalAlignment = HorizontalAlignment.Stretch, Items = { "GitHub Proxy", "jsDelivr" }, SelectedIndex = 0 };
     private readonly TextBox url = new() { PlaceholderText = "https://…" };
     private readonly InfoBar message = new() { Severity = InfoBarSeverity.Error, IsClosable = true };
@@ -24,6 +24,7 @@ internal sealed class MirrorsEditor : StackPanel
     {
         Spacing = 16;
         NativeInfoBars.CollapseWhenClosed(message);
+        list.Items.VectorChanged += (_, _) => list.Visibility = list.Items.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
         AutomationProperties.SetName(type, "鏡像類型"); AutomationProperties.SetName(url, "鏡像網址");
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
