@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"time"
@@ -25,6 +26,18 @@ type session struct {
 }
 
 func main() {
+	// Torrent chooses its storage backend during package initialization. Relaunch
+	// direct invocations once so Windows never retains mmap file locks.
+	if os.Getenv("TORRENT_STORAGE_DEFAULT_FILE_IO") != "classic" {
+		if err := os.Setenv("TORRENT_STORAGE_DEFAULT_FILE_IO", "classic"); err != nil {
+			panic(err)
+		}
+		command := exec.Command(os.Args[0], os.Args[1:]...)
+		if err := command.Run(); err != nil {
+			panic(err)
+		}
+		return
+	}
 	root := flag.String("data", "", "Application data directory")
 	ui := flag.String("ui", "", "Native frontend executable")
 	icon := flag.String("icon", "", "Tray icon path")

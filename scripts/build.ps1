@@ -2,9 +2,10 @@ param([switch]$Test)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 $env:CGO_ENABLED = '0'
+$env:TORRENT_STORAGE_DEFAULT_FILE_IO = 'classic'
 Push-Location (Join-Path $repo 'core')
 try {
-    go build -trimpath -ldflags '-s -w -H=windowsgui -X github.com/GopeedLab/gopeed/pkg/base.Version=1.9.3' -o gopeed-core.exe .
+    go build -trimpath -ldflags '-s -w -H=windowsgui -X github.com/GopeedLab/gopeed/pkg/base.Version=2.0.0-dev.224b488' -o gopeed-core.exe .
     if ($LASTEXITCODE) { throw 'Go core build failed' }
     go build -trimpath -ldflags '-s -w -H=windowsgui' -o gopeed-browser-host.exe ./cmd/browser-host
     if ($LASTEXITCODE) { throw 'Browser host build failed' }

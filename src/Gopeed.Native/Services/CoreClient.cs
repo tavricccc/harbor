@@ -29,6 +29,7 @@ public sealed class CoreClient : IDisposable
         {
             var exe = Path.Combine(AppContext.BaseDirectory, "Engine", "gopeed-core.exe");
             var start = new ProcessStartInfo(exe) { UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = DataDirectory };
+            start.Environment["TORRENT_STORAGE_DEFAULT_FILE_IO"] = "classic";
             start.ArgumentList.Add("--data"); start.ArgumentList.Add(DataDirectory);
             start.ArgumentList.Add("--port"); start.ArgumentList.Add(UiPreferences.Load().ApiPort.ToString());
             start.ArgumentList.Add("--ui"); start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "Gopeed.Native.exe"));

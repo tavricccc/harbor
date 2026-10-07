@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/json"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -138,5 +139,7 @@ func TestLocalTorrentSelectedFileTransfer(t *testing.T) {
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	t.Fatal("local BitTorrent transfer did not complete within 30 seconds")
+	snapshot, _ := json.Marshal(rest.Downloader.GetTasksByFilter(&download.TaskFilter{IDs: []string{id}}))
+	log, _ := os.ReadFile(filepath.Join(root, "state", "logs", "core.log"))
+	t.Fatalf("local BitTorrent transfer did not complete within 30 seconds: tasks=%s, seed bytes=%d/%d\n%s", snapshot, seeded.BytesCompleted(), seeded.Length(), log)
 }
