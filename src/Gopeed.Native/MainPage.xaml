@@ -195,6 +195,6 @@
         </Grid>
         <Frame x:Name="SettingsFrame" Grid.Row="1" Margin="20,0,20,12" Visibility="Collapsed"/>
         <TextBlock Grid.Row="2" Margin="20,0,20,4" Text="{x:Bind ViewModel.Summary, Mode=OneWay}"
-                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                   Style="{StaticResource SecondaryTextBlockStyle}"/>
     </Grid>
 </Page>

@@ -63,6 +63,11 @@ public sealed partial class SettingsPage
     {
         var panel = Section("關於");
         panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"] });
+        var credits = SettingsFields.Group(panel, "致謝");
+        credits.Children.Add(SettingsFields.Description("Harbor fork 自 Gopeed，沿用其開源下載引擎，並以 WinUI 3 製作 Windows 原生介面。感謝 GopeedLab 與所有 Gopeed 貢獻者提供的基礎與持續維護。"));
+        credits.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
+        credits.Children.Add(SettingsFields.Description("Harbor 是社群維護的獨立專案，並非 Gopeed 官方發行版。依 GPL-3.0 授權發布。"));
+        panel.Children.Add(credits);
         panel.Children.Add(checkUpdates);
         var update = NativeButtons.Create("檢查更新", "\uE72C");
         update.Click += async (_, _) =>
@@ -75,7 +80,7 @@ public sealed partial class SettingsPage
         panel.Children.Add(update);
         var links = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 20 };
         links.Children.Add(new HyperlinkButton { Content = "專案首頁", NavigateUri = new Uri("https://github.com/tavricccc/harbor"), Padding = new Thickness(0) });
-        links.Children.Add(new HyperlinkButton { Content = "授權與致謝", NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
+        links.Children.Add(new HyperlinkButton { Content = "GPL-3.0 授權", NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
         panel.Children.Add(links);
         var logs = NativeButtons.Create("開啟記錄資料夾", "\uE8B7");
         logs.Click += (_, _) => FileActions.Open(Path.Combine(CoreClient.DataDirectory, "logs")); panel.Children.Add(logs);
