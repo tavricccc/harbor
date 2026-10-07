@@ -1,6 +1,6 @@
 # 參與開發
 
-Harbor 的程式碼維護在 `winui-native` 分支。下載引擎是固定版本的 `GopeedLab/gopeed` submodule；開始修改前，請先讀 [README](README.md) 和 [DESIGN.md](DESIGN.md)。
+Harbor 的程式碼維護在 `winui-native` 分支。下載引擎是固定版本的 `GopeedLab/gopeed` submodule；建置方式見 [README](README.md)。
 
 1. 使用 Windows、PowerShell 7、.NET 10 SDK 與 Go 1.27 建置。
 2. 遞迴取得 submodule，執行 `pwsh -File scripts/build.ps1 -Test`。

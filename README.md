@@ -4,112 +4,87 @@
 
 ![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
-![Go 1.27](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)
-![Gopeed 1.9.3](https://img.shields.io/badge/Gopeed-1.9.3-123D42)
+![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
 ![License GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22C55E)
 
-Harbor 是 Windows 下載管理員，使用 WinUI 3 介面與 [Gopeed](https://github.com/GopeedLab/gopeed) 下載引擎。支援瀏覽器下載接管、HTTP 中斷續傳、BitTorrent，以及稍後下載與定時開始。介面使用繁體中文，隨 Windows 切換明暗主題。
+Windows 原生下載管理員。使用 WinUI 3 介面與 [Gopeed](https://github.com/GopeedLab/gopeed) 下載引擎，提供繁體中文介面、瀏覽器下載接管、稍後下載與定時開始。
 
-這是社群維護的 Gopeed fork，並非 Gopeed 官方發行版。原名 Gopeed Native，從 0.6.0 起改名為 Harbor。
+Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方發行版。
 
-## 下載與安裝
+## 下載
 
-目前版本：[Harbor 0.6.1](https://github.com/tavricccc/harbor/releases/tag/v0.6.1)，Windows x64 預覽版。
+**[下載 Harbor 0.7.0](https://github.com/tavricccc/harbor/releases/tag/v0.7.0)** · Windows x64 預覽版
 
 | 檔案 | 用途 |
 | --- | --- |
-| [Harbor-Setup-0.6.1-x64.exe](https://github.com/tavricccc/harbor/releases/download/v0.6.1/Harbor-Setup-0.6.1-x64.exe) | 安裝版。建立開始功能表捷徑，註冊瀏覽器接管與下載協定，不需管理員權限。 |
-| [Harbor-Portable-0.6.1-x64.zip](https://github.com/tavricccc/harbor/releases/download/v0.6.1/Harbor-Portable-0.6.1-x64.zip) | 完整解壓縮後執行 `Gopeed.Native.exe`。 |
-| [Harbor-Source-0.6.1.zip](https://github.com/tavricccc/harbor/releases/download/v0.6.1/Harbor-Source-0.6.1.zip) | 完整原始碼，含固定版本的上游核心。 |
-| [SHA256SUMS.txt](https://github.com/tavricccc/harbor/releases/download/v0.6.1/SHA256SUMS.txt) | 核對下載檔案的 SHA-256。 |
+| [安裝版](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Setup-0.7.0-x64.exe) | 一般使用者選這個。包含執行環境，安裝到使用者目錄，不需管理員權限。 |
+| [Portable](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Portable-0.7.0-x64.zip) | 完整解壓縮後執行 `Gopeed.Native.exe`。 |
+| [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-Source-0.7.0.zip) | 包含此版本使用的 Gopeed 核心。 |
+| [SHA-256](https://github.com/tavricccc/harbor/releases/download/v0.7.0/SHA256SUMS.txt) | 下載檔案校驗碼。 |
 
-已在 Windows 11 x64 建置與安裝。安裝包包含 .NET 與 Windows App SDK runtime；Windows 10 尚未完成實機驗證。
+支援 Windows 10 1809 以上及 Windows 11；建議 Windows 11。Windows 10 尚未完成實機驗證。從舊版直接執行安裝包即可升級，任務、設定與下載檔案會保留。
 
-從 Gopeed Native 升級可直接執行安裝包，原有任務、設定與下載檔案會保留。程式檔名仍為 `Gopeed.Native.exe`，資料仍放在 `%LOCALAPPDATA%\GopeedNative`。
+## 功能
 
-## 安裝官方瀏覽器擴充套件
+- HTTP／HTTPS 多連線下載、暫停與中斷續傳。
+- BitTorrent、magnet 與 eD2k；Torrent 支援挑選內含檔案。
+- Gopeed 官方瀏覽器擴充套件接管下載。
+- 多行連結批次加入、搜尋、排序與多選操作。
+- 稍後下載及一次性的開始排程。
+- 下載分類、代理設定與 Gopeed 擴充功能。
+- 隨 Windows 切換明暗主題，關閉主視窗後可繼續下載。
 
-要把網站下載交給 Harbor，還需要在瀏覽器另外安裝 **Gopeed 官方擴充套件**。用要接管下載的瀏覽器，開啟對應商店：
+目前排程需背景核心運行；不會喚醒睡眠或關機的電腦。到期項目會在核心下次啟動時補執行。多個命名佇列、週期排程與全域限速尚未提供。
 
-| 瀏覽器 | 官方安裝頁 |
+## 瀏覽器接管
+
+先在要使用的瀏覽器安裝 **Gopeed 官方擴充套件**：
+
+| Chrome | Edge | Firefox |
+| --- | --- | --- |
+| [Chrome Web Store](https://chromewebstore.google.com/detail/gopeed/mijpgljlfcapndmchhjffkpckknofcnd) | [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/dkajnckekendchdleoaenoophcobooce) | [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/gopeed-extension) |
+
+1. 確認擴充套件已啟用。
+2. 開啟 Harbor 的「瀏覽器接管」引導。安裝版會註冊本機接管；Portable 版按「啟用本機接管」。
+3. 在 Gopeed 擴充套件設定中關閉「遠端下載」，再嘗試下載一個檔案。出現 Harbor 確認視窗就表示接管生效。
+
+本機接管不用填伺服器位址或 Token。詳細設定與排除問題見 [瀏覽器接管指南](docs/browser-integration.md)。
+
+## 使用
+
+按「貼上網址」或 Ctrl+V 加入連結；每行一個可批次加入。按「新增下載」可調整位置、檔名與分類，再選擇立即開始、稍後下載或排程。
+
+Torrent 可從工具列選取，也能拖進主視窗。清單右側操作隨狀態切換，下載中可暫停、失敗可重試，完成後可開啟檔案。移除任務預設保留檔案。
+
+HTTP 來源失效時，可修改網址，或選「用下一次瀏覽器連結更新來源」接續原任務。
+
+| 快捷鍵 | 操作 |
 | --- | --- |
-| Chrome | [Chrome Web Store：Gopeed](https://chromewebstore.google.com/detail/gopeed/mijpgljlfcapndmchhjffkpckknofcnd) |
-| Edge | [Microsoft Edge Add-ons：Gopeed](https://microsoftedge.microsoft.com/addons/detail/dkajnckekendchdleoaenoophcobooce) |
-| Firefox | [Firefox Add-ons：Gopeed](https://addons.mozilla.org/firefox/addon/gopeed-extension) |
-
-1. 在商店加入 Gopeed，並確認擴充套件已啟用。
-2. 開啟 Harbor 的「瀏覽器接管」引導。安裝版會註冊本機接管；Portable 版需按「啟用本機接管」。
-3. 在 Gopeed 擴充套件設定中關閉「遠端下載」。回到網站嘗試下載一個檔案，出現 Harbor 確認視窗就表示接管生效。
-
-本機接管不用填伺服器位址或 Token。首次開啟主視窗會顯示「安裝與設定」提示，略過後仍可從工具列的更多選單「瀏覽器接管」，或設定的「連線」分頁開啟引導。
-
-Harbor 顯示「本機接管已註冊」只代表下載器端就緒，擴充套件是否安裝需在瀏覽器確認。其他 Gopeed 安裝若改寫註冊，可在引導重新啟用；Portable 啟用後請保留資料夾位置。排除問題見 [瀏覽器接管指南](docs/browser-integration.md)，商店連結來源見 [Gopeed 官方說明](https://github.com/GopeedLab/browser-extension)。
-
-## 開始下載
-
-在主視窗按「貼上網址」或 Ctrl+V，貼上 HTTP、HTTPS、magnet 或 eD2k 連結。一次貼上多行連結可批次加入。「新增下載」可調整儲存位置、檔名、分類和這次下載的設定。
-
-Torrent 檔案可用工具列的「開啟 Torrent」加入，也能拖進主視窗，或在檔案總管複製後按 Ctrl+V。選檔視窗支援多選；單一 Torrent 檢查完成後，可勾選要下載的內含檔案。Tracker、做種條件與連接埠在設定的「下載」分頁調整。
-
-清單每筆右側的主要操作會隨狀態切換：下載中可暫停、失敗可重試，完成後可開啟檔案。支援搜尋、排序、Ctrl／Shift 多選，以及批次暫停、繼續和移除。移除任務時預設保留檔案。
-
-HTTP 來源失效時，暫停後可修改網址；也可選「用下一次瀏覽器連結更新來源」，等待瀏覽器送來新連結後接續原任務。
-
-## 稍後下載與排程
-
-確認視窗的「稍後下載」會保存請求，現在不開始傳輸。「排程」可指定一次性的開始日期與時間。
-
-保存後會開啟主清單的「待下載／排程」篩選。按播放按鈕可立即開始，右鍵「調整排程」可改時間，或改回手動開始。「全部繼續」會開始手動待下載項目，有指定時間的項目仍依排程執行。
-
-關閉介面後，背景核心會繼續下載和處理排程。電腦關機期間到期的項目，會在下次核心啟動時補執行。排程啟動失敗會保留項目與錯誤原因，修正後可手動重試。
-
-目前排程是單次開始；多個命名佇列、週期排程和全域限速尚未提供。
-
-## 快捷鍵
-
-| 按鍵 | 操作 |
-| --- | --- |
-| Ctrl+N | 新增下載 |
-| Ctrl+V | 在主視窗貼上連結或 Torrent 檔案 |
-| Ctrl+F | 搜尋下載 |
-| F5 | 重新整理 |
-| Ctrl+A | 在清單選取全部 |
-| Delete | 移除選取的任務 |
-| Ctrl+Enter | 在確認視窗檢查或開始下載 |
-| Esc | 取消下載確認 |
+| Ctrl+N / Ctrl+V | 新增下載 / 貼上連結或 Torrent |
+| Ctrl+F / F5 | 搜尋 / 重新整理 |
+| Ctrl+A / Delete | 在清單全選 / 移除選取任務 |
+| Ctrl+Enter / Esc | 在確認視窗檢查或開始 / 取消 |
 
 ## 資料與解除安裝
 
-任務、偏好與 API Token 位於 `%LOCALAPPDATA%\GopeedNative`。核心只監聽本機介面，API 使用 Token 驗證。回報問題時，請勿附上 Token、session、Cookie 或含私人連結的請求檔。
+任務、設定與 API Token 放在 `%LOCALAPPDATA%\GopeedNative`。解除安裝會移除程式與整合註冊，保留任務資料和下載檔案。回報問題時，請勿附上 Token、Cookie 或私人下載連結。
 
-解除安裝會停止核心、移除整合註冊，並還原安裝前的瀏覽器 host；任務資料與下載檔案會保留。若要清除任務資料，先結束核心，再刪除上述資料夾。
+## 建置
 
-## 開發
-
-準備 Windows、PowerShell 7、Go 1.27 與 .NET 10 SDK。製作安裝包另需 Inno Setup 6。
+需要 Windows、PowerShell 7、Go 1.27 與 .NET 10 SDK。安裝包另需 Inno Setup 6。
 
 ```powershell
-git clone --branch winui-native --recurse-submodules https://github.com/tavricccc/harbor.git
-cd harbor
-pwsh -File scripts/build.ps1 -Test
-pwsh -File scripts/package.ps1 -SkipBuild
-pwsh -File scripts/source.ps1
+ git clone --branch winui-native --recurse-submodules https://github.com/tavricccc/harbor.git
+ cd harbor
+ pwsh -File scripts/build.ps1 -Test
+ pwsh -File scripts/package.ps1 -SkipBuild
+ pwsh -File scripts/source.ps1
 ```
 
-程式碼維護在 `winui-native` 分支，`main` 保留上游內容。下載引擎固定在 Gopeed v1.9.3，submodule commit 為 `a5cd53f94c18ac65add684b1113fa5f0b47cc4da`。
+`core/` 是背景服務；`src/Gopeed.Native/` 是 WinUI 前端；`upstream/` 固定 Gopeed 核心版本。0.7.0 使用 Gopeed 2.0 開發版本 `224b4880871f8d7a87c16a3d4daca31546f0ca80`。參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-`core/` 維護背景服務、瀏覽器請求與排程；`src/Gopeed.Native/` 是 WinUI 前端；`tests/Gopeed.ProtocolChecks/` 檢查協定、HTTP 標頭與狀態操作。建置產物放在 `artifacts/`。重新建置前，請關閉從該目錄執行的前端、核心和瀏覽器 host。
+## 致謝與授權
 
-圖示原稿是 `src/Gopeed.Native/Assets/Harbor.svg`。要重產 Windows 圖示，先執行 `python -m pip install -r scripts/requirements.txt`，再執行 `python scripts/create_icon.py`。介面規則見 [DESIGN.md](DESIGN.md)，參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
+感謝 [GopeedLab 與 Gopeed 貢獻者](https://github.com/GopeedLab/gopeed/graphs/contributors)開源並持續維護下載引擎。Harbor 的核心能力建立在 Gopeed 之上；WinUI 3 介面另行實作。
 
-## 驗證狀態
-
-0.6.0 已通過核心測試、ProtocolChecks、WinUI Release publish、安裝包與 Portable 打包。測試包含 HTTP 暫停與重啟續傳、排程保存與到期處理，以及本機 Tracker／種子的 BT 選檔傳輸和 SHA-256 比對。打包後也檢查了核心重啟、排程修改與移除。
-
-0.6.1 補上瀏覽器安裝引導並重新建置與打包；商店連結依官方擴充套件 README 核對。本機 host 註冊、擴充套件安裝與實際下載接管是不同檢查，Harbor 只顯示自身的註冊狀態。
-
-瀏覽器前景焦點、新版原生視覺、Narrator、高對比、公開 BT 網路和 eD2k 傳輸尚待實機驗收。此版仍列為預覽版。詳細範圍見 [0.6.0 維護紀錄](docs/harbor-0.6.0.md)；遠端建置結果以 [GitHub Actions](https://github.com/tavricccc/harbor/actions) 為準。
-
-## 授權
-
-[GPL-3.0](LICENSE)。下載引擎來自 GopeedLab/gopeed，保留上游授權與來源。Release 附加的完整 Source ZIP 包含 submodule；GitHub 自動產生的 Source code ZIP 不包含，請下載附加檔或遞迴 clone。
+依 [GPL-3.0](LICENSE) 發布，保留上游授權與來源。Release 附加的完整原始碼包含 submodule；GitHub 自動產生的 Source code ZIP 不包含，請下載附加檔或遞迴 clone。

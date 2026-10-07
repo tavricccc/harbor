@@ -2,7 +2,9 @@
 **/obj/
 artifacts/
 work/
-.impeccable/review/
+.impeccable/
+DESIGN.md
+PRODUCT.md
 *.pfx
 *.cer
 core/gopeed-core.exe
