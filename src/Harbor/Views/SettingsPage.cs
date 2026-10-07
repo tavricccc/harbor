@@ -14,6 +14,7 @@ public sealed partial class SettingsPage : Page
     private readonly SettingsFields fields = new();
     private readonly InfoBar message = new() { IsClosable = true, Visibility = Visibility.Collapsed };
     private readonly Pivot sections = new();
+    private Button saveButton = null!;
     private readonly ComboBox theme = new() { Header = "佈景主題", HorizontalAlignment = HorizontalAlignment.Stretch, Items = { "跟隨 Windows", "淺色", "深色" }, SelectedIndex = 0 };
     private readonly CheckBox remember = new() { Content = "記住上次使用的下載位置" };
     private readonly CheckBox closeProgress = new() { Content = "開啟檔案後關閉下載視窗" };
@@ -47,8 +48,9 @@ public sealed partial class SettingsPage : Page
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };
         var cancel = NativeButtons.Create("取消", "\uE711"); cancel.Click += (_, _) => CloseRequested?.Invoke();
-        var save = NativeButtons.Create("儲存", "\uE74E", true); save.Click += Save;
-        actions.Children.Add(cancel); actions.Children.Add(save);
+        saveButton = NativeButtons.Create("儲存", "\uE74E", true); saveButton.Click += Save;
+        sections.IsEnabled = saveButton.IsEnabled = false;
+        actions.Children.Add(cancel); actions.Children.Add(saveButton);
         Grid.SetRow(actions, 2); surface.Children.Add(actions);
         Content = surface; Loaded += Load;
     }
@@ -81,6 +83,7 @@ public sealed partial class SettingsPage : Page
             apiPort.Value = prefs.ApiPort; checkUpdates.IsChecked = prefs.CheckForUpdates; startup.IsChecked = WindowsIntegration.StartsWithWindows;
             proxyMode.SelectedIndex = config["proxy"]?["enable"]?.GetValue<bool>() == true ? config["proxy"]?["system"]?.GetValue<bool>() == true ? 0 : 2 : 1;
             theme.SelectedIndex = WindowAppearance.Theme switch { ElementTheme.Light => 1, ElementTheme.Dark => 2, _ => 0 };
+            sections.IsEnabled = saveButton.IsEnabled = true;
         }
         catch (Exception error) { Report(error); }
     }

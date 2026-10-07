@@ -14,7 +14,6 @@ public sealed partial class MainPage : Page
 {
  public DownloadsViewModel ViewModel { get; } = new();
  private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(1) };
- private bool refreshing;
  private SettingsWindow? settingsWindow;
  private readonly TaskCompletionSource ready = new();
  public MainPage()
@@ -22,12 +21,12 @@ public sealed partial class MainPage : Page
   InitializeComponent(); Loaded += Start;
   NativeInfoBars.CollapseWhenClosed(ErrorBar);
   InitializeBrowserSetupHint();
-  Unloaded += (_, _) => { timer.Stop(); settingsWindow?.Close(); ViewModel.Dispose(); };
+  Unloaded += (_, _) => { polling = false; timer.Stop(); searchTimer.Stop(); settingsWindow?.Close(); ViewModel.Dispose(); };
   ViewModel.VisibleItems.CollectionChanged += (_, _) => EmptyState.Visibility = ViewModel.VisibleItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
   ViewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(ViewModel.Error) && ViewModel.Error.Length > 0) { ErrorBar.Message = ViewModel.Error; ErrorBar.IsOpen = true; } };
-  timer.Tick += async (_, _) => { if (refreshing || !ViewModel.IsConnected) return; refreshing = true; await ViewModel.RefreshAsync(); refreshing = false; };
+  InitializeRefresh();
  }
- private async void Start(object sender, RoutedEventArgs e) { Loaded -= Start; await ViewModel.InitializeAsync(); timer.Start(); ready.SetResult(); if (ViewModel.IsConnected && UiPreferences.Load().CheckForUpdates) { try { var update = await UpdateService.CheckAsync(ViewModel.Core); if (update is not null) { ErrorBar.Severity = InfoBarSeverity.Informational; ErrorBar.Message = $"有新版本：{update.Version}"; var button = new Button { Content = "下載更新" }; button.Click += async (_, _) => await UpdateService.PromptAsync(ViewModel.Core, update, XamlRoot); ErrorBar.ActionButton = button; ErrorBar.IsOpen = true; } } catch (Exception) { /* A background update check must not interrupt downloads. Manual checks report errors. */ } } }
+ private async void Start(object sender, RoutedEventArgs e) { Loaded -= Start; await ViewModel.InitializeAsync(); ready.SetResult(); UpdatePollingVisibility(); if (ViewModel.IsConnected && UiPreferences.Load().CheckForUpdates) { try { var update = await UpdateService.CheckAsync(ViewModel.Core); if (update is not null) { ErrorBar.Severity = InfoBarSeverity.Informational; ErrorBar.Message = $"有新版本：{update.Version}"; var button = new Button { Content = "下載更新" }; button.Click += async (_, _) => await UpdateService.PromptAsync(ViewModel.Core, update, XamlRoot); ErrorBar.ActionButton = button; ErrorBar.IsOpen = true; } } catch (Exception) { /* A background update check must not interrupt downloads. Manual checks report errors. */ } } }
  private async void AddDownload(object sender, RoutedEventArgs e)
  {
   await AddDownloadAsync(null);
@@ -56,7 +55,7 @@ public sealed partial class MainPage : Page
   catch (Exception error) { ViewModel.Error = $"無法開啟 Gopeed 連結：{error.Message}"; }
  }
  private void FilterChanged(object s, SelectionChangedEventArgs e) { if (FilterBox?.SelectedItem is ComboBoxItem item) { ViewModel.Filter = item.Tag.ToString()!; ViewModel.ApplyFilter(); } }
- private void SearchChanged(AutoSuggestBox s, AutoSuggestBoxTextChangedEventArgs e) { ViewModel.Search = s.Text; ViewModel.ApplyFilter(); }
+ private void SearchChanged(AutoSuggestBox s, AutoSuggestBoxTextChangedEventArgs e) { ViewModel.Search = s.Text; searchTimer.Stop(); searchTimer.Start(); }
  private async void PauseSelected(object s, RoutedEventArgs e) => await ViewModel.ActAsync("pause", ViewModel.Selection.Where(x => x.CanPause));
  private async void ResumeSelected(object s, RoutedEventArgs e) => await ViewModel.ActAsync("continue", ViewModel.Selection.Where(x => x.CanResume));
  private async void PauseAll(object s, RoutedEventArgs e) => await ViewModel.ActAsync("pause", ViewModel.AllItems.Where(i => i.CanPause));
@@ -117,7 +116,17 @@ public sealed partial class MainPage : Page
   if (ViewModel.Selected is not { } item) return;
   await NativeDialogs.ShowAsync(new TaskDetailsDialog(ViewModel.Core, item), XamlRoot);
  }
- private void ListDoubleTapped(object s, DoubleTappedRoutedEventArgs e) { if (ViewModel.Selected?.IsComplete == true) OpenSelected(s, new()); else ShowDetails(s, new()); }
+ private void ListDoubleTapped(object s, DoubleTappedRoutedEventArgs e) { OpenSelection(); e.Handled = ViewModel.HasSingleSelection; }
+ private void OpenSelection()
+ {
+  if (ViewModel.Selected is not { } item) return;
+  if (item.IsDeferred) ShowDetails(this, new());
+  else if (item is { IsComplete: true, Uploading: false, IsProcessing: false }) OpenSelected(this, new());
+  else ((App)Application.Current).OpenProgressWindow(item.Id);
+ }
+ private void OpenShortcut(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { if (ListHasFocus() && ViewModel.HasSingleSelection) { OpenSelection(); e.Handled = true; } }
+ private void ContextProgress(object s, RoutedEventArgs e) { if (ContextItem(s) is { IsDeferred: false } item) ((App)Application.Current).OpenProgressWindow(item.Id); }
+ private void ShowProgress(object s, RoutedEventArgs e) { if (ViewModel.Selected is { IsDeferred: false } item) ((App)Application.Current).OpenProgressWindow(item.Id); }
  private DownloadItem? ContextItem(object s) => ViewModel.VisibleItems.FirstOrDefault(i => i.Id == (s as MenuFlyoutItem)?.Tag?.ToString());
  private async void ContextPrimary(object s, RoutedEventArgs e)
  {
@@ -127,14 +136,13 @@ public sealed partial class MainPage : Page
   else if (action.Key != "none") await ViewModel.ActAsync(action.Key, [item]);
  }
  private async void ContextPause(object s, RoutedEventArgs e) { if (ContextItem(s) is { CanPause: true } item) await ViewModel.ActAsync("pause", [item]); }
- private async void ContextResume(object s, RoutedEventArgs e) { if (ContextItem(s) is { CanResume: true } item) await ViewModel.ActAsync("continue", [item]); }
  private void ContextFolder(object s, RoutedEventArgs e) { try { if (ContextItem(s) is { } item) FileActions.Reveal(item.FilePath, item.Folder); } catch (Exception ex) { ViewModel.Error = UserError.Message(ex); } }
  private async void ContextDelete(object s, RoutedEventArgs e) { if (ContextItem(s) is { } item) await DeleteAsync(item); }
  private void NewShortcut(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { AddDownload(s, new()); e.Handled = true; }
  private void SearchShortcut(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { SearchBox.Focus(FocusState.Keyboard); e.Handled = true; }
  private async void RefreshShortcut(KeyboardAccelerator s, KeyboardAcceleratorInvokedEventArgs e) { await ViewModel.RefreshAsync(); e.Handled = true; }
- private void OpenSection(Page page) { DownloadsSurface.Visibility = Visibility.Collapsed; DownloadsCommands.Visibility = Visibility.Collapsed; SettingsFrame.Content = page; SettingsFrame.Visibility = Visibility.Visible; BackToDownloads.Visibility = Visibility.Visible; }
- private void ShowDownloads(object sender, RoutedEventArgs args) { SettingsFrame.Content = null; SettingsFrame.Visibility = Visibility.Collapsed; DownloadsSurface.Visibility = Visibility.Visible; DownloadsCommands.Visibility = Visibility.Visible; BackToDownloads.Visibility = Visibility.Collapsed; }
+ private void OpenSection(Page page) { DownloadsSurface.Visibility = Visibility.Collapsed; DownloadsCommands.Visibility = Visibility.Collapsed; SettingsFrame.Content = page; SettingsFrame.Visibility = Visibility.Visible; BackToDownloads.Visibility = Visibility.Visible; UpdatePollingVisibility(); }
+ private void ShowDownloads(object sender, RoutedEventArgs args) { SettingsFrame.Content = null; SettingsFrame.Visibility = Visibility.Collapsed; DownloadsSurface.Visibility = Visibility.Visible; DownloadsCommands.Visibility = Visibility.Visible; BackToDownloads.Visibility = Visibility.Collapsed; UpdatePollingVisibility(); }
  private void ShowSettings(object sender, RoutedEventArgs args)
  {
   if (settingsWindow is not null) { settingsWindow.Activate(); return; }

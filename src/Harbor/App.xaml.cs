@@ -122,9 +122,20 @@ public partial class App : Application
     internal void OpenDownloadWindow(System.Text.Json.Nodes.JsonObject request, bool compact = true)
     {
         var window = new Views.DownloadWindow(request, compact);
+        TrackDownloadWindow(window);
+        Services.WindowActivation.ShowConfirmation(window);
+    }
+    internal void OpenProgressWindow(string taskId)
+    {
+        var window = downloadWindows.FirstOrDefault(window => window.TaskId == taskId);
+        if (window is null) { window = new Views.DownloadWindow(taskId); TrackDownloadWindow(window); }
+        if (window.AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter) presenter.Restore();
+        window.AppWindow.Show(true); window.Activate();
+    }
+    private void TrackDownloadWindow(Views.DownloadWindow window)
+    {
         downloadWindows.Add(window);
         window.Closed += (_, _) => { downloadWindows.Remove(window); ReleaseRegistration(); };
-        Services.WindowActivation.ShowConfirmation(window);
     }
     internal void ShowDeferredDownloads()
     {

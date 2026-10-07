@@ -10,6 +10,7 @@
         <KeyboardAccelerator Key="F" Modifiers="Control" Invoked="SearchShortcut"/>
         <KeyboardAccelerator Key="A" Modifiers="Control" Invoked="SelectAllShortcut"/>
         <KeyboardAccelerator Key="Delete" Invoked="DeleteShortcut"/>
+        <KeyboardAccelerator Key="Enter" Invoked="OpenShortcut"/>
         <KeyboardAccelerator Key="F5" Invoked="RefreshShortcut"/>
     </Page.KeyboardAccelerators>
 
@@ -30,26 +31,32 @@
                 </StackPanel>
             </Button>
             <CommandBar x:Name="DownloadsCommands" DefaultLabelPosition="Right"
-                        IsDynamicOverflowEnabled="True" Background="Transparent">
-                <AppBarButton Label="貼上網址" Icon="Paste" Click="PasteDownload" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
+                        IsDynamicOverflowEnabled="True" HorizontalAlignment="Left" Background="Transparent">
                 <AppBarButton Label="新增下載" Icon="Add" Click="AddDownload"
                               IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}" AutomationProperties.AutomationId="AddDownload"/>
-                <AppBarButton Label="開啟 Torrent" Icon="OpenFile" Click="OpenTorrent" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
+                <AppBarButton Label="貼上網址" Icon="Paste" Click="PasteDownload" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
                 <AppBarSeparator/>
-                <AppBarButton Label="全部暫停" Icon="Pause" Click="PauseAll" IsEnabled="{x:Bind ViewModel.CanPauseAll, Mode=OneWay}"/>
-                <AppBarButton Label="全部繼續" Icon="Play" Click="ResumeAll" IsEnabled="{x:Bind ViewModel.CanResumeAll, Mode=OneWay}"/>
+                <AppBarButton Icon="Play" Label="繼續" Click="ResumeSelected" IsEnabled="{x:Bind ViewModel.CanResumeSelected, Mode=OneWay}" ToolTipService.ToolTip="繼續或重試選取的下載"/>
+                <AppBarButton Icon="Pause" Label="暫停" Click="PauseSelected" IsEnabled="{x:Bind ViewModel.CanPauseSelected, Mode=OneWay}" ToolTipService.ToolTip="暫停選取的下載或停止做種"/>
+                <AppBarButton Icon="Delete" Label="移除" Click="DeleteSelected" IsEnabled="{x:Bind ViewModel.HasSelection, Mode=OneWay}" ToolTipService.ToolTip="移除選取的下載"/>
+                <AppBarSeparator/>
                 <AppBarButton Label="設定" Icon="Setting" Click="ShowSettings"
                               IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}" AutomationProperties.AutomationId="SettingsItem"/>
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Icon="Pause" Label="暫停選取" Click="PauseSelected" IsEnabled="{x:Bind ViewModel.CanPauseSelected, Mode=OneWay}"/>
-                    <AppBarButton Icon="Play" Label="繼續選取" Click="ResumeSelected" IsEnabled="{x:Bind ViewModel.CanResumeSelected, Mode=OneWay}"/>
+                    <AppBarButton Label="開啟 Torrent" Icon="OpenFile" Click="OpenTorrent" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"/>
+                    <AppBarButton Label="待下載與排程" Icon="Calendar" Click="OpenDeferredDownloads"/>
+                    <AppBarSeparator/>
+                    <AppBarButton Label="全部暫停" Icon="Pause" Click="PauseAll" IsEnabled="{x:Bind ViewModel.CanPauseAll, Mode=OneWay}"/>
+                    <AppBarButton Label="全部繼續" Icon="Play" Click="ResumeAll" IsEnabled="{x:Bind ViewModel.CanResumeAll, Mode=OneWay}"/>
+                    <AppBarButton Icon="Clear" Label="清除已完成紀錄" Click="ClearCompleted" IsEnabled="{x:Bind ViewModel.CanClearCompleted, Mode=OneWay}"/>
+                    <AppBarSeparator/>
+                    <AppBarButton Label="下載進度" Icon="Download" Click="ShowProgress" IsEnabled="{x:Bind ViewModel.CanShowProgress, Mode=OneWay}"/>
                     <AppBarButton Label="詳細資訊" Click="ShowDetails" IsEnabled="{x:Bind ViewModel.HasSingleSelection, Mode=OneWay}">
                         <AppBarButton.Icon><FontIcon Glyph="&#xE946;"/></AppBarButton.Icon>
                     </AppBarButton>
                     <AppBarButton Icon="Edit" Label="修改下載來源" Click="EditSelectedSource" IsEnabled="{x:Bind ViewModel.CanEditSource, Mode=OneWay}"/>
                     <AppBarButton Icon="Download" Label="重新下載" Click="Redownload" IsEnabled="{x:Bind ViewModel.HasSingleSelection, Mode=OneWay}"/>
                     <AppBarButton Icon="Copy" Label="複製選取網址" Click="CopySelected" IsEnabled="{x:Bind ViewModel.HasSelection, Mode=OneWay}"/>
-                    <AppBarButton Icon="Delete" Label="移除選取" Click="DeleteSelected" IsEnabled="{x:Bind ViewModel.HasSelection, Mode=OneWay}"/>
                     <AppBarButton Icon="SelectAll" Label="選取全部" Click="SelectAll"/>
                     <AppBarButton Icon="Refresh" Label="重新整理" Click="RefreshClicked"/>
                     <AppBarSeparator/>
@@ -76,7 +83,6 @@
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="140"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <ComboBox x:Name="FilterBox" SelectedIndex="0" SelectionChanged="FilterChanged"
                           HorizontalAlignment="Stretch" AutomationProperties.Name="下載狀態篩選">
@@ -99,9 +105,6 @@
                     <ComboBoxItem Content="檔案大小" Tag="size"/>
                     <ComboBoxItem Content="下載進度" Tag="progress"/>
                 </ComboBox>
-                <Button Grid.Column="3" Content="清除已完成" Click="ClearCompleted"
-                        IsEnabled="{x:Bind ViewModel.CanClearCompleted, Mode=OneWay}"
-                        ToolTipService.ToolTip="只清除紀錄，不刪除檔案"/>
             </Grid>
             <Grid Grid.Row="1" Margin="24,0" ColumnSpacing="12" SizeChanged="TableSizeChanged">
                 <Grid.ColumnDefinitions>
@@ -109,7 +112,7 @@
                     <ColumnDefinition Width="140"/>
                     <ColumnDefinition Width="152"/>
                     <ColumnDefinition Width="104"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="66"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="檔名" Style="{StaticResource SecondaryTextBlockStyle}"/>
                 <TextBlock Grid.Column="1" Text="下載大小" HorizontalAlignment="Right" Style="{StaticResource SecondaryTextBlockStyle}"/>
@@ -134,7 +137,7 @@
                                 <ColumnDefinition Width="140"/>
                                 <ColumnDefinition Width="152"/>
                                 <ColumnDefinition Width="104"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="66"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{x:Bind Name, Mode=OneWay}" VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{x:Bind Name, Mode=OneWay}"/>
@@ -159,10 +162,6 @@
                                         AutomationProperties.Name="在資料夾中顯示" ToolTipService.ToolTip="在資料夾中顯示">
                                     <FontIcon Glyph="&#xE838;" FontSize="14"/>
                                 </Button>
-                                <Button Tag="{x:Bind Id}" Click="RowDelete" Style="{StaticResource RowActionButtonStyle}"
-                                        AutomationProperties.Name="移除下載" ToolTipService.ToolTip="移除下載">
-                                    <FontIcon Glyph="&#xE711;" FontSize="14"/>
-                                </Button>
                             </StackPanel>
                             <Grid.ContextFlyout>
                                 <MenuFlyout>
@@ -170,10 +169,10 @@
                                         <MenuFlyoutItem.Icon><FontIcon Glyph="{x:Bind PrimaryActionGlyph, Mode=OneWay}"/></MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem Text="在資料夾中顯示" Icon="Folder" Click="ContextFolder" Tag="{x:Bind Id}" IsEnabled="{x:Bind CanReveal, Mode=OneWay}"/>
+                                    <MenuFlyoutItem Text="下載進度" Icon="Download" Click="ContextProgress" Tag="{x:Bind Id}" IsEnabled="{x:Bind CanReveal, Mode=OneWay}"/>
                                     <MenuFlyoutItem Text="檔案與詳細資訊" Icon="Document" Click="ContextDetails" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutSeparator/>
-                                    <MenuFlyoutItem Text="暫停／停止做種" Icon="Pause" Click="ContextPause" IsEnabled="{x:Bind CanPause, Mode=OneWay}" Tag="{x:Bind Id}"/>
-                                    <MenuFlyoutItem Text="繼續／重試" Icon="Play" Click="ContextResume" IsEnabled="{x:Bind CanResume, Mode=OneWay}" Tag="{x:Bind Id}"/>
+                                    <MenuFlyoutItem Text="停止做種" Icon="Pause" Click="ContextPause" Visibility="{x:Bind SeedVisibility, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutItem Text="調整排程" Icon="Calendar" Click="EditSchedule" IsEnabled="{x:Bind IsDeferred, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutItem Text="修改下載來源" Icon="Edit" Click="ContextEditSource" IsEnabled="{x:Bind CanEditSource, Mode=OneWay}" Tag="{x:Bind Id}"/>
                                     <MenuFlyoutItem Text="用下一次瀏覽器連結更新來源" Icon="Link" Click="ContextListenSource" IsEnabled="{x:Bind CanEditSource, Mode=OneWay}" Tag="{x:Bind Id}"/>

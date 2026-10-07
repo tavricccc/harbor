@@ -14,6 +14,7 @@ public sealed class CoreClient : IDisposable
     public string ApiAddress => $"http://127.0.0.1:{session["port"]}";
     public string Token => session["token"]!.GetValue<string>();
     public int ProcessId => session["pid"]!.GetValue<int>();
+    public string Version { get; private set; } = "";
 
     public async Task ConnectAsync()
     {
@@ -52,19 +53,21 @@ public sealed class CoreClient : IDisposable
         http.BaseAddress = new Uri(ApiAddress + "/api/v1/");
         http.DefaultRequestHeaders.Add("X-Api-Token", Token);
         http.DefaultRequestHeaders.Add("X-Gopeed-Native-Confirmed", "1");
-        await GetAsync("info");
+        Version = (await GetAsync("info"))!["version"]!.GetValue<string>();
     }
 
-    public Task<JsonNode?> GetAsync(string route) => SendAsync(HttpMethod.Get, route);
-    public async Task<JsonNode?> SendAsync(HttpMethod method, string route, JsonNode? body = null)
+    public Task<JsonNode?> GetAsync(string route, CancellationToken cancellationToken = default) => SendAsync(HttpMethod.Get, route, cancellationToken: cancellationToken);
+    public async Task<JsonNode?> SendAsync(HttpMethod method, string route, JsonNode? body = null, CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(method, route);
         if (body is not null) request.Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
-        using var response = await http.SendAsync(request);
+        using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        var result = JsonNode.Parse(await response.Content.ReadAsStringAsync())!.AsObject();
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var result = (await JsonNode.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false))!.AsObject();
         if (result["code"]!.GetValue<int>() != 0) throw new DownloadApiException(result["msg"]!.GetValue<string>());
-        return result["data"]?.DeepClone();
+        result.Remove("data", out var data);
+        return data;
     }
     public async Task<string> FetchTextAsync(string url)
     {

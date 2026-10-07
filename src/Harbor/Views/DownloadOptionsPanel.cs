@@ -38,12 +38,11 @@ internal sealed class DownloadOptionsPanel : StackPanel
         host.TextChanged += (_, _) => RequestChanged?.Invoke(); user.TextChanged += (_, _) => RequestChanged?.Invoke(); password.PasswordChanged += (_, _) => RequestChanged?.Invoke(); scheme.SelectionChanged += (_, _) => RequestChanged?.Invoke();
         skipCert.Checked += (_, _) => RequestChanged?.Invoke(); skipCert.Unchecked += (_, _) => RequestChanged?.Invoke();
     }
-    private static StackPanel Section(string title, params UIElement[] controls)
+    private static Expander Section(string title, params UIElement[] controls)
     {
         var section = new StackPanel { Spacing = 12 };
-        section.Children.Add(new TextBlock { Text = title, Style = (Style)Application.Current.Resources["CompactSectionTitleStyle"], FontSize = 14 });
         foreach (var control in controls) section.Children.Add(control);
-        return section;
+        return new Expander { Header = title, Content = section, HorizontalAlignment = HorizontalAlignment.Stretch };
     }
     private static Grid Pair(FrameworkElement first, FrameworkElement second)
     {

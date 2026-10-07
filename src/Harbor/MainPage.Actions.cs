@@ -13,6 +13,7 @@ public sealed partial class MainPage
     private void DownloadSelectionChanged(object sender, SelectionChangedEventArgs args) => ViewModel.SetSelection(DownloadList.SelectedItems.Cast<DownloadItem>());
     private void SortChanged(object sender, SelectionChangedEventArgs args) { if (((ComboBox)sender).SelectedItem is ComboBoxItem item) { ViewModel.Sort = item.Tag.ToString()!; ViewModel.ApplyFilter(); } }
     private void SelectAll(object sender, RoutedEventArgs args) => DownloadList.SelectAll();
+    private void OpenDeferredDownloads(object sender, RoutedEventArgs args) => ShowDeferredDownloads();
     private bool ListHasFocus() { var current = Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(XamlRoot) as DependencyObject; while (current is not null) { if (current == DownloadList) return true; current = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(current); } return false; }
     private void SelectAllShortcut(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args) { if (ListHasFocus()) { DownloadList.SelectAll(); args.Handled = true; } }
     private async void DeleteShortcut(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args) { if (ListHasFocus() && ViewModel.HasSelection) { args.Handled = true; await DeleteItemsAsync(ViewModel.Selection); } }

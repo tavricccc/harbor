@@ -56,6 +56,20 @@ internal sealed class SettingsFields
         panel.Children.Add(group); return group;
     }
 
+    public static StackPanel Advanced(Panel panel, string title)
+    {
+        var content = new StackPanel { Spacing = 16, Padding = new Thickness(0, 4, 0, 8) };
+        panel.Children.Add(new Expander { Header = title, Content = content, HorizontalAlignment = HorizontalAlignment.Stretch });
+        return content;
+    }
+
+    public static void Reveal(CheckBox toggle, UIElement content)
+    {
+        void Update() => content.Visibility = toggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        toggle.Checked += (_, _) => Update(); toggle.Unchecked += (_, _) => Update();
+        Update();
+    }
+
     public static TextBlock Description(string text) => new()
     {
         Text = text, TextWrapping = TextWrapping.Wrap,

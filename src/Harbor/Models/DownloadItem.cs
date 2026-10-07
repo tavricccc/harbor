@@ -4,7 +4,7 @@ using Harbor.Services;
 
 namespace Harbor.Models;
 
-public sealed class DownloadItem : ObservableObject
+public sealed partial class DownloadItem : ObservableObject
 {
     public string Id { get; }
     public JsonObject Data { get; private set; }
@@ -34,7 +34,6 @@ public sealed class DownloadItem : ObservableObject
     public string SizeText => Size > 0 ? FormatBytes(Size) : "大小未知";
     public string TransferText => $"{FormatBytes(Downloaded)} / {SizeText}" + (ExtractionText.Length > 0 ? $" · {ExtractionText}" : "");
     public string TransferSizeText => IsComplete ? SizeText : $"{FormatBytes(Downloaded)} / {SizeText}";
-    public Microsoft.UI.Xaml.Visibility ProgressVisibility => !IsComplete && Size > 0 && Status != "error" ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
     public string RowProgressText => Status == "running" && Size > 0 ? $"{Percent:0}%" : StatusText;
     public string DetailsText => $"{Name}\n{StatusText} · {TransferText}\n速度：{SpeedText} · 剩餘 {RemainingText}\n{FilePath}\n{Url}" + (DeferredError.Length > 0 ? "\n" + DeferredError : "");
     public long Uploaded => Data["progress"]?["uploaded"]?.GetValue<long>() ?? 0;
@@ -49,8 +48,6 @@ public sealed class DownloadItem : ObservableObject
     public bool CanEditSource => Protocol == "HTTP" && (Status is "pause" or "error");
     public bool CanReveal => !IsDeferred;
     public bool CanAct => PrimaryAction.Key != "none";
-    public Microsoft.UI.Xaml.Visibility ActionVisibility => CanAct ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
-    public Microsoft.UI.Xaml.Visibility FolderVisibility => IsComplete && !IsProcessing ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
     public string FilePath
     {
         get
@@ -62,12 +59,6 @@ public sealed class DownloadItem : ObservableObject
             if (!string.IsNullOrEmpty(name)) return Path.Combine(Folder, string.IsNullOrEmpty(custom) ? name : custom);
             return Path.Combine(Folder, file?["path"]?.GetValue<string>() ?? "", string.IsNullOrEmpty(custom) ? file?["name"]?.GetValue<string>() ?? Name : custom);
         }
-    }
-    public void Update(JsonObject data)
-    {
-        if (Data.ToJsonString() == data.ToJsonString()) return;
-        Data = data;
-        OnPropertyChanged(string.Empty);
     }
     public override string ToString() => Name;
     public static string FormatBytes(long value) => value switch

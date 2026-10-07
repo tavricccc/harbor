@@ -14,6 +14,7 @@ public sealed class DownloadWindow : Window
     private readonly bool compact;
     private bool closed;
     private DownloadProgressPage? progress;
+    public string? TaskId { get; private set; }
     private Func<double,double>? preferredHeight;
     private const double ContentWidth = 660;
     private bool fitQueued;
@@ -42,7 +43,18 @@ public sealed class DownloadWindow : Window
             presenter.IsAlwaysOnTop = true;
         }
         Closed += (_, _) => { closed = true; progress?.Stop(); core.Dispose(); };
+        Activated += (_, _) => progress?.UpdatePollingVisibility();
+        AppWindow.Changed += (_, args) => { if (args.DidVisibilityChange || args.DidPresenterChange) progress?.UpdatePollingVisibility(); };
         surface.Loaded += Confirm;
+    }
+
+    public DownloadWindow(string taskId) : this(new JsonObject(), compact: false)
+    {
+        TaskId = taskId; Title = "下載進度";
+        if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
+        {
+            presenter.IsAlwaysOnTop = false; presenter.IsMinimizable = true;
+        }
     }
 
     private async void Confirm(object sender, RoutedEventArgs e)
@@ -55,6 +67,7 @@ public sealed class DownloadWindow : Window
             return;
         }
         if (closed) return;
+        if (TaskId is { } taskId) { ShowProgress(taskId); return; }
         if (await TryUpdateSource()) return;
         var page = new DownloadConfirmationPage(core, request, WinRT.Interop.WindowNative.GetWindowHandle(this), compact);
         preferredHeight = page.PreferredHeight;
@@ -93,12 +106,15 @@ public sealed class DownloadWindow : Window
 
     private void ShowProgress(string id)
     {
+        TaskId = id;
         Title = "下載進度";
         pageHost.Children.Clear();
-        progress = new DownloadProgressPage(core, id, Close); pageHost.Children.Add(progress);
+        progress = new DownloadProgressPage(core, id, Close, () => AppWindow.IsVisible
+            && AppWindow.Presenter is not Microsoft.UI.Windowing.OverlappedPresenter { State: Microsoft.UI.Windowing.OverlappedPresenterState.Minimized });
         preferredHeight = progress.PreferredHeight;
         progress.LayoutChanged += RequestFit;
         progress.TitleChanged += title => Title = title;
+        pageHost.Children.Add(progress);
         if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter) { presenter.IsAlwaysOnTop = false; presenter.IsMinimizable = true; }
         RequestFit();
     }

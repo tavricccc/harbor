@@ -22,5 +22,4 @@ public sealed partial class MainPage
         catch (Exception error) { ViewModel.Error = UserError.Message(error); }
     }
     private void RowFolder(object sender, RoutedEventArgs args) { try { if (RowItem(sender) is { } item) FileActions.Reveal(item.FilePath, item.Folder); } catch (Exception error) { ViewModel.Error = UserError.Message(error); } }
-    private async void RowDelete(object sender, RoutedEventArgs args) { if (RowItem(sender) is { } item) await DeleteItemsAsync([item]); }
 }

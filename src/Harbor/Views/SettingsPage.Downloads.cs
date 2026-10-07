@@ -38,14 +38,14 @@ public sealed partial class SettingsPage
         fields.Number(concurrency, "同時下載數（1–256）", "maxRunning", 5, 1, 256);
         panel.Children.Add(remember);
         fields.Toggle(panel, "啟動時繼續上次未完成的下載", "extra.autoStartTasks");
-        fields.Toggle(panel, "新增連結時直接開始下載", "extra.defaultDirectDownload");
+        fields.Toggle(panel, "新增連結時略過連結檢查", "extra.defaultDirectDownload");
         fields.Toggle(panel, "自動移除檔案已不存在的完成紀錄", "autoDeleteMissingFileTasks");
 
-        var http = SettingsFields.Group(panel, "HTTP");
+        var http = SettingsFields.Advanced(panel, "HTTP 選項");
         fields.Text(http, "User-Agent", "protocolConfig.http.userAgent");
         fields.Toggle(http, "使用伺服器提供的檔案時間", "protocolConfig.http.useServerCtime");
 
-        var bt = SettingsFields.Group(panel, "BitTorrent");
+        var bt = SettingsFields.Advanced(panel, "BitTorrent 與 Tracker");
         fields.Number(bt, "監聽連接埠（0 為自動）", "protocolConfig.bt.listenPort", 0, 0, 65535);
         customTrackers = fields.Text(bt, "自訂 Tracker（每行一個）", "extra.bt.customTrackers", true);
         var subscriptions = fields.Text(bt, "Tracker 訂閱網址（每行一個）", "extra.bt.trackerSubscribeUrls", true);
@@ -81,7 +81,7 @@ public sealed partial class SettingsPage
         var defaults = NativeButtons.Create("設定預設 Torrent 與磁力連結程式", "\uE713");
         defaults.Click += (_, _) => WindowsIntegration.OpenDefaultApps(); bt.Children.Add(defaults);
 
-        var ed2k = SettingsFields.Group(panel, "eD2k");
+        var ed2k = SettingsFields.Advanced(panel, "eD2k 選項");
         var (tcp, udp) = SettingsFields.Columns(ed2k);
         fields.Number(tcp, "TCP 連接埠（0 為自動）", "protocolConfig.ed2k.listenPort", 0, 0, 65535);
         fields.Number(udp, "UDP 連接埠（0 為自動）", "protocolConfig.ed2k.udpPort", 0, 0, 65535);
@@ -92,7 +92,7 @@ public sealed partial class SettingsPage
 
     private void BuildBehavior()
     {
-        var panel = Section("介面與行為");
+        var panel = Section("介面");
         panel.Children.Add(theme); panel.Children.Add(startup); panel.Children.Add(closeProgress);
         fields.Toggle(panel, "下載完成時顯示通知", "extra.desktopNotification", true);
         var archive = SettingsFields.Group(panel, "壓縮檔與 Torrent");

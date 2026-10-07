@@ -22,6 +22,8 @@ public sealed partial class MainWindow : Window
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
+        Activated += (_, _) => ((MainPage)RootFrame.Content).UpdatePollingVisibility();
+        AppWindow.Changed += (_, args) => { if (args.DidVisibilityChange || args.DidPresenterChange) ((MainPage)RootFrame.Content).UpdatePollingVisibility(); };
     }
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern uint GetDpiForWindow(nint hwnd);

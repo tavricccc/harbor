@@ -25,3 +25,5 @@ if (DownloadPresentation.ForStatus("done").Key != "open") throw new Exception("C
 if (DownloadPresentation.ForStatus("pause").Key != "continue" || DownloadPresentation.ForStatus("error").Label != "重試下載") throw new Exception("Paused/failed downloads must prioritize resume/retry");
 if (DownloadPresentation.ForStatus("running").Key != "pause" || DownloadPresentation.ForStatus("unknown").Key != "none") throw new Exception("Running/unknown actions are incorrect");
 Console.WriteLine("Action checks passed: completed Open, paused Resume, failed Retry, running Pause, unknown disabled.");
+DownloadChecks.Run();
+if (args.Contains("--benchmark")) DownloadChecks.Benchmark();

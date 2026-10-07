@@ -12,18 +12,22 @@ public sealed partial class SettingsPage
     {
         var panel = Section("連線");
         panel.Children.Add(proxyMode);
-        var (scheme, host) = SettingsFields.Columns(panel);
+        var customProxy = new StackPanel { Spacing = 16 };
+        panel.Children.Add(customProxy);
+        void ShowProxy() => customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
+        proxyMode.SelectionChanged += (_, _) => ShowProxy(); ShowProxy();
+        var (scheme, host) = SettingsFields.Columns(customProxy);
         fields.Text(scheme, "協定", "proxy.scheme", initial: "http");
         fields.Text(host, "主機與連接埠", "proxy.host");
-        var (user, password) = SettingsFields.Columns(panel);
+        var (user, password) = SettingsFields.Columns(customProxy);
         fields.Text(user, "使用者名稱", "proxy.usr");
         fields.Password(password, "密碼", "proxy.pwd");
 
-        var github = SettingsFields.Group(panel, "GitHub 鏡像"); github.Children.Add(mirrors);
+        var github = SettingsFields.Advanced(panel, "GitHub 鏡像"); github.Children.Add(mirrors);
         var browser = SettingsFields.Group(panel, "官方瀏覽器擴充功能");
         browser.Children.Add(new BrowserIntegrationGuide());
-        var remote = SettingsFields.Group(panel, "遠端下載連線");
-        remote.Children.Add(SettingsFields.Description("在官方擴充功能選擇 HTTP，填入以下伺服器位址與 Token。"));
+        var remote = SettingsFields.Advanced(panel, "本機 HTTP API");
+        remote.Children.Add(SettingsFields.Description("供本機工具或擴充套件的 HTTP 模式使用。一般瀏覽器接管不需設定。"));
         remote.Children.Add(new TextBox { Header = "伺服器位址", IsReadOnly = true, Text = new Uri(vm.Core.ApiAddress).Authority });
         remote.Children.Add(new PasswordBox { Header = "API Token", Password = vm.Core.Token, PasswordRevealMode = PasswordRevealMode.Peek });
         var copy = NativeButtons.Create("複製 API Token", "\uE8C8");
@@ -34,8 +38,10 @@ public sealed partial class SettingsPage
     private void BuildAutomation()
     {
         var panel = Section("自動化");
-        fields.Toggle(panel, "完成下載後傳送 Webhook 通知", "webhook.enable");
-        var urls = fields.Text(panel, "Webhook 網址（每行一個）", "webhook.urls", true);
+        var webhookEnabled = fields.Toggle(panel, "完成下載後傳送 Webhook 通知", "webhook.enable");
+        var webhook = new StackPanel { Spacing = 16 }; panel.Children.Add(webhook);
+        SettingsFields.Reveal(webhookEnabled, webhook);
+        var urls = fields.Text(webhook, "Webhook 網址（每行一個）", "webhook.urls", true);
         var test = NativeButtons.Create("測試 Webhook", "\uE724");
         test.Click += async (_, _) =>
         {
@@ -53,16 +59,19 @@ public sealed partial class SettingsPage
             catch (Exception error) { Report(error); }
             finally { test.IsEnabled = true; }
         };
-        panel.Children.Add(test);
+        webhook.Children.Add(test);
         var script = SettingsFields.Group(panel, "執行程式");
-        fields.Toggle(script, "完成或失敗後執行程式", "script.enable");
-        fields.Text(script, "程式或指令檔路徑（每行一個）", "script.paths", true);
+        var scriptEnabled = fields.Toggle(script, "完成或失敗後執行程式", "script.enable");
+        var scriptPaths = new StackPanel { Spacing = 16 }; script.Children.Add(scriptPaths);
+        SettingsFields.Reveal(scriptEnabled, scriptPaths);
+        fields.Text(scriptPaths, "程式或指令檔路徑（每行一個）", "script.paths", true);
     }
 
     private void BuildAbout()
     {
         var panel = Section("關於");
         panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"] });
+        panel.Children.Add(SettingsFields.Description($"Gopeed 核心 {vm.Core.Version}"));
         var credits = SettingsFields.Group(panel, "致謝");
         credits.Children.Add(SettingsFields.Description("Harbor fork 自 Gopeed，沿用其開源下載引擎，並以 WinUI 3 製作 Windows 原生介面。感謝 GopeedLab 與所有 Gopeed 貢獻者提供的基礎與持續維護。"));
         credits.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
