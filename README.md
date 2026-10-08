@@ -13,7 +13,7 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 
 ![Harbor 下載清單](docs/images/harbor-main.jpg)
 
-畫面為 0.7.0 操作示範；目前分支正在準備 0.8.0，工具列與設定已重新整理。
+畫面為 0.7.0 操作示範；0.8.0 的工具列與設定已重新整理。
 
 [觀看操作示範](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-demo.mp4)
 
