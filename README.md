@@ -7,7 +7,7 @@
 ![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)
 ![License GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-22C55E)
 
-Windows 原生下載管理員。使用 WinUI 3 介面與 [Gopeed](https://github.com/GopeedLab/gopeed) 下載引擎，提供繁體中文介面、瀏覽器下載接管、稍後下載與定時開始。
+Windows 原生下載管理員。使用 WinUI 3 介面與 [Gopeed](https://github.com/GopeedLab/gopeed) 下載引擎，支援繁體中文、English、简体中文，提供瀏覽器下載接管、稍後下載與定時開始。
 
 Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方發行版。
 
@@ -38,6 +38,7 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 - 稍後下載及一次性的開始排程。
 - 下載分類、代理設定與 Gopeed 擴充功能。
 - 隨 Windows 切換明暗主題，關閉主視窗後可繼續下載。
+- 0.9.0 起可跟隨 Windows 語言，或在「設定 → 介面 → 語言」選擇繁體中文、英文、簡體中文；儲存後關閉所有 Harbor 視窗並重新開啟套用。
 
 目前排程需背景核心運行；不會喚醒睡眠或關機的電腦。到期項目會在核心下次啟動時補執行。多個命名佇列、週期排程與全域限速尚未提供。
 
