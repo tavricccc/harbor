@@ -2,6 +2,7 @@ package main
 
 import (
 	"golang.org/x/sys/windows"
+	"harbor/core/localization"
 	"os"
 	"unicode/utf16"
 	"unsafe"
@@ -44,7 +45,7 @@ func notifyComplete(name string) {
 	}
 	data := balloonData{Window: window, ID: 100, Flags: 0x10, InfoFlags: 1}
 	data.Size = uint32(unsafe.Sizeof(data))
-	copy(data.Title[:len(data.Title)-1], utf16.Encode([]rune("下載完成")))
+	copy(data.Title[:len(data.Title)-1], utf16.Encode([]rune(localization.Text("Notification.Completed"))))
 	copy(data.Info[:len(data.Info)-1], utf16.Encode([]rune(name)))
 	windows.NewLazySystemDLL("shell32.dll").NewProc("Shell_NotifyIconW").Call(1, uintptr(unsafe.Pointer(&data)))
 }

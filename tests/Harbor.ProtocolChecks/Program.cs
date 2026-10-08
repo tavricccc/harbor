@@ -26,4 +26,5 @@ if (DownloadPresentation.ForStatus("pause").Key != "continue" || DownloadPresent
 if (DownloadPresentation.ForStatus("running").Key != "pause" || DownloadPresentation.ForStatus("unknown").Key != "none") throw new Exception("Running/unknown actions are incorrect");
 Console.WriteLine("Action checks passed: completed Open, paused Resume, failed Retry, running Pause, unknown disabled.");
 DownloadChecks.Run();
+LocalizationChecks.Run();
 if (args.Contains("--benchmark")) DownloadChecks.Benchmark();

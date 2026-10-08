@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"harbor/core/localization"
+
 	"github.com/GopeedLab/gopeed/pkg/rest"
 	"github.com/GopeedLab/gopeed/pkg/rest/model"
 )
@@ -42,6 +44,7 @@ func main() {
 	ui := flag.String("ui", "", "Native frontend executable")
 	icon := flag.String("icon", "", "Tray icon path")
 	apiPort := flag.Int("port", 18762, "Local API port")
+	language := flag.String("language", "en-US", "Interface language: en-US, zh-TW or zh-CN")
 	shutdown := flag.Bool("shutdown", false, "Gracefully stop the running core")
 	flag.Parse()
 	if *root == "" {
@@ -77,6 +80,9 @@ func main() {
 		return
 	}
 	if err := os.MkdirAll(*root, 0700); err != nil {
+		panic(err)
+	}
+	if err := localization.Set(*language); err != nil {
 		panic(err)
 	}
 	release, acquired := acquireCore(*root)
@@ -163,6 +169,25 @@ func main() {
 	signal.Notify(stop, os.Interrupt)
 	// A separate authenticated lifecycle endpoint avoids modifications to upstream.
 	control := http.NewServeMux()
+	control.HandleFunc("POST /language", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Api-Token") != token {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		var request struct {
+			Language string `json:"language"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			http.Error(w, "invalid language request", http.StatusBadRequest)
+			return
+		}
+		if err := localization.Set(request.Language); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		refreshTrayLanguage()
+		w.WriteHeader(http.StatusNoContent)
+	})
 	control.HandleFunc("POST /shutdown", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-Api-Token") != token {
 			http.Error(w, "unauthorized", 401)

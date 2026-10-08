@@ -3,10 +3,29 @@ package main
 import (
 	"os"
 	"os/exec"
+	"sync"
 	"syscall"
+
+	"harbor/core/localization"
 
 	"github.com/getlantern/systray"
 )
+
+var trayLanguageMutex sync.Mutex
+var trayOpen, trayQuit *systray.MenuItem
+
+func refreshTrayLanguage() {
+	trayLanguageMutex.Lock()
+	defer trayLanguageMutex.Unlock()
+	if trayOpen == nil {
+		return
+	}
+	systray.SetTooltip(localization.Text("Tray.Tooltip"))
+	trayOpen.SetTitle(localization.Text("Tray.Open"))
+	trayOpen.SetTooltip(localization.Text("Tray.OpenHint"))
+	trayQuit.SetTitle(localization.Text("Tray.Quit"))
+	trayQuit.SetTooltip(localization.Text("Tray.QuitHint"))
+}
 
 func runTray(ui, iconPath string, stop chan os.Signal) {
 	systray.Run(func() {
@@ -14,10 +33,13 @@ func runTray(ui, iconPath string, stop chan os.Signal) {
 		if err == nil {
 			systray.SetIcon(icon)
 		}
-		systray.SetTooltip("Harbor — 背景下載")
-		open := systray.AddMenuItem("開啟 Harbor", "檢視下載佇列")
+		trayLanguageMutex.Lock()
+		open := systray.AddMenuItem(localization.Text("Tray.Open"), localization.Text("Tray.OpenHint"))
 		systray.AddSeparator()
-		quit := systray.AddMenuItem("停止下載並結束", "保存進度並停止核心")
+		quit := systray.AddMenuItem(localization.Text("Tray.Quit"), localization.Text("Tray.QuitHint"))
+		trayOpen, trayQuit = open, quit
+		trayLanguageMutex.Unlock()
+		refreshTrayLanguage()
 		go func() {
 			for {
 				select {
