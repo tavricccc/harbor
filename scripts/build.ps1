@@ -14,7 +14,12 @@ try {
     if ($LASTEXITCODE) { throw 'Go core build failed' }
     go build -trimpath -ldflags '-s -w -H=windowsgui' -o harbor-browser-host.exe ./cmd/browser-host
     if ($LASTEXITCODE) { throw 'Browser host build failed' }
-    if ($Test) { go test ./...; if ($LASTEXITCODE) { throw 'Core verification failed' } }
+    if ($Test) {
+        go mod verify
+        if ($LASTEXITCODE) { throw 'Go module checksum verification failed' }
+        go test ./...
+        if ($LASTEXITCODE) { throw 'Core verification failed' }
+    }
 } finally { Pop-Location }
 if ($Test) {
     dotnet run --project (Join-Path $repo 'tests/Harbor.ProtocolChecks/ProtocolCheck.csproj')

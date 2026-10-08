@@ -13,6 +13,8 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 
 ![Harbor 下載清單](docs/images/harbor-main.jpg)
 
+畫面為 0.7.0 操作示範；目前分支正在準備 0.8.0，工具列與設定已重新整理。
+
 [觀看操作示範](https://github.com/tavricccc/harbor/releases/download/v0.7.0/Harbor-demo.mp4)
 
 ## 下載
@@ -57,7 +59,9 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 
 按「貼上網址」或 Ctrl+V 加入連結；每行一個可批次加入。按「新增下載」可調整位置、檔名與分類，再選擇立即開始、稍後下載或排程。
 
-Torrent 可從工具列選取，也能拖進主視窗。清單右側操作隨狀態切換，下載中可暫停、失敗可重試，完成後可開啟檔案。移除任務預設保留檔案。
+Torrent 可從「更多」選單選取，也能拖進主視窗。清單右側操作隨狀態切換，下載中可暫停、失敗可重試，完成後可開啟檔案。選取下載後，工具列可批次繼續、暫停或移除；移除預設保留檔案。
+
+雙擊或在清單按 Enter，會開啟進行中的下載進度或已完成檔案。HTTP／BitTorrent／eD2k 等設定放在可展開的選項中，下載確認的「下載選項」可調整這次下載。完整操作見 [使用指南](docs/usage.md)。
 
 HTTP 來源失效時，可修改網址，或選「用下一次瀏覽器連結更新來源」接續原任務。
 
@@ -66,6 +70,7 @@ HTTP 來源失效時，可修改網址，或選「用下一次瀏覽器連結更
 | Ctrl+N / Ctrl+V | 新增下載 / 貼上連結或 Torrent |
 | Ctrl+F / F5 | 搜尋 / 重新整理 |
 | Ctrl+A / Delete | 在清單全選 / 移除選取任務 |
+| Enter | 在清單開啟進度或已完成檔案 |
 | Ctrl+Enter / Esc | 在確認視窗檢查或開始 / 取消 |
 
 ## 資料與解除安裝
@@ -93,6 +98,8 @@ pwsh -File scripts/update-core.ps1 -Channel preview -Test
 ```
 
 `preview` 包含正式版及預覽版，目前用於 Gopeed 2.0；`stable` 只選正式版。完整更新與回復步驟見 [核心維護](docs/core-updates.md)，參與方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+模組劃分、效能測量與發行檢查見 [開發維護](docs/maintenance.md)。
 
 ## 致謝與授權
 

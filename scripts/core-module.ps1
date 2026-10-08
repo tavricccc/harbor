@@ -5,6 +5,7 @@ function Get-GopeedModule {
     try {
         $module = go list -m -json github.com/GopeedLab/gopeed | ConvertFrom-Json
         if ($LASTEXITCODE) { throw 'Cannot resolve the Gopeed module' }
+        if ($module.Replace) { throw 'Release builds require the official Gopeed module; remove the local replace directive' }
         $source = go mod download -json "$($module.Path)@$($module.Version)" | ConvertFrom-Json
         if ($LASTEXITCODE) { throw 'Cannot download the Gopeed source' }
         $release = [IO.File]::ReadAllText((Join-Path $Repository 'core/upstream.json')) | ConvertFrom-Json

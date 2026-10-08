@@ -1,4 +1,6 @@
-#define AppVersion "0.7.2"
+#ifndef AppVersion
+  #error Use scripts/package.ps1 to provide AppVersion
+#endif
 [Setup]
 AppId={{B652BEF3-0741-4B5E-9066-C6F3EBF18622}
 AppName=Harbor

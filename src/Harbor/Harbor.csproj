@@ -14,7 +14,7 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.7.2</Version>
+    <Version>0.8.0</Version>
     <Product>Harbor</Product>
     <Title>Harbor</Title>
     <Description>Windows 原生下載管理員，使用 Gopeed 下載引擎</Description>
