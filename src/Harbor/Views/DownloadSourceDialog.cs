@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Harbor.Models;
 using Harbor.Services;
 using Microsoft.UI.Xaml;
@@ -14,8 +15,8 @@ public sealed class DownloadSourceDialog : ContentDialog
     private readonly DownloadItem item;
     private readonly JsonObject request;
     private readonly TextBox source;
-    private readonly TextBox headers = new() { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 120, MaxHeight = 220, PlaceholderText = "每行一組，例如 Referer: https://example.com" };
-    private readonly CheckBox resume = new() { Content = "更新後繼續下載", IsChecked = true };
+    private readonly TextBox headers = new() { AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 120, MaxHeight = 220, PlaceholderText = Strings.Get("Source.HeadersPlaceholder") };
+    private readonly CheckBox resume = new() { Content = Strings.Get("Source.ResumeAfterUpdate"), IsChecked = true };
     private readonly InfoBar error = new() { Severity = InfoBarSeverity.Error, IsClosable = true };
 
     public DownloadSourceDialog(CoreClient core, DownloadItem item)
@@ -28,15 +29,15 @@ public sealed class DownloadSourceDialog : ContentDialog
         if (request["extra"]?["header"] is JsonObject values)
             headers.Text = string.Join("\n", values.Select(x => $"{x.Key}: {x.Value}"));
 
-        Title = "修改下載來源";
-        PrimaryButtonText = "更新來源";
-        CloseButtonText = "取消";
+        Title = Strings.Get("Source.Edit");
+        PrimaryButtonText = Strings.Get("Source.Update");
+        CloseButtonText = Strings.Get("Common.Cancel");
         DefaultButton = ContentDialogButton.Primary;
-        AutomationProperties.SetName(source, "來源網址");
-        AutomationProperties.SetName(headers, "HTTP 標頭");
+        AutomationProperties.SetName(source, Strings.Get("Common.SourceUrl"));
+        AutomationProperties.SetName(headers, Strings.Get("Common.HttpHeaders"));
         var form = new NativeFormGrid(labelWidth: 80, rowSpacing: 20);
-        form.AddField("來源網址", source);
-        form.AddField("HTTP 標頭", headers);
+        form.AddField(Strings.Get("Common.SourceUrl"), source);
+        form.AddField(Strings.Get("Common.HttpHeaders"), headers);
         Content = new StackPanel
         {
             Spacing = 20, MinWidth = 460,
@@ -57,7 +58,7 @@ public sealed class DownloadSourceDialog : ContentDialog
         try
         {
             if (!Uri.TryCreate(source.Text.Trim(), UriKind.Absolute, out var url) || url.Scheme is not ("http" or "https"))
-                throw new FormatException("請輸入有效的 HTTP 或 HTTPS 來源網址。");
+                throw new FormatException(Strings.Get("Errors.SourceUrl"));
             request["url"] = url.AbsoluteUri;
             request["extra"] ??= new JsonObject();
             request["extra"]!["header"] = HttpHeaders.Parse(headers.Text);

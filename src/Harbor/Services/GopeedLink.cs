@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
@@ -15,7 +16,7 @@ public sealed record GopeedLink(string Route, JsonObject? Parameters)
     public static GopeedLink Parse(string value)
     {
         var uri = new Uri(value);
-        if (uri.Scheme != "gopeed") throw new FormatException("這不是 Gopeed 連結。");
+        if (uri.Scheme != "gopeed") throw new FormatException(Strings.Get("Errors.NotGopeedLink"));
         var route = uri.AbsolutePath.Trim('/');
         JsonObject? parameters = null;
         foreach (var part in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))

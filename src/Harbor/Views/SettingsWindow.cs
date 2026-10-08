@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,7 +11,7 @@ public sealed class SettingsWindow : Window
 {
     public SettingsWindow(DownloadsViewModel viewModel)
     {
-        Title = "Harbor 設定";
+        Title = Strings.Get("Settings.WindowTitle");
         var handle = WinRT.Interop.WindowNative.GetWindowHandle(this);
         var root = new Grid { RequestedTheme = WindowAppearance.Theme };
         var page = new SettingsPage(viewModel, handle);

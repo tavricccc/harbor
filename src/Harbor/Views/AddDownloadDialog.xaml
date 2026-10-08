@@ -1,7 +1,8 @@
 <ContentDialog x:Class="Harbor.Views.AddDownloadDialog"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               Title="新增下載" PrimaryButtonText="檢查連結" CloseButtonText="取消"
+    xmlns:loc="using:Harbor.Localization"
+               Title="{loc:Localize Key=Downloads.Add}" PrimaryButtonText="{loc:Localize Key=Download.CheckLink}" CloseButtonText="{loc:Localize Key=Common.Cancel}"
                DefaultButton="Primary" PrimaryButtonClick="Submit"
                FontFamily="{StaticResource ContentControlThemeFontFamily}" FontSize="14">
     <ContentDialog.Resources>

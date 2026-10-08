@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
@@ -30,7 +31,7 @@ public static class WindowsIntegration
     public static void InstallBrowserHost()
     {
         var host = Path.Combine(AppContext.BaseDirectory, "Engine", "harbor-browser-host.exe");
-        if (!File.Exists(host)) throw new FileNotFoundException("請重新安裝程式以啟用瀏覽器接管。");
+        if (!File.Exists(host)) throw new FileNotFoundException(Strings.Get("Errors.BrowserReinstall"));
         Directory.CreateDirectory(CoreClient.DataDirectory);
         if (!File.Exists(BackupPath))
         {
@@ -50,7 +51,7 @@ public static class WindowsIntegration
     }
     public static void RegisterFileTypes()
     {
-        using var capability = Registry.CurrentUser.CreateSubKey(@"Software\Harbor\Capabilities"); capability.SetValue("ApplicationName", "Harbor"); capability.SetValue("ApplicationDescription", "下載管理員");
+        using var capability = Registry.CurrentUser.CreateSubKey(@"Software\Harbor\Capabilities"); capability.SetValue("ApplicationName", "Harbor"); capability.SetValue("ApplicationDescription", Strings.Get("App.Description"));
         using var files = capability.CreateSubKey("FileAssociations"); files.SetValue(".torrent", "Harbor.Torrent");
         using var links = capability.CreateSubKey("URLAssociations"); links.SetValue("magnet", "Harbor.Magnet"); links.SetValue("ed2k", "Harbor.Ed2k");
         using var registered = Registry.CurrentUser.CreateSubKey("Software\\RegisteredApplications"); registered.SetValue("Harbor", @"Software\Harbor\Capabilities");

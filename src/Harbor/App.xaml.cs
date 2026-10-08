@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
@@ -60,6 +61,8 @@ public partial class App : Application
     {
         var commandLine = Environment.GetCommandLineArgs();
         Services.LegacyMigration.Run();
+        Strings.Initialize(Services.UiPreferences.Load().Language, Windows.System.UserProfile.GlobalizationPreferences.Languages);
+        Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = Strings.Language;
         if (commandLine.Contains("--register-integrations")) { Services.WindowsIntegration.InstallBrowserHost(); Services.WindowsIntegration.RegisterFileTypes(); Exit(); return; }
         if (commandLine.Contains("--unregister-integrations")) { Services.WindowsIntegration.Unregister(); Exit(); return; }
         if (!Services.WindowsIntegration.IsBrowserHostRegistered()) Services.WindowsIntegration.InstallBrowserHost();
@@ -111,7 +114,7 @@ public partial class App : Application
         }
         catch (Exception error)
         {
-            var main = EnsureMainWindow(); main.Activate(); main.ReportError("無法開啟下載：" + error.Message);
+            var main = EnsureMainWindow(); main.Activate(); main.ReportError(Strings.Get("Errors.OpenDownload") + error.Message);
         }
     }
     private MainWindow EnsureMainWindow()

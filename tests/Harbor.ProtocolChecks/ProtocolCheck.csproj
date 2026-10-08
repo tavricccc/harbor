@@ -11,6 +11,7 @@
     <EmbeddedResource Include="../../core/localization/*.json" LogicalName="Harbor.Localization.%(Filename)%(Extension)" />
     <Compile Include="../../src/Harbor/Services/GopeedLink.cs" Link="GopeedLink.cs" />
     <Compile Include="../../src/Harbor/Services/HttpHeaders.cs" Link="HttpHeaders.cs" />
+    <Compile Include="../../src/Harbor/Services/UserError.cs" Link="UserError.cs" />
     <Compile Include="../../src/Harbor/Services/DownloadPresentation.cs" Link="DownloadPresentation.cs" />
     <Compile Include="../../src/Harbor/Models/DownloadItem.cs" Link="DownloadItem.cs" />
     <Compile Include="../../src/Harbor/Models/DownloadItem.Update.cs" Link="DownloadItem.Update.cs" />

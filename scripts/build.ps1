@@ -22,6 +22,7 @@ try {
     }
 } finally { Pop-Location }
 if ($Test) {
+    & (Join-Path $PSScriptRoot 'check-localization.ps1')
     dotnet run --project (Join-Path $repo 'tests/Harbor.ProtocolChecks/ProtocolCheck.csproj')
     if ($LASTEXITCODE) { throw 'Gopeed protocol verification failed' }
 }

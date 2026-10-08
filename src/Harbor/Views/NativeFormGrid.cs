@@ -8,7 +8,7 @@ internal sealed class NativeFormGrid : Grid
     public NativeFormGrid(double labelWidth = 72, double rowSpacing = 14)
     {
         ColumnSpacing = 16; RowSpacing = rowSpacing;
-        ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(labelWidth) });
+        ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto, MinWidth = labelWidth });
         ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
     }
 

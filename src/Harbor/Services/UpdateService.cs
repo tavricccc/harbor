@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using System.Text.Json.Nodes;
 
 namespace Harbor.Services;
@@ -18,7 +19,7 @@ public static class UpdateService
     }
     public static async Task PromptAsync(CoreClient core, AvailableUpdate update, Microsoft.UI.Xaml.XamlRoot root)
     {
-        var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog { Title = $"Harbor {update.Version}", Content = "下載安裝程式後即可更新，原有下載與設定會保留。", PrimaryButtonText = "下載安裝程式", SecondaryButtonText = "版本說明", CloseButtonText = "稍後" };
+        var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog { Title = $"Harbor {update.Version}", Content = Strings.Get("Update.Description"), PrimaryButtonText = Strings.Get("Update.DownloadInstaller"), SecondaryButtonText = Strings.Get("Update.ReleaseNotes"), CloseButtonText = Strings.Get("Common.Later") };
         var result = await NativeDialogs.ShowAsync(dialog, root);
         if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Secondary) System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(update.Url) { UseShellExecute = true });
         else if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary) { var config = (await core.GetAsync("config"))!; ((App)Microsoft.UI.Xaml.Application.Current).OpenDownloadWindow(new JsonObject { ["req"] = new JsonObject { ["url"] = GitHubMirror.Apply(update.Installer, config) }, ["opts"] = new JsonObject { ["path"] = Path.Combine(CoreClient.DataDirectory, "Updates"), ["name"] = Path.GetFileName(new Uri(update.Installer).LocalPath) } }); }

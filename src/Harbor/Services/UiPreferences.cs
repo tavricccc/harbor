@@ -4,6 +4,7 @@ namespace Harbor.Services;
 
 public sealed class UiPreferences
 {
+    public string Language { get; set; } = "";
     public bool RememberDownloadDirectory { get; set; } = true;
     public string LastDownloadDirectory { get; set; } = "";
     public bool CloseProgressAfterOpen { get; set; } = true;

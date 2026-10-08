@@ -153,17 +153,17 @@ func (q *deferredDownloads) handler(next http.Handler, token string) http.Handle
 				StartAt  *time.Time         `json:"startAt"`
 			}
 			if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024*1024)).Decode(&input); err != nil || len(input.Requests) == 0 {
-				rest.WriteJson(w, model.NewErrorResult("請提供下載連結。"))
+				rest.WriteJson(w, model.NewErrorResult("download link is required"))
 				return
 			}
 			for _, request := range input.Requests {
 				if request.Req == nil || request.Req.Validate() != nil {
-					rest.WriteJson(w, model.NewErrorResult("下載連結無效。"))
+					rest.WriteJson(w, model.NewErrorResult("invalid download link"))
 					return
 				}
 			}
 			if input.StartAt != nil && !input.StartAt.After(time.Now()) {
-				rest.WriteJson(w, model.NewErrorResult("請選擇未來的開始時間。"))
+				rest.WriteJson(w, model.NewErrorResult("schedule must be in the future"))
 				return
 			}
 			ids, err := q.add(input.Requests, input.StartAt)
@@ -196,11 +196,11 @@ func (q *deferredDownloads) handler(next http.Handler, token string) http.Handle
 					StartAt *time.Time `json:"startAt"`
 				}
 				if decodeErr := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024)).Decode(&input); decodeErr != nil {
-					rest.WriteJson(w, model.NewErrorResult("排程資料無效。"))
+					rest.WriteJson(w, model.NewErrorResult("invalid schedule data"))
 					return
 				}
 				if input.StartAt != nil && !input.StartAt.After(time.Now()) {
-					rest.WriteJson(w, model.NewErrorResult("請選擇未來的開始時間。"))
+					rest.WriteJson(w, model.NewErrorResult("schedule must be in the future"))
 					return
 				}
 				before := q.entries[index]
@@ -223,6 +223,6 @@ func (q *deferredDownloads) handler(next http.Handler, token string) http.Handle
 			rest.WriteJson(w, model.NewOkResult(result))
 			return
 		}
-		rest.WriteJson(w, model.NewErrorResult(fmt.Sprintf("找不到待下載項目：%s", id), model.CodeTaskNotFound))
+		rest.WriteJson(w, model.NewErrorResult(fmt.Sprintf("pending download not found: %s", id), model.CodeTaskNotFound))
 	})
 }

@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
@@ -29,7 +30,7 @@ internal sealed class SettingsFields
         AutomationProperties.SetAutomationId(box, "Setting-" + path); AutomationProperties.SetName(box, title); panel.Children.Add(box);
         bindings.Add((c => box.Value = (ConfigJson.Get(c, path)?.GetValue<double>() ?? initial * scale) / scale, c =>
         {
-            if (!double.IsFinite(box.Value) || box.Value < min || box.Value > max) throw new FormatException($"請輸入有效的{title}。 ");
+            if (!double.IsFinite(box.Value) || box.Value < min || box.Value > max) throw new FormatException(Strings.Format("Errors.InvalidSetting", title));
             ConfigJson.Set(c, path, fractional ? JsonValue.Create(box.Value * scale) : JsonValue.Create((long)(box.Value * scale)));
         })); return box;
     }

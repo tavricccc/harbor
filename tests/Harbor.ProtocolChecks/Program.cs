@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Nodes;
 using Harbor.Services;
+using Harbor.Localization;
 
 var payload = """{"req":{"url":"https://example.com/file?a=1&b=2","extra":{"header":{"Referer":"https://example.com/","Cookie":"key=value"}}},"opts":{"name":"測試下載.zip"}}""";
 var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(payload));
@@ -22,7 +23,7 @@ foreach (var newline in new[] { "\r", "\n", "\r\n" })
 }
 Console.WriteLine("Header checks passed: WinUI CR, LF and CRLF; Sec-Ch-Ua quotes, Referer and Cookie preserved.");
 if (DownloadPresentation.ForStatus("done").Key != "open") throw new Exception("Completed download must prioritize opening the file");
-if (DownloadPresentation.ForStatus("pause").Key != "continue" || DownloadPresentation.ForStatus("error").Label != "重試下載") throw new Exception("Paused/failed downloads must prioritize resume/retry");
+if (DownloadPresentation.ForStatus("pause").Key != "continue" || DownloadPresentation.ForStatus("error").Label != Strings.Get("Downloads.Retry")) throw new Exception("Paused/failed downloads must prioritize resume/retry");
 if (DownloadPresentation.ForStatus("running").Key != "pause" || DownloadPresentation.ForStatus("unknown").Key != "none") throw new Exception("Running/unknown actions are incorrect");
 Console.WriteLine("Action checks passed: completed Open, paused Resume, failed Retry, running Pause, unknown disabled.");
 DownloadChecks.Run();

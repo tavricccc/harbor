@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Text.Json.Nodes;
@@ -7,20 +8,20 @@ namespace Harbor.Views;
 
 internal sealed class DownloadOptionsPanel : StackPanel
 {
-    private readonly ComboBox method = new() { Header = "方法", IsEditable = true, Items = { "GET", "POST", "PUT", "HEAD" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
-    private readonly TextBox body = new() { Header = "請求內容", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 64, MaxHeight = 160 };
-    private readonly CheckBox skipCert = new() { Content = "略過 HTTPS 憑證驗證" };
-    private readonly TextBox trackers = new() { Header = "Tracker（每行一個）", AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 64, MaxHeight = 160 };
-    private readonly ComboBox proxyMode = new() { Header = "連線方式", Items = { "使用預設值", "直接連線", "自訂" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
-    private readonly ComboBox scheme = new() { Header = "協定", Items = { "http", "https", "socks5" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
-    private readonly TextBox host = new() { Header = "主機與連接埠" };
-    private readonly TextBox user = new() { Header = "使用者名稱" };
-    private readonly PasswordBox password = new() { Header = "密碼" };
-    private readonly ComboBox autoTorrent = Choice("Torrent 檔案自動下載");
-    private readonly ComboBox deleteTorrent = Choice("開始 BT 下載後刪除 Torrent 檔案");
-    private readonly ComboBox extract = Choice("自動解壓縮");
-    private readonly PasswordBox archivePassword = new() { Header = "壓縮檔密碼" };
-    private readonly CheckBox deleteArchive = new() { Content = "解壓縮成功後刪除壓縮檔" };
+    private readonly ComboBox method = new() { Header = Strings.Get("Request.Method"), IsEditable = true, Items = { "GET", "POST", "PUT", "HEAD" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+    private readonly TextBox body = new() { Header = Strings.Get("Request.Body"), AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 64, MaxHeight = 160 };
+    private readonly CheckBox skipCert = new() { Content = Strings.Get("Request.SkipCertificate") };
+    private readonly TextBox trackers = new() { Header = Strings.Get("Request.Trackers"), AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 64, MaxHeight = 160 };
+    private readonly ComboBox proxyMode = new() { Header = Strings.Get("Request.ConnectionMode"), Items = { Strings.Get("Common.UseDefault"), Strings.Get("Request.Direct"), Strings.Get("Common.Custom") }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+    private readonly ComboBox scheme = new() { Header = Strings.Get("Common.Protocol"), Items = { "http", "https", "socks5" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+    private readonly TextBox host = new() { Header = Strings.Get("Proxy.Host") };
+    private readonly TextBox user = new() { Header = Strings.Get("Common.Username") };
+    private readonly PasswordBox password = new() { Header = Strings.Get("Common.Password") };
+    private readonly ComboBox autoTorrent = Choice(Strings.Get("Torrent.AutoDownload"));
+    private readonly ComboBox deleteTorrent = Choice(Strings.Get("Torrent.DeleteFile"));
+    private readonly ComboBox extract = Choice(Strings.Get("Archive.AutoExtract"));
+    private readonly PasswordBox archivePassword = new() { Header = Strings.Get("Archive.Password") };
+    private readonly CheckBox deleteArchive = new() { Content = Strings.Get("Archive.DeleteAfter") };
     private readonly StackPanel customProxy = new() { Spacing = 12, Visibility = Visibility.Collapsed };
     public event Action? RequestChanged;
     public DownloadOptionsPanel()
@@ -30,8 +31,8 @@ internal sealed class DownloadOptionsPanel : StackPanel
         Children.Add(Section("BitTorrent", trackers, autoTorrent, deleteTorrent));
         customProxy.Children.Add(Pair(scheme, host));
         customProxy.Children.Add(Pair(user, password));
-        Children.Add(Section("代理伺服器", proxyMode, customProxy));
-        Children.Add(Section("解壓縮", Pair(extract, archivePassword), deleteArchive));
+        Children.Add(Section(Strings.Get("Proxy.Title"), proxyMode, customProxy));
+        Children.Add(Section(Strings.Get("Archive.Extraction"), Pair(extract, archivePassword), deleteArchive));
         method.SelectionChanged += (_, _) => RequestChanged?.Invoke(); method.TextSubmitted += (_, _) => RequestChanged?.Invoke();
         body.TextChanged += (_, _) => RequestChanged?.Invoke(); trackers.TextChanged += (_, _) => RequestChanged?.Invoke();
         proxyMode.SelectionChanged += (_, _) => { customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed; RequestChanged?.Invoke(); };
@@ -54,7 +55,7 @@ internal sealed class DownloadOptionsPanel : StackPanel
         row.Children.Add(second);
         return row;
     }
-    private static ComboBox Choice(string title) => new() { Header = title, Items = { "使用預設值", "啟用", "停用" }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+    private static ComboBox Choice(string title) => new() { Header = title, Items = { Strings.Get("Common.UseDefault"), Strings.Get("Common.Enable"), Strings.Get("Common.Disable") }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
     public void Load(JsonObject? initial, JsonNode config)
     {
         var req = initial?["req"]; method.Text = req?["extra"]?["method"]?.GetValue<string>() ?? "GET"; body.Text = req?["extra"]?["body"]?.GetValue<string>() ?? "";
@@ -73,7 +74,7 @@ internal sealed class DownloadOptionsPanel : StackPanel
         extra["method"] = method.Text.Trim().Length == 0 ? "GET" : method.Text.Trim().ToUpperInvariant(); extra["body"] = body.Text;
         if (trackers.Text.Length > 0) extra["trackers"] = ConfigJson.Array(ConfigJson.Lines(trackers.Text));
         req["skipVerifyCert"] = skipCert.IsChecked == true;
-        if (proxyMode.SelectedIndex == 2 && host.Text.Trim().Length == 0) throw new FormatException("請輸入代理伺服器的主機與連接埠。");
+        if (proxyMode.SelectedIndex == 2 && host.Text.Trim().Length == 0) throw new FormatException(Strings.Get("Errors.ProxyHost"));
         req["proxy"] = new JsonObject { ["mode"] = proxyMode.SelectedIndex switch { 1 => "none", 2 => "custom", _ => "follow" }, ["scheme"] = scheme.SelectedItem?.ToString() ?? "http", ["host"] = host.Text.Trim(), ["usr"] = user.Text, ["pwd"] = password.Password };
         var opts = request["opts"]!.AsObject(); opts["extra"] ??= new JsonObject();
         foreach (var (control, key) in new[] { (autoTorrent, "autoTorrent"), (deleteTorrent, "deleteTorrentAfterDownload"), (extract, "autoExtract") }) opts["extra"]![key] = control.SelectedIndex == 0 ? null : JsonValue.Create(control.SelectedIndex == 1);

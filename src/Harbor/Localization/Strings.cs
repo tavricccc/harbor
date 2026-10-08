@@ -30,7 +30,11 @@ public static class Strings
             var parts = language.ToLowerInvariant().Split('-');
             if (parts[0] == "en") return "en-US";
             if (parts[0] == "zh")
-                return parts.Intersect(["hant", "tw", "hk", "mo"]).Any() ? "zh-TW" : "zh-CN";
+            {
+                if (parts.Contains("hant")) return "zh-TW";
+                if (parts.Contains("hans")) return "zh-CN";
+                return parts.Intersect(["tw", "hk", "mo"]).Any() ? "zh-TW" : "zh-CN";
+            }
         }
         return "en-US";
     }

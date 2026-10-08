@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json.Nodes;
 using Harbor.Services;
@@ -15,10 +16,10 @@ public sealed partial class DownloadItem : ObservableObject
     public string DeferredError => Data["error"]?.GetValue<string>() ?? "";
     public DateTimeOffset? ScheduledAt => Data["scheduledAt"] is JsonValue value ? DateTimeOffset.Parse(value.GetValue<string>()) : null;
     public string ExtractionStatus => Data["progress"]?["extractStatus"]?.GetValue<string>() ?? "";
-    public string ExtractionText => ExtractionStatus switch { "extracting" => $"解壓縮中 {Data["progress"]?["extractProgress"]}%", "waitingParts" => "等待壓縮檔分卷", "error" => "解壓縮失敗", "done" => "已解壓縮", _ => "" };
+    public string ExtractionText => ExtractionStatus switch { "extracting" => Strings.Format("Status.ExtractProgress", Data["progress"]?["extractProgress"]), "waitingParts" => Strings.Get("Status.WaitingParts"), "error" => Strings.Get("Status.ExtractFailed"), "done" => Strings.Get("Status.Extracted"), _ => "" };
     public bool IsProcessing => ExtractionStatus is "extracting" or "waitingParts";
     public bool Uploading => Data["uploading"]?.GetValue<bool>() == true;
-    public string StatusText => IsDeferred ? DeferredError.Length > 0 ? "排程失敗" : ScheduledAt is { } time ? $"{time.ToLocalTime():MM/dd HH:mm}" : "稍後下載" : IsProcessing ? ExtractionText : Status switch { "running" => "下載中", "done" => Uploading ? "做種中" : "已完成", "pause" => "已暫停", "error" => "下載失敗", "wait" => "等待中", _ => "準備中" };
+    public string StatusText => IsDeferred ? DeferredError.Length > 0 ? Strings.Get("Status.ScheduleFailed") : ScheduledAt is { } time ? time.ToLocalTime().ToString("g") : Strings.Get("Schedule.Later") : IsProcessing ? ExtractionText : Status switch { "running" => Strings.Get("Status.Downloading"), "done" => Uploading ? Strings.Get("Status.Seeding") : Strings.Get("Status.Completed"), "pause" => Strings.Get("Status.Paused"), "error" => Strings.Get("Status.DownloadFailed"), "wait" => Strings.Get("Status.Waiting"), _ => Strings.Get("Status.Preparing") };
     public DateTimeOffset CreatedAt => DateTimeOffset.Parse(Data["createdAt"]!.GetValue<string>());
     public string Url => Data["meta"]?["req"]?["url"]?.GetValue<string>() ?? "";
     public string Folder => Data["meta"]?["opts"]?["path"]?.GetValue<string>() ?? "";
@@ -31,17 +32,17 @@ public sealed partial class DownloadItem : ObservableObject
     public bool CanPause => Status is "running" or "wait" or "ready" || Data["uploading"]?.GetValue<bool>() == true;
     public bool CanResume => IsDeferred || Status is "pause" or "error";
     public bool IsComplete => Status == "done";
-    public string SizeText => Size > 0 ? FormatBytes(Size) : "大小未知";
+    public string SizeText => Size > 0 ? FormatBytes(Size) : Strings.Get("Status.UnknownSize");
     public string TransferText => $"{FormatBytes(Downloaded)} / {SizeText}" + (ExtractionText.Length > 0 ? $" · {ExtractionText}" : "");
     public string TransferSizeText => IsComplete ? SizeText : $"{FormatBytes(Downloaded)} / {SizeText}";
     public string RowProgressText => Status == "running" && Size > 0 ? $"{Percent:0}%" : StatusText;
-    public string DetailsText => $"{Name}\n{StatusText} · {TransferText}\n速度：{SpeedText} · 剩餘 {RemainingText}\n{FilePath}\n{Url}" + (DeferredError.Length > 0 ? "\n" + DeferredError : "");
+    public string DetailsText => Strings.Format("Downloads.DetailsText", Name, StatusText, TransferText, SpeedText, RemainingText, FilePath, Url) + (DeferredError.Length > 0 ? "\n" + DeferredError : "");
     public long Uploaded => Data["progress"]?["uploaded"]?.GetValue<long>() ?? 0;
     public long UploadSpeed => Data["progress"]?["uploadSpeed"]?.GetValue<long>() ?? 0;
     public string SpeedText => Status == "running" ? FormatBytes(Speed) + "/s" : Uploading ? "↑ " + FormatBytes(UploadSpeed) + "/s" : "—";
     public string RemainingText => Status == "running" && Speed > 0 && Size > Downloaded ? FormatTime((Size - Downloaded) / Speed) : "—";
     public string OpenPath => ExtractionStatus == "done" && !File.Exists(FilePath) && !Directory.Exists(FilePath) ? Folder : FilePath;
-    public DownloadAction PrimaryAction => IsDeferred ? new("continue", "立即開始下載", "\uE768") : IsProcessing ? new("none", "正在解壓縮", "\uE895") : IsComplete && OpenPath == Folder ? new("open", "開啟解壓縮資料夾", "\uE8B7") : DownloadPresentation.ForStatus(Status);
+    public DownloadAction PrimaryAction => IsDeferred ? new("continue", Strings.Get("Downloads.StartNow"), "\uE768") : IsProcessing ? new("none", Strings.Get("Status.Extracting"), "\uE895") : IsComplete && OpenPath == Folder ? new("open", Strings.Get("Downloads.OpenExtracted"), "\uE8B7") : DownloadPresentation.ForStatus(Status);
     public string PrimaryActionLabel => PrimaryAction.Label;
     public string PrimaryActionGlyph => PrimaryAction.Glyph;
     public string FileGlyph => Data["meta"]?["res"]?["name"]?.GetValue<string>() is { Length: > 0 } ? "\uE8B7" : DownloadPresentation.FileGlyph(Name);
@@ -68,5 +69,5 @@ public sealed partial class DownloadItem : ObservableObject
         >= 1L << 10 => $"{value / 1024.0:0.0} KB",
         _ => $"{value} B"
     };
-    private static string FormatTime(long seconds) => seconds >= 3600 ? $"{seconds / 3600} 小時 {seconds % 3600 / 60} 分" : seconds >= 60 ? $"{seconds / 60} 分 {seconds % 60} 秒" : $"{seconds} 秒";
+    private static string FormatTime(long seconds) => seconds >= 3600 ? Strings.Format("Duration.HoursMinutes", seconds / 3600, seconds % 3600 / 60) : seconds >= 60 ? Strings.Format("Duration.MinutesSeconds", seconds / 60, seconds % 60) : Strings.Format("Duration.Seconds", seconds);
 }

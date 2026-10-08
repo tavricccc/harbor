@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using System.Diagnostics;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -7,7 +8,7 @@ public static class FileActions
 {
     public static void Open(string path)
     {
-        if (!File.Exists(path) && !Directory.Exists(path)) throw new FileNotFoundException("檔案已移動或刪除，可從儲存資料夾確認位置。", path);
+        if (!File.Exists(path) && !Directory.Exists(path)) throw new FileNotFoundException(Strings.Get("Errors.FileMissing"), path);
         Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
     }
     public static void Reveal(string path, string folder)

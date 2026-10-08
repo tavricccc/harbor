@@ -1,3 +1,4 @@
+using Harbor.Localization;
 namespace Harbor.Services;
 
 public sealed record DownloadAction(string Key, string Label, string Glyph);
@@ -6,11 +7,11 @@ public static class DownloadPresentation
 {
     public static DownloadAction ForStatus(string status) => status switch
     {
-        "done" => new("open", "開啟檔案", "\uE8E5"),
-        "pause" => new("continue", "繼續下載", "\uE768"),
-        "error" => new("continue", "重試下載", "\uE72C"),
-        "running" or "wait" or "ready" => new("pause", "暫停下載", "\uE769"),
-        _ => new("none", "選取下載", "\uE896")
+        "done" => new("open", Strings.Get("Downloads.OpenFile"), "\uE8E5"),
+        "pause" => new("continue", Strings.Get("Downloads.Resume"), "\uE768"),
+        "error" => new("continue", Strings.Get("Downloads.Retry"), "\uE72C"),
+        "running" or "wait" or "ready" => new("pause", Strings.Get("Downloads.Pause"), "\uE769"),
+        _ => new("none", Strings.Get("Downloads.Select"), "\uE896")
     };
 
     public static string FileGlyph(string name) => Path.GetExtension(name).ToLowerInvariant() switch

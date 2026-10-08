@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using System.Text.Json.Nodes;
 
 namespace Harbor.Services;
@@ -11,7 +12,7 @@ public static class HttpHeaders
         foreach (var line in text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
         {
             var separator = line.IndexOf(':');
-            if (separator < 1) throw new FormatException("HTTP 標頭請使用「名稱: 值」格式。");
+            if (separator < 1) throw new FormatException(Strings.Get("Errors.HeaderFormat"));
             headers[line[..separator].Trim()] = line[(separator + 1)..].Trim();
         }
         return headers;

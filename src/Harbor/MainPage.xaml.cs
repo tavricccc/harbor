@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -26,7 +27,7 @@ public sealed partial class MainPage : Page
   ViewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(ViewModel.Error) && ViewModel.Error.Length > 0) { ErrorBar.Message = ViewModel.Error; ErrorBar.IsOpen = true; } };
   InitializeRefresh();
  }
- private async void Start(object sender, RoutedEventArgs e) { Loaded -= Start; await ViewModel.InitializeAsync(); ready.SetResult(); UpdatePollingVisibility(); if (ViewModel.IsConnected && UiPreferences.Load().CheckForUpdates) { try { var update = await UpdateService.CheckAsync(ViewModel.Core); if (update is not null) { ErrorBar.Severity = InfoBarSeverity.Informational; ErrorBar.Message = $"有新版本：{update.Version}"; var button = new Button { Content = "下載更新" }; button.Click += async (_, _) => await UpdateService.PromptAsync(ViewModel.Core, update, XamlRoot); ErrorBar.ActionButton = button; ErrorBar.IsOpen = true; } } catch (Exception) { /* A background update check must not interrupt downloads. Manual checks report errors. */ } } }
+ private async void Start(object sender, RoutedEventArgs e) { Loaded -= Start; await ViewModel.InitializeAsync(); ready.SetResult(); UpdatePollingVisibility(); if (ViewModel.IsConnected && UiPreferences.Load().CheckForUpdates) { try { var update = await UpdateService.CheckAsync(ViewModel.Core); if (update is not null) { ErrorBar.Severity = InfoBarSeverity.Informational; ErrorBar.Message = Strings.Format("Update.Available", update.Version); var button = new Button { Content = Strings.Get("Update.Download") }; button.Click += async (_, _) => await UpdateService.PromptAsync(ViewModel.Core, update, XamlRoot); ErrorBar.ActionButton = button; ErrorBar.IsOpen = true; } } catch (Exception) { /* A background update check must not interrupt downloads. Manual checks report errors. */ } } }
  private async void AddDownload(object sender, RoutedEventArgs e)
  {
   await AddDownloadAsync(null);
@@ -52,7 +53,7 @@ public sealed partial class MainPage : Page
     if (link.Route == "create") ((App)Application.Current).OpenDownloadWindow(link.Parameters ?? new System.Text.Json.Nodes.JsonObject());
    }
   }
-  catch (Exception error) { ViewModel.Error = $"無法開啟 Gopeed 連結：{error.Message}"; }
+  catch (Exception error) { ViewModel.Error = Strings.Format("Errors.OpenGopeedLink", error.Message); }
  }
  private void FilterChanged(object s, SelectionChangedEventArgs e) { if (FilterBox?.SelectedItem is ComboBoxItem item) { ViewModel.Filter = item.Tag.ToString()!; ViewModel.ApplyFilter(); } }
  private void SearchChanged(AutoSuggestBox s, AutoSuggestBoxTextChangedEventArgs e) { ViewModel.Search = s.Text; searchTimer.Stop(); searchTimer.Start(); }
@@ -69,19 +70,19 @@ public sealed partial class MainPage : Page
    var content = Clipboard.GetContent();
    if (content.Contains(StandardDataFormats.StorageItems)) {
     var files = await content.GetStorageItemsAsync();
-    if (files.Count == 0 || files.Any(file => !file.Path.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))) throw new FormatException("請複製 Torrent 檔案或下載連結。");
+    if (files.Count == 0 || files.Any(file => !file.Path.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))) throw new FormatException(Strings.Get("Errors.ClipboardType"));
     await AddText(string.Join("\n", files.Select(file => file.Path)));
    }
    else if (content.Contains(StandardDataFormats.WebLink)) await AddText((await content.GetWebLinkAsync()).AbsoluteUri);
    else if (content.Contains(StandardDataFormats.Text)) await AddText(await content.GetTextAsync());
-   else throw new FormatException("剪貼簿沒有下載連結或 Torrent 檔案。");
+   else throw new FormatException(Strings.Get("Errors.ClipboardEmpty"));
   }
   catch (Exception ex) { ViewModel.Error = UserError.Message(ex); }
  }
  private async Task AddText(string text)
  {
   var links = text.Split(['\r','\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(link => link.Trim('"')).ToArray();
-  if (links.Length == 0 || links.Any(link => !DownloadSources.IsSupported(link))) throw new FormatException("請貼上 HTTP、HTTPS、磁力、eD2k 下載連結或 Torrent 檔案路徑。");
+  if (links.Length == 0 || links.Any(link => !DownloadSources.IsSupported(link))) throw new FormatException(Strings.Get("Errors.UnsupportedLink"));
   await AddDownloadAsync(new System.Text.Json.Nodes.JsonObject { ["req"] = new System.Text.Json.Nodes.JsonObject { ["url"] = string.Join("\n", links) } });
  }
  private void DownloadDragOver(object s, DragEventArgs e) { e.AcceptedOperation = e.DataView.Contains(StandardDataFormats.Text) || e.DataView.Contains(StandardDataFormats.WebLink) || e.DataView.Contains(StandardDataFormats.StorageItems) ? DataPackageOperation.Copy : DataPackageOperation.None; }
@@ -97,7 +98,7 @@ public sealed partial class MainPage : Page
    else if (e.DataView.Contains(StandardDataFormats.StorageItems))
    {
     var files = await e.DataView.GetStorageItemsAsync();
-    if (files.Count == 0 || files.Any(f => !f.Path.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))) throw new FormatException("拖放檔案目前接受 torrent 檔案。");
+    if (files.Count == 0 || files.Any(f => !f.Path.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))) throw new FormatException(Strings.Get("Errors.DropType"));
     parameters = new System.Text.Json.Nodes.JsonObject { ["req"] = new System.Text.Json.Nodes.JsonObject { ["url"] = string.Join("\n", files.Select(f => f.Path)) } };
    }
   }

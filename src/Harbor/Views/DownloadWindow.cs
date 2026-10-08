@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Harbor.Services;
@@ -24,7 +25,7 @@ public sealed class DownloadWindow : Window
     public DownloadWindow(JsonObject request, bool compact = true)
     {
         this.request = request; this.compact = compact;
-        Title = "新增下載";
+        Title = Strings.Get("Downloads.Add");
         surface.RequestedTheme = WindowAppearance.Theme;
         surface.Style = (Style)Application.Current.Resources["DownloadSurfaceStyle"];
         surface.Children.Add(pageHost);
@@ -50,7 +51,7 @@ public sealed class DownloadWindow : Window
 
     public DownloadWindow(string taskId) : this(new JsonObject(), compact: false)
     {
-        TaskId = taskId; Title = "下載進度";
+        TaskId = taskId; Title = Strings.Get("Downloads.Progress");
         if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
         {
             presenter.IsAlwaysOnTop = false; presenter.IsMinimizable = true;
@@ -63,7 +64,7 @@ public sealed class DownloadWindow : Window
         try { await core.ConnectAsync(); }
         catch (Exception error)
         {
-            if (!closed) { await NativeDialogs.ShowAsync(new ContentDialog { Title = "無法載入下載", Content = UserError.Message(error), CloseButtonText = "關閉" }, surface.XamlRoot); Close(); }
+            if (!closed) { await NativeDialogs.ShowAsync(new ContentDialog { Title = Strings.Get("Errors.LoadDownloads"), Content = UserError.Message(error), CloseButtonText = Strings.Get("Common.Close") }, surface.XamlRoot); Close(); }
             return;
         }
         if (closed) return;
@@ -88,7 +89,7 @@ public sealed class DownloadWindow : Window
             var error = new InfoBar { Severity = InfoBarSeverity.Error };
             NativeInfoBars.CollapseWhenClosed(error);
             var panel = new StackPanel { Spacing = 12, Children = { error, new TextBlock { Text = item.Name, TextWrapping = TextWrapping.Wrap }, new TextBlock { Text = request["req"]?["url"]?.GetValue<string>() ?? "", TextWrapping = TextWrapping.Wrap } } };
-            var dialog = new ContentDialog { Title = "用此連結繼續原本的下載？", Content = panel, PrimaryButtonText = "更新並繼續", IsPrimaryButtonEnabled = item.CanEditSource, SecondaryButtonText = "建立新下載", CloseButtonText = "取消" };
+            var dialog = new ContentDialog { Title = Strings.Get("Source.ResumeConfirm"), Content = panel, PrimaryButtonText = Strings.Get("Source.UpdateResume"), IsPrimaryButtonEnabled = item.CanEditSource, SecondaryButtonText = Strings.Get("Source.CreateNew"), CloseButtonText = Strings.Get("Common.Cancel") };
             dialog.PrimaryButtonClick += async (_, click) => { var deferral = click.GetDeferral(); try { await core.SendAsync(System.Net.Http.HttpMethod.Patch, "tasks/" + pending, new JsonObject { ["req"] = request["req"]!.DeepClone() }); await core.SendAsync(System.Net.Http.HttpMethod.Put, "tasks/" + pending + "/continue"); } catch (Exception failure) { click.Cancel = true; error.Message = UserError.Message(failure); error.IsOpen = true; } finally { deferral.Complete(); } };
             var result = await NativeDialogs.ShowAsync(dialog, surface.XamlRoot);
             if (result == ContentDialogResult.None) { Close(); return true; }
@@ -98,7 +99,7 @@ public sealed class DownloadWindow : Window
         }
         catch (Exception error)
         {
-            var dialog = new ContentDialog { Title = "無法更新原本的下載", Content = UserError.Message(error), PrimaryButtonText = "建立新下載", CloseButtonText = "取消" };
+            var dialog = new ContentDialog { Title = Strings.Get("Source.UpdateFailed"), Content = UserError.Message(error), PrimaryButtonText = Strings.Get("Source.CreateNew"), CloseButtonText = Strings.Get("Common.Cancel") };
             if (await NativeDialogs.ShowAsync(dialog, surface.XamlRoot) != ContentDialogResult.Primary) { Close(); return true; }
             var prefs = UiPreferences.Load(); prefs.PendingUpdateTaskId = ""; prefs.Save(); return false;
         }
@@ -107,7 +108,7 @@ public sealed class DownloadWindow : Window
     private void ShowProgress(string id)
     {
         TaskId = id;
-        Title = "下載進度";
+        Title = Strings.Get("Downloads.Progress");
         pageHost.Children.Clear();
         progress = new DownloadProgressPage(core, id, Close, () => AppWindow.IsVisible
             && AppWindow.Presenter is not Microsoft.UI.Windowing.OverlappedPresenter { State: Microsoft.UI.Windowing.OverlappedPresenterState.Minimized });

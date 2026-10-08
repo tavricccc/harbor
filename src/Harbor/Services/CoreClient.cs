@@ -1,3 +1,4 @@
+using Harbor.Localization;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
@@ -36,11 +37,12 @@ public sealed class CoreClient : IDisposable
             start.ArgumentList.Add("--port"); start.ArgumentList.Add(UiPreferences.Load().ApiPort.ToString());
             start.ArgumentList.Add("--ui"); start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "Harbor.exe"));
             start.ArgumentList.Add("--icon"); start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
+            start.ArgumentList.Add("--language"); start.ArgumentList.Add(Strings.Language);
             using var child = Process.Start(start)!;
             var deadline = DateTime.UtcNow.AddSeconds(30);
             while (DateTime.UtcNow < deadline)
             {
-                if (child.HasExited && child.ExitCode != 0) throw new IOException("無法啟動下載服務。請查看記錄資料夾。");
+                if (child.HasExited && child.ExitCode != 0) throw new IOException(Strings.Get("Errors.CoreStart"));
                 if (File.Exists(path))
                 {
                     var candidate = JsonNode.Parse(await File.ReadAllTextAsync(path))!.AsObject();
@@ -48,11 +50,17 @@ public sealed class CoreClient : IDisposable
                 }
                 await Task.Delay(100);
             }
-            if (session is null) throw new TimeoutException("下載核心啟動逾時。");
+            if (session is null) throw new TimeoutException(Strings.Get("Errors.CoreTimeout"));
         }
         http.BaseAddress = new Uri(ApiAddress + "/api/v1/");
         http.DefaultRequestHeaders.Add("X-Api-Token", Token);
         http.DefaultRequestHeaders.Add("X-Gopeed-Native-Confirmed", "1");
+        using var languageRequest = new HttpRequestMessage(HttpMethod.Post, $"http://127.0.0.1:{session["controlPort"]}/language")
+        {
+            Content = new StringContent(new JsonObject { ["language"] = Strings.Language }.ToJsonString(), Encoding.UTF8, "application/json")
+        };
+        using var languageResponse = await http.SendAsync(languageRequest);
+        languageResponse.EnsureSuccessStatusCode();
         Version = (await GetAsync("info"))!["version"]!.GetValue<string>();
     }
 

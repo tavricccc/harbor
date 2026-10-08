@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System.Runtime.InteropServices;
+using Harbor.Localization;
 
 namespace Harbor.Services;
 
@@ -18,6 +19,7 @@ public static class WindowAppearance
 
     public static void ApplyFrame(Window window, FrameworkElement root)
     {
+        root.Language = Strings.Language;
         SetIcon(window);
         window.SystemBackdrop = new MicaBackdrop();
         var corners = 2;
