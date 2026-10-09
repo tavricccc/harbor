@@ -19,13 +19,13 @@ Harbor fork 自 Gopeed，是社群維護的獨立專案，並非 Gopeed 官方�
 
 ## 下載
 
-**[下載 Harbor 0.9.0](https://github.com/tavricccc/harbor/releases/tag/v0.9.0)** · Windows x64 預覽版
+**[下載 Harbor 0.10.0](https://github.com/tavricccc/harbor/releases/tag/v0.10.0)** · Windows x64 預覽版
 
 | 檔案 | 用途 |
 | --- | --- |
-| [安裝版](https://github.com/tavricccc/harbor/releases/download/v0.9.0/Harbor-Setup-0.9.0-x64.exe) | 一般使用者選這個。包含執行環境，安裝到使用者目錄，不需管理員權限。 |
-| [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.9.0/Harbor-Source-0.9.0.zip) | 包含此版本使用的 Gopeed 核心。 |
-| [SHA-256](https://github.com/tavricccc/harbor/releases/download/v0.9.0/SHA256SUMS.txt) | 下載檔案校驗碼。 |
+| [安裝版](https://github.com/tavricccc/harbor/releases/download/v0.10.0/Harbor-Setup-0.10.0-x64.exe) | 一般使用者選這個。包含執行環境，安裝到使用者目錄，不需管理員權限。 |
+| [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.10.0/Harbor-Source-0.10.0.zip) | 包含此版本使用的 Gopeed 核心。 |
+| [SHA-256](https://github.com/tavricccc/harbor/releases/download/v0.10.0/SHA256SUMS.txt) | 下載檔案校驗碼。 |
 
 支援 Windows 10 1809 以上及 Windows 11；建議 Windows 11。Windows 10 尚未完成實機驗證。從舊版直接執行安裝包即可升級，任務、設定與下載檔案會保留。
 
