@@ -80,6 +80,8 @@
             </Grid>
             <Border x:Name="OptionsSurface" Visibility="Collapsed" BorderThickness="0,1,0,0"
                     BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="0,16,0,0">
+                <ScrollViewer MaxHeight="240" VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="OptionsContent" Spacing="16">
                     <TextBlock Text="{loc:Localize Key=Download.OptionsTitle}" FontSize="16" FontWeight="SemiBold"/>
                     <CheckBox x:Name="DirectDownload" Content="{loc:Localize Key=Download.SkipCheck}"
@@ -89,6 +91,7 @@
                     <TextBox x:Name="Headers" Header="{loc:Localize Key=Common.HttpHeaders}" PlaceholderText="{loc:Localize Key=Download.HeadersPlaceholder}"
                              AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxHeight="160"/>
                 </StackPanel>
+                </ScrollViewer>
             </Border>
         </StackPanel>
     </ScrollViewer>

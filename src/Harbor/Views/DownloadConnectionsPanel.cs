@@ -9,7 +9,7 @@ using System.Text.Json.Nodes;
 
 namespace Harbor.Views;
 
-internal sealed class DownloadConnectionsPanel : StackPanel
+internal sealed class DownloadConnectionsPanel : Grid
 {
     private readonly ObservableCollection<ConnectionProgress> rows = [];
     private readonly TextBlock message = SettingsFields.Description(Strings.Get("Details.LoadingConnections"));
@@ -19,9 +19,14 @@ internal sealed class DownloadConnectionsPanel : StackPanel
 
     public DownloadConnectionsPanel()
     {
-        Spacing = 12;
+        MaxHeight = 240;
+        RowSpacing = 12;
+        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         Children.Add(new TextBlock { Text = Strings.Get("Progress.ConnectionsTitle"), FontSize = 16, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
-        list = new ListView { ItemsSource = rows, SelectionMode = ListViewSelectionMode.None, MaxHeight = 260, Visibility = Visibility.Collapsed };
+        list = new ListView { ItemsSource = rows, SelectionMode = ListViewSelectionMode.None, Visibility = Visibility.Collapsed };
+        ScrollViewer.SetVerticalScrollBarVisibility(list, ScrollBarVisibility.Auto);
         ScrollViewer.SetHorizontalScrollMode(list, ScrollMode.Disabled);
         ScrollViewer.SetHorizontalScrollBarVisibility(list, ScrollBarVisibility.Disabled);
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters =
@@ -47,6 +52,7 @@ internal sealed class DownloadConnectionsPanel : StackPanel
                 </Grid>
             </DataTemplate>
             """);
+        SetRow(message, 1); SetRow(list, 1); SetRow(hint, 2);
         Children.Add(message); Children.Add(list); Children.Add(hint);
         hint.Visibility = Visibility.Collapsed;
     }

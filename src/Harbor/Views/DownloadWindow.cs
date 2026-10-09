@@ -18,8 +18,8 @@ public sealed class DownloadWindow : Window
     public string? TaskId { get; private set; }
     private Func<double,double>? preferredHeight;
     private const double ContentWidth = 660;
+    private const double MaximumContentHeight = 600;
     private bool fitQueued;
-    private bool positioned;
     private Windows.Graphics.SizeInt32 lastClientSize;
 
     public DownloadWindow(JsonObject request, bool compact = true)
@@ -129,18 +129,17 @@ public sealed class DownloadWindow : Window
             var scale = surface.XamlRoot.RasterizationScale;
             var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
             var width = Math.Min(ContentWidth, area.Width / scale - 24);
-            var height = Math.Clamp(preferredHeight(width), 140, area.Height / scale - 48);
+            var height = Math.Clamp(preferredHeight(width), 140, Math.Min(MaximumContentHeight, area.Height / scale - 48));
             var size = new Windows.Graphics.SizeInt32((int)Math.Round(width * scale), (int)Math.Ceiling(height * scale));
             if (size.Width == lastClientSize.Width && size.Height == lastClientSize.Height) return;
+            var position = AppWindow.Position;
+            var previousSize = AppWindow.Size;
+            var centerX = position.X + previousSize.Width / 2.0;
+            var centerY = position.Y + previousSize.Height / 2.0;
             if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter) presenter.IsResizable = true;
             AppWindow.ResizeClient(size); lastClientSize = size;
-            var position = AppWindow.Position;
-            if (!positioned)
-            {
-                position.X = area.X + (area.Width - AppWindow.Size.Width) / 2;
-                position.Y = area.Y + (area.Height - AppWindow.Size.Height) / 3;
-                positioned = true;
-            }
+            position.X = (int)Math.Round(centerX - AppWindow.Size.Width / 2.0);
+            position.Y = (int)Math.Round(centerY - AppWindow.Size.Height / 2.0);
             position.X = Math.Clamp(position.X, area.X, area.X + area.Width - AppWindow.Size.Width);
             position.Y = Math.Clamp(position.Y, area.Y, area.Y + area.Height - AppWindow.Size.Height);
             AppWindow.Move(position);
