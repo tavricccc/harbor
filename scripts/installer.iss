@@ -7,7 +7,7 @@ AppName=Harbor
 AppVersion={#AppVersion}
 AppPublisher=Tavric
 DefaultDirName={localappdata}\Programs\Harbor
-UsePreviousAppDir=no
+UsePreviousAppDir=yes
 DefaultGroupName=Harbor
 UsePreviousGroup=no
 PrivilegesRequired=lowest
@@ -51,8 +51,12 @@ zhCN.RegistrationLaunchFailed=无法启动 Harbor 完成浏览器接管注册。
 en.RegistrationFailed=Harbor browser integration registration failed. Code: %1
 zhTW.RegistrationFailed=Harbor 瀏覽器接管註冊失敗，代碼：%1
 zhCN.RegistrationFailed=Harbor 浏览器接管注册失败，代码：%1
+en.CleanupFailed=Unable to remove an old Harbor file. Close Harbor and its browser integration, then retry: %1
+zhTW.CleanupFailed=無法移除 Harbor 舊檔案。請關閉 Harbor 與瀏覽器接管後重試：%1
+zhCN.CleanupFailed=无法移除 Harbor 旧文件。请关闭 Harbor 与浏览器接管后重试：%1
 
 [Files]
+Source: "..\artifacts\app\installed-files.txt"; Flags: dontcopy
 Source: "..\artifacts\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
@@ -73,10 +77,10 @@ Filename: "{app}\Harbor.exe"; Description: "{cm:LaunchHarbor}"; Flags: nowait po
 
 [UninstallRun]
 Filename: "{app}\Harbor.exe"; Parameters: "--unregister-integrations"; Flags: runhidden waituntilterminated; RunOnceId: "RemoveNativeIntegration"
-Filename: "{app}\Engine\harbor-core.exe"; Parameters: "--data ""{localappdata}\Harbor"" --shutdown"; Flags: runhidden waituntilterminated; RunOnceId: "StopNativeCore"
 
 [Code]
 #include "migration.iss"
+#include "cleanup.iss"
 procedure VerifyBrowserHost(BrowserKey, ManifestName: String);
 var Manifest: String;
 begin
@@ -91,6 +95,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var Code: Integer;
 begin
+  if CurStep = ssInstall then CleanCurrentInstallation;
   if CurStep = ssPostInstall then
   begin
     if not Exec(ExpandConstant('{app}\Harbor.exe'), '--register-integrations', '', SW_HIDE, ewWaitUntilTerminated, Code) then
@@ -100,16 +105,19 @@ begin
     VerifyBrowserHost('Software\Google\Chrome\NativeMessagingHosts', 'browser-host.json');
     VerifyBrowserHost('Software\Microsoft\Edge\NativeMessagingHosts', 'browser-host.json');
     VerifyBrowserHost('Software\Mozilla\NativeMessagingHosts', 'browser-host-firefox.json');
+    RemoveOldInstallation(PreviousInstallDir);
+    RemoveOldInstallation(ExpandConstant('{localappdata}\Programs\Gopeed Native'));
+    RemoveLegacyShortcuts;
   end;
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
-var Code: Integer; Command, Description, Icon: String;
+var Command, Description, Icon: String;
 begin
-  StopLegacyCore;
+  StopInstalledVersions;
   if not RegKeyExists(HKCU, 'Software\Harbor\ProtocolBackup') and
     RegQueryStringValue(HKCU, 'Software\Classes\gopeed\shell\open\command', '', Command) and
-    (Pos('Harbor.exe', Command) = 0) then
+    not IsHarborCommand(Command) then
   begin
     RegWriteStringValue(HKCU, 'Software\Harbor\ProtocolBackup', 'Command', Command);
     if RegQueryStringValue(HKCU, 'Software\Classes\gopeed', '', Description) then
@@ -117,18 +125,18 @@ begin
     if RegQueryStringValue(HKCU, 'Software\Classes\gopeed\DefaultIcon', '', Icon) then
       RegWriteStringValue(HKCU, 'Software\Harbor\ProtocolBackup', 'Icon', Icon);
   end;
-  if FileExists(ExpandConstant('{app}\Engine\harbor-core.exe')) then
-    Exec(ExpandConstant('{app}\Engine\harbor-core.exe'), '--data "' + ExpandConstant('{localappdata}\Harbor') + '" --shutdown', '', SW_HIDE, ewWaitUntilTerminated, Code);
   Result := '';
 end;
 
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
-var Command, Description, Icon: String;
+var Command, Description, Icon: String; EmptyFiles: TStringList;
 begin
+  if CurUninstallStep = usUninstall then StopInstalledVersions;
   if CurUninstallStep = usPostUninstall then
   begin
-    if RegQueryStringValue(HKCU, 'Software\Harbor\ProtocolBackup', 'Command', Command) then
+    if RegQueryStringValue(HKCU, 'Software\Harbor\ProtocolBackup', 'Command', Command) and
+      not IsHarborCommand(Command) then
     begin
       RegWriteStringValue(HKCU, 'Software\Classes\gopeed', 'URL Protocol', '');
       RegWriteStringValue(HKCU, 'Software\Classes\gopeed\shell\open\command', '', Command);
@@ -136,7 +144,22 @@ begin
         RegWriteStringValue(HKCU, 'Software\Classes\gopeed', '', Description);
       if RegQueryStringValue(HKCU, 'Software\Harbor\ProtocolBackup', 'Icon', Icon) then
         RegWriteStringValue(HKCU, 'Software\Classes\gopeed\DefaultIcon', '', Icon);
-      RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Harbor\ProtocolBackup');
+    end;
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Harbor');
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\GopeedNative');
+    RegDeleteValue(HKCU, 'Software\RegisteredApplications', 'Harbor');
+    RegDeleteValue(HKCU, 'Software\RegisteredApplications', 'GopeedNative');
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Harbor');
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'GopeedNative');
+    RemoveLegacyShortcuts;
+    RemoveApplicationState(ExpandConstant('{localappdata}\Harbor'));
+    RemoveApplicationState(ExpandConstant('{localappdata}\GopeedNative'));
+    EmptyFiles := TStringList.Create;
+    try
+      CleanInstallationTree(ExpandConstant('{app}'), '', EmptyFiles, True);
+      RemoveDir(ExpandConstant('{app}'));
+    finally
+      EmptyFiles.Free;
     end;
   end;
 end;
