@@ -38,7 +38,6 @@ internal sealed class MirrorsEditor : StackPanel
             </DataTemplate>
             """);
         Children.Add(enabled);
-        Children.Add(SettingsFields.Description(Strings.Get("Mirrors.Description")));
         Children.Add(list); Children.Add(message);
         var form = new NativeFormGrid(); form.AddField(Strings.Get("Common.Type"), type); form.AddField(Strings.Get("Common.Url"), url); Children.Add(form);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };

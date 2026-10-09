@@ -108,7 +108,6 @@ public sealed partial class SettingsPage
     private void BuildCategories()
     {
         var panel = Section(Strings.Get("Common.Category"));
-        panel.Children.Add(SettingsFields.Description(Strings.Get("Categories.Description")));
         panel.Children.Add(categories);
     }
 }

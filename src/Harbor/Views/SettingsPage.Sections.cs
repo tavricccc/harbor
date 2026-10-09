@@ -28,7 +28,6 @@ public sealed partial class SettingsPage
         var browser = SettingsFields.Group(panel, Strings.Get("Settings.Browser"));
         browser.Children.Add(new BrowserIntegrationGuide());
         var remote = SettingsFields.Advanced(panel, Strings.Get("Settings.LocalApi"));
-        remote.Children.Add(SettingsFields.Description(Strings.Get("Settings.LocalApiDescription")));
         remote.Children.Add(new TextBox { Header = Strings.Get("Settings.ServerAddress"), IsReadOnly = true, Text = new Uri(vm.Core.ApiAddress).Authority });
         remote.Children.Add(new PasswordBox { Header = "API Token", Password = vm.Core.Token, PasswordRevealMode = PasswordRevealMode.Peek });
         var copy = NativeButtons.Create(Strings.Get("Settings.CopyToken"), "\uE8C8");
@@ -74,9 +73,7 @@ public sealed partial class SettingsPage
         panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"] });
         panel.Children.Add(SettingsFields.Description(Strings.Format("Settings.CoreVersion", vm.Core.Version)));
         var credits = SettingsFields.Group(panel, Strings.Get("Settings.Credits"));
-        credits.Children.Add(SettingsFields.Description(Strings.Get("Settings.CreditsDescription")));
         credits.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
-        credits.Children.Add(SettingsFields.Description(Strings.Get("Settings.IndependentProject")));
         panel.Children.Add(checkUpdates);
         var update = NativeButtons.Create(Strings.Get("Update.Check"), "\uE72C");
         update.Click += async (_, _) =>

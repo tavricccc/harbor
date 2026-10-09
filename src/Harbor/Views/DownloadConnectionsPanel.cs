@@ -13,7 +13,6 @@ internal sealed class DownloadConnectionsPanel : Grid
 {
     private readonly ObservableCollection<ConnectionProgress> rows = [];
     private readonly TextBlock message = SettingsFields.Description(Strings.Get("Details.LoadingConnections"));
-    private readonly TextBlock hint = SettingsFields.Description(Strings.Get("Progress.ConnectionShareHint"));
     private readonly ListView list;
     public event Action? LayoutChanged;
 
@@ -23,7 +22,6 @@ internal sealed class DownloadConnectionsPanel : Grid
         RowSpacing = 12;
         RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         Children.Add(new TextBlock { Text = Strings.Get("Progress.ConnectionsTitle"), FontSize = 16, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
         list = new ListView { ItemsSource = rows, SelectionMode = ListViewSelectionMode.None, Visibility = Visibility.Collapsed };
         ScrollViewer.SetVerticalScrollBarVisibility(list, ScrollBarVisibility.Auto);
@@ -52,9 +50,8 @@ internal sealed class DownloadConnectionsPanel : Grid
                 </Grid>
             </DataTemplate>
             """);
-        SetRow(message, 1); SetRow(list, 1); SetRow(hint, 2);
-        Children.Add(message); Children.Add(list); Children.Add(hint);
-        hint.Visibility = Visibility.Collapsed;
+        SetRow(message, 1); SetRow(list, 1);
+        Children.Add(message); Children.Add(list);
     }
 
     public void Update(JsonNode? stats, DownloadItem item)
@@ -74,9 +71,6 @@ internal sealed class DownloadConnectionsPanel : Grid
         message.Text = Strings.Get("Details.NoConnections");
         message.Visibility = count == 0 ? Visibility.Visible : Visibility.Collapsed;
         list.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        var hintVisibility = http && count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        changed |= hint.Visibility != hintVisibility;
-        hint.Visibility = hintVisibility;
         if (changed) LayoutChanged?.Invoke();
     }
 

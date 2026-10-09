@@ -23,7 +23,6 @@ internal sealed class CategoriesEditor : StackPanel
     {
         Spacing = 20;
         Children.Add(enabled);
-        Children.Add(SettingsFields.Description(Strings.Get("Categories.SaveByCategoryHint")));
         NativeInfoBars.CollapseWhenClosed(message);
         AutomationProperties.SetName(name, Strings.Get("Categories.Name")); AutomationProperties.SetName(path, Strings.Get("Common.SaveLocation"));
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };

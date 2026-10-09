@@ -79,6 +79,8 @@ public sealed partial class DownloadForm : UserControl
   Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(AdvancedButton, Strings.Get(expanded ? "Common.Collapse" : "Common.Expand"));
   LayoutChanged?.Invoke();
  }
+ private void OptionsExpanding(Expander sender, ExpanderExpandingEventArgs args) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
+ private void OptionsCollapsed(Expander sender, ExpanderCollapsedEventArgs args) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
  private void InputChanged(object s, TextChangedEventArgs e) { if (Files is null || lastInput == Links.Text) return; lastInput = Links.Text; InvalidateResolution(); }
  private void InvalidateResolution()
  {

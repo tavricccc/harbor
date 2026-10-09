@@ -88,8 +88,11 @@
                               ToolTipService.ToolTip="{loc:Localize Key=Download.SkipCheckHint}"
                               Checked="DirectChanged" Unchecked="DirectChanged"/>
                     <NumberBox x:Name="Connections" Header="{loc:Localize Key=Download.Connections}" Value="8" Minimum="1" Maximum="256" SpinButtonPlacementMode="Compact"/>
-                    <TextBox x:Name="Headers" Header="{loc:Localize Key=Common.HttpHeaders}" PlaceholderText="{loc:Localize Key=Download.HeadersPlaceholder}"
-                             AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxHeight="160"/>
+                    <Expander Header="{loc:Localize Key=Common.HttpHeaders}" HorizontalAlignment="Stretch"
+                              IsExpanded="False" Expanding="OptionsExpanding" Collapsed="OptionsCollapsed">
+                        <TextBox x:Name="Headers" PlaceholderText="{loc:Localize Key=Download.HeadersPlaceholder}"
+                                 AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxHeight="160"/>
+                    </Expander>
                 </StackPanel>
                 </ScrollViewer>
             </Border>
