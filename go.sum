@@ -25,8 +25,8 @@ filippo.io/edwards25519 v1.0.0-rc.1 h1:m0VOOB23frXZvAOK44usCgLWvtsxIoMCTBGJZlpmG
 filippo.io/edwards25519 v1.0.0-rc.1/go.mod h1:N1IkdkCkiLB6tki+MYJoSx2JTY9NUlxZE7eHn5EwJns=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/GopeedLab/gopeed v1.9.4-0.20260918153409-fe25ccab1db3 h1:J0NhxDHQRtVzZ/slfeMU/w2lrJEtCy2Z2XwzGEZb/uA=
-github.com/GopeedLab/gopeed v1.9.4-0.20260918153409-fe25ccab1db3/go.mod h1:ebjgxk1Hp6JgKvKhxKQiwYQQDyi7lstjw9o9RcvmZ8U=
+github.com/GopeedLab/gopeed v1.9.4-0.20261008083116-ba84a04a434b h1:Q1WNhTMkO3vIOHSxkCyy8MM4zoLhDpTODsNJeWLsf/A=
+github.com/GopeedLab/gopeed v1.9.4-0.20261008083116-ba84a04a434b/go.mod h1:ebjgxk1Hp6JgKvKhxKQiwYQQDyi7lstjw9o9RcvmZ8U=
 github.com/Masterminds/semver/v3 v3.2.1 h1:RN9w6+7QoMeJVGyfmbcgs28Br8cvmnucEXnY0rYXWg0=
 github.com/Masterminds/semver/v3 v3.2.1/go.mod h1:qvl/7zhW3nngYb5+80sSMF+FG2BjYrf8m9wsX0PNOMQ=
 github.com/Microsoft/go-winio v0.5.2/go.mod h1:WpS1mjBmmwHBEWmogvA2mj8546UReBk4v8QkMxJ6pZY=

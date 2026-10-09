@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Harbor.Localization;
 using System.Diagnostics;
-using System.Text.Json.Nodes;
 
 namespace Harbor.Models;
 
@@ -23,13 +22,13 @@ public sealed partial class ConnectionProgress : ObservableObject
         SpeedText = "—";
     }
 
-    public void UpdateHttp(JsonNode connection, int index, long now, bool running)
+    public void UpdateHttp(HttpConnectionStatistics connection, int index, long now, bool running)
     {
-        var downloaded = connection["downloaded"]!.GetValue<long>();
-        var total = connection["total"]!.GetValue<long>();
-        var completed = connection["completed"]!.GetValue<bool>();
-        var failed = connection["failed"]!.GetValue<bool>();
-        var retries = connection["retryTimes"]!.GetValue<int>();
+        var downloaded = connection.Downloaded;
+        var total = connection.Total;
+        var completed = connection.Completed;
+        var failed = connection.Failed;
+        var retries = connection.RetryTimes;
         Label = Strings.Format("Details.Connection", index + 1);
         TransferText = total > 0 ? $"{DownloadItem.FormatBytes(downloaded)} / {DownloadItem.FormatBytes(total)}" : DownloadItem.FormatBytes(downloaded);
         Percent = completed ? 100 : total > 0 ? Math.Min(100, downloaded * 100.0 / total) : 0;
@@ -42,15 +41,15 @@ public sealed partial class ConnectionProgress : ObservableObject
         lastSample = now; lastDownloaded = downloaded; lastRetries = retries;
     }
 
-    public void UpdatePeer(JsonNode peer)
+    public void UpdatePeer(PeerStatistics peer)
     {
-        Label = peer["address"]!.GetValue<string>();
-        var completion = peer["completion"]?.GetValue<double>();
+        Label = peer.Address;
+        var completion = peer.Completion;
         Percent = completion is { } value ? value * 100 : 0;
         IsIndeterminate = false;
         TransferText = completion is { } ratio ? Strings.Format("Progress.PeerCompletion", $"{ratio * 100:0.0}%") : Strings.Get("Status.UnknownSize");
-        StatusText = peer["client"]!.GetValue<string>();
-        SpeedText = DownloadItem.FormatBytes(peer["downloadSpeed"]!.GetValue<long>()) + "/s";
+        StatusText = peer.Client;
+        SpeedText = DownloadItem.FormatBytes(peer.DownloadSpeed) + "/s";
         lastSample = 0;
     }
 

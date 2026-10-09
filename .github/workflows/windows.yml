@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       core-channel:
-        description: 'Gopeed release channel (locked keeps go.mod)'
+        description: 'Gopeed source channel (locked keeps go.mod)'
         type: choice
-        options: [locked, preview, stable]
+        options: [locked, preview, stable, main]
         default: locked
 permissions:
   contents: read

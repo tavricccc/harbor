@@ -16,5 +16,6 @@
     <Compile Include="../../src/Harbor/Services/DownloadPresentation.cs" Link="DownloadPresentation.cs" />
     <Compile Include="../../src/Harbor/Models/DownloadItem.cs" Link="DownloadItem.cs" />
     <Compile Include="../../src/Harbor/Models/DownloadItem.Update.cs" Link="DownloadItem.Update.cs" />
+    <Compile Include="../../src/Harbor/Models/TaskStatistics.cs" Link="TaskStatistics.cs" />
   </ItemGroup>
 </Project>

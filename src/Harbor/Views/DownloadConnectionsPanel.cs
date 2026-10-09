@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text.Json.Nodes;
 
 namespace Harbor.Views;
 
@@ -54,19 +53,20 @@ internal sealed class DownloadConnectionsPanel : Grid
         Children.Add(message); Children.Add(list);
     }
 
-    public void Update(JsonNode? stats, DownloadItem item)
+    public void Update(TaskStatistics? stats, DownloadItem item)
     {
         var http = item.Protocol == "HTTP";
-        var connections = http ? stats?["snapshot"]?["connections"] as JsonArray : stats?["runtime"]?["peers"] as JsonArray;
-        var count = connections?.Count ?? 0;
+        var connections = stats?.Snapshot?.Connections ?? [];
+        var peers = stats?.Runtime?.Peers ?? [];
+        var count = http ? connections.Length : peers.Length;
         var changed = rows.Count != count;
         while (rows.Count > count) rows.RemoveAt(rows.Count - 1);
         while (rows.Count < count) rows.Add(new ConnectionProgress());
         var now = Stopwatch.GetTimestamp();
         for (var index = 0; index < count; index++)
         {
-            if (http) rows[index].UpdateHttp(connections![index]!, index, now, item.Status == "running");
-            else rows[index].UpdatePeer(connections![index]!);
+            if (http) rows[index].UpdateHttp(connections[index], index, now, item.Status == "running");
+            else rows[index].UpdatePeer(peers[index]);
         }
         message.Text = Strings.Get("Details.NoConnections");
         message.Visibility = count == 0 ? Visibility.Visible : Visibility.Collapsed;

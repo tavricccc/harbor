@@ -1,12 +1,18 @@
 #Requires -Version 7.0
 param(
-    [ValidateSet('stable', 'preview')][string]$Channel = 'preview',
+    [ValidateSet('stable', 'preview', 'main')][string]$Channel = 'preview',
     [string]$Version,
     [switch]$Test
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 $headers = @{ 'User-Agent' = 'Harbor-core-updater' }
+if ($Channel -eq 'main' -and !$Version) {
+    $tag = 'main'
+    $refs = @(git ls-remote https://github.com/GopeedLab/gopeed.git 'refs/heads/main')
+    if ($LASTEXITCODE -or !$refs.Count) { throw 'Cannot resolve Gopeed main' }
+    $revision = ($refs[0] -split '\s+')[0]
+} else {
 if ($Version) {
     $release = Invoke-RestMethod "https://api.github.com/repos/GopeedLab/gopeed/releases/tags/$([Uri]::EscapeDataString($Version))" -Headers $headers
 } else {
@@ -21,6 +27,7 @@ $refs = @(git ls-remote https://github.com/GopeedLab/gopeed.git "refs/tags/$tag"
 if ($LASTEXITCODE -or !$refs.Count) { throw "Cannot resolve Gopeed $tag" }
 $peeled = $refs | Where-Object { $_.EndsWith('^{}') } | Select-Object -First 1
 $revision = (($peeled ?? $refs[0]) -split '\s+')[0]
+}
 Push-Location $repo
 try {
     go get "github.com/GopeedLab/gopeed@$revision"
@@ -29,7 +36,7 @@ try {
     if ($LASTEXITCODE) { throw 'Go module synchronization failed' }
     $module = go list -m -json github.com/GopeedLab/gopeed | ConvertFrom-Json
     if ($LASTEXITCODE) { throw 'Cannot read the resolved Gopeed version' }
-    $metadata = [ordered]@{ release = $tag; channel = $(if ($release.prerelease) { 'preview' } else { 'stable' }); moduleVersion = $module.Version }
+    $metadata = [ordered]@{ release = $tag; channel = $(if ($tag -eq 'main') { 'main' } elseif ($release.prerelease) { 'preview' } else { 'stable' }); moduleVersion = $module.Version; revision = $revision }
     [IO.File]::WriteAllText((Join-Path $repo 'core/upstream.json'), ($metadata | ConvertTo-Json) + "`n")
     Write-Host "Gopeed $tag ($($module.Version))"
 } finally { Pop-Location }

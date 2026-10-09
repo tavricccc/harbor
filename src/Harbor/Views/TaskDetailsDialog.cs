@@ -37,26 +37,25 @@ public sealed class TaskDetailsDialog : ContentDialog
         {
             try
             {
-                var data = await core.GetAsync("tasks/" + item.Id + "/stats");
+                var data = await core.GetAsync<TaskStatistics>("tasks/" + item.Id + "/stats");
                 connections.Children.Clear();
                 if (data is null) { connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections"))); return; }
-                if (item.Protocol == "BT")
+                if (item.Protocol == "BT" && data.Snapshot is { } snapshot)
                 {
                     var details = new NativeFormGrid(labelWidth: 88);
-                    details.AddText(Strings.Get("Details.TotalPeers"), data["totalPeers"]!.ToString());
-                    details.AddText(Strings.Get("Details.ActivePeers"), data["activePeers"]!.ToString());
-                    details.AddText(Strings.Get("Details.Seeders"), data["connectedSeeders"]!.ToString());
-                    details.AddText(Strings.Get("Details.Shared"), DownloadItem.FormatBytes(data["seedBytes"]!.GetValue<long>()));
-                    details.AddText(Strings.Get("Details.ShareRatio"), data["seedRatio"]!.ToString());
-                    details.AddText(Strings.Get("Details.SeedTime"), Strings.Format("Duration.Seconds", data["seedTime"]));
+                    details.AddText(Strings.Get("Details.TotalPeers"), data.Runtime?.TotalPeers.ToString() ?? "—");
+                    details.AddText(Strings.Get("Details.ActivePeers"), data.Runtime?.ActivePeers.ToString() ?? "—");
+                    details.AddText(Strings.Get("Details.Seeders"), data.Runtime?.ConnectedSeeders.ToString() ?? "—");
+                    details.AddText(Strings.Get("Details.Shared"), DownloadItem.FormatBytes(snapshot.SeedBytes));
+                    details.AddText(Strings.Get("Details.ShareRatio"), snapshot.SeedRatio.ToString());
+                    details.AddText(Strings.Get("Details.SeedTime"), Strings.Format("Duration.Seconds", snapshot.SeedTime));
                     connections.Children.Add(details);
                 }
-                else if (data["connections"] is JsonArray active)
+                else if (data.Snapshot?.Connections is { Length: > 0 } active)
                 {
-                    if (active.Count == 0) connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections")));
                     var details = new NativeFormGrid(labelWidth: 72);
                     foreach (var (connection, index) in active.Select((value, index) => (value!, index)))
-                        details.AddText(Strings.Format("Details.Connection", index + 1), Strings.Format("Details.ConnectionStats", DownloadItem.FormatBytes(connection["downloaded"]!.GetValue<long>()), (connection["completed"]!.GetValue<bool>() ? Strings.Get("Status.Completed") : connection["failed"]!.GetValue<bool>() ? Strings.Get("Status.Retrying") : Strings.Get("Status.Downloading")), connection["retryTimes"]));
+                        details.AddText(Strings.Format("Details.Connection", index + 1), Strings.Format("Details.ConnectionStats", DownloadItem.FormatBytes(connection.Downloaded), Strings.Get(connection.Completed ? "Status.Completed" : connection.Failed ? "Status.Retrying" : "Status.Downloading"), connection.RetryTimes));
                     connections.Children.Add(details);
                 }
                 else connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections")));

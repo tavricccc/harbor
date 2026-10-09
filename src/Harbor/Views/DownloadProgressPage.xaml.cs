@@ -57,7 +57,7 @@ public sealed partial class DownloadProgressPage : Page
             if (changes != DownloadChanges.None) UpdatePresentation(item, changes);
             if (ConnectionsSurface.Visibility == Visibility.Visible)
             {
-                var stats = await core.GetAsync($"tasks/{id}/stats");
+                var stats = await core.GetAsync<TaskStatistics>($"tasks/{id}/stats");
                 if (!stopped && !cancelling && ConnectionsSurface.Visibility == Visibility.Visible) connections.Update(stats, item);
             }
             timer.Interval = TimeSpan.FromSeconds(item.CanPause || item.IsProcessing ? 1 : 5);

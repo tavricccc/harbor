@@ -1,5 +1,6 @@
 {
-  "release": "v2.0.0-beta.3",
-  "channel": "preview",
-  "moduleVersion": "v1.9.4-0.20260918153409-fe25ccab1db3"
+  "release": "main",
+  "channel": "main",
+  "moduleVersion": "v1.9.4-0.20261008083116-ba84a04a434b",
+  "revision": "ba84a04a434bc65bebddb2fac2f9b8cec68f8c99"
 }

@@ -9,7 +9,7 @@ $env:CGO_ENABLED = '0'
 $env:TORRENT_STORAGE_DEFAULT_FILE_IO = 'classic'
 Push-Location (Join-Path $repo 'core')
 try {
-    $coreVersion = $upstream.Release.TrimStart('v')
+    $coreVersion = if ($upstream.Release -eq 'main') { 'main-' + ($upstream.Version -split '-')[-1] } else { $upstream.Release.TrimStart('v') }
     go build -trimpath -ldflags "-s -w -H=windowsgui -X github.com/GopeedLab/gopeed/pkg/base.Version=$coreVersion" -o harbor-core.exe .
     if ($LASTEXITCODE) { throw 'Go core build failed' }
     go build -trimpath -ldflags '-s -w -H=windowsgui' -o harbor-browser-host.exe ./cmd/browser-host

@@ -13,6 +13,13 @@ internal static class LocalizationChecks
             if (Strings.ResolveLanguage("", [system]) != expected) throw new Exception($"Wrong language for {system}");
         if (Strings.ResolveLanguage("zh-CN", ["en-US"]) != "zh-CN") throw new Exception("Language preference ignored");
         if (Strings.ResolveLanguage("", ["de-DE", "zh-TW"]) != "zh-TW") throw new Exception("Windows language priority ignored");
+        var statistics = JsonSerializer.Deserialize<Harbor.Models.TaskStatistics>("""
+            {"snapshot":{"connections":[{"downloaded":512,"total":1024,"completed":false,"failed":false,"retryTimes":2}]},
+             "runtime":{"activePeers":3,"peers":[{"address":"127.0.0.1:1234","client":"fixture","downloadSpeed":64,"completion":0.5}]}}
+            """, JsonSerializerOptions.Web)!;
+        if (statistics.Snapshot!.Connections[0].Downloaded != 512 || statistics.Snapshot.Connections[0].RetryTimes != 2 ||
+            statistics.Runtime!.Peers[0].DownloadSpeed != 64 || statistics.Runtime.ActivePeers != 3)
+            throw new Exception("Gopeed stats snapshot/runtime contract changed");
 
         Dictionary<string, string>? baseline = null;
         foreach (var language in Strings.SupportedLanguages)
