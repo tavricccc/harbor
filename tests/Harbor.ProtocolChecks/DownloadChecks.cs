@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json.Nodes;
+using System.Text.Json;
 using Harbor.Models;
 
 internal static class DownloadChecks
@@ -19,6 +20,14 @@ internal static class DownloadChecks
 
     public static void Run()
     {
+        var statistics = JsonSerializer.Deserialize<Harbor.Models.TaskStatistics>("""
+            {"snapshot":{"connections":[{"downloaded":512,"total":1024,"completed":false,"failed":false,"retryTimes":2}]},
+             "runtime":{"activePeers":3,"peers":[{"address":"127.0.0.1:1234","client":"fixture","downloadSpeed":64,"completion":0.5}]}}
+            """, JsonSerializerOptions.Web)!;
+        if (statistics.Snapshot!.Connections[0].Downloaded != 512 || statistics.Snapshot.Connections[0].RetryTimes != 2 ||
+            statistics.Runtime!.Peers[0].DownloadSpeed != 64 || statistics.Runtime.ActivePeers != 3)
+            throw new Exception("Gopeed stats snapshot/runtime contract changed");
+
         var original = Snapshot(1);
         var item = new DownloadItem(original);
         var notified = new HashSet<string?>();
