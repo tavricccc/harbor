@@ -11,7 +11,7 @@ end;
 
 function IsManagedInstallation(Directory: String): Boolean;
 begin
-  Result := (Directory <> '') and
+  Result := (Directory <> '') and (Length(Directory) > Length(ExtractFileDrive(Directory)) + 1) and
     (FileExists(AddBackslash(Directory) + 'Harbor.exe') or
      FileExists(AddBackslash(Directory) + 'Gopeed.Native.exe'));
 end;

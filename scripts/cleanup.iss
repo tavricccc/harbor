@@ -72,6 +72,23 @@ begin
   RemoveDir(ExpandConstant('{userprograms}\Gopeed Native'));
 end;
 
+procedure RemoveOwnedRegistrations;
+var Index: Integer; Names, BrowserKeys: TArrayOfString; Manifest: String;
+begin
+  Names := ['Harbor.Torrent', 'Harbor.Magnet', 'Harbor.Ed2k',
+    'GopeedNative.Torrent', 'GopeedNative.Magnet', 'GopeedNative.Ed2k'];
+  for Index := 0 to GetArrayLength(Names) - 1 do
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Classes\' + Names[Index]);
+  BrowserKeys := ['Software\Google\Chrome\NativeMessagingHosts\com.gopeed.gopeed',
+    'Software\Microsoft\Edge\NativeMessagingHosts\com.gopeed.gopeed',
+    'Software\Mozilla\NativeMessagingHosts\com.gopeed.gopeed'];
+  for Index := 0 to GetArrayLength(BrowserKeys) - 1 do
+    if RegQueryStringValue(HKCU, BrowserKeys[Index], '', Manifest) then
+      if (CompareText(ExtractFileDir(Manifest), ExpandConstant('{localappdata}\Harbor')) = 0) or
+        (CompareText(ExtractFileDir(Manifest), ExpandConstant('{localappdata}\GopeedNative')) = 0) then
+        RegDeleteKeyIncludingSubkeys(HKCU, BrowserKeys[Index]);
+end;
+
 procedure RemoveApplicationState(DataDirectory: String);
 var
   Index: Integer;

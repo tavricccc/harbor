@@ -151,7 +151,9 @@ begin
     RegDeleteValue(HKCU, 'Software\RegisteredApplications', 'GopeedNative');
     RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Harbor');
     RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'GopeedNative');
+    RemoveOwnedRegistrations;
     RemoveLegacyShortcuts;
+    RemoveOldInstallation(ExpandConstant('{localappdata}\Programs\Gopeed Native'));
     RemoveApplicationState(ExpandConstant('{localappdata}\Harbor'));
     RemoveApplicationState(ExpandConstant('{localappdata}\GopeedNative'));
     EmptyFiles := TStringList.Create;
