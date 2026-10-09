@@ -10,11 +10,16 @@ foreach ($language in $languages) {
     if ($difference) { throw "Translation keys differ: $($language.id)" }
 }
 $references = 0
-foreach ($file in @(git -C $repo ls-files 'src/Harbor/*.cs' 'src/Harbor/*.xaml' 'core/*.go')) {
+foreach ($file in @(git -C $repo ls-files 'src/Harbor/*.cs' 'src/Harbor/*.xaml' 'core/*.go' 'scripts/*.iss')) {
     $source = [IO.File]::ReadAllText((Join-Path $repo $file))
     foreach ($match in [regex]::Matches($source, '(?:Strings\.(?:Get|Format)|localization\.Text)\("(?<key>[\w.]+)"|\{loc:Localize Key=(?<key>[\w.]+)\}')) {
         $key = $match.Groups['key'].Value
         if (!$catalog.ContainsKey($key)) { throw "Unknown localization key in ${file}: $key" }
+        $references++
+    }
+    foreach ($match in [regex]::Matches($source, 'CustomMessage\(''(?<key>[\w.]+)''\)|\{cm:(?<key>[\w.]+)\}')) {
+        $key = 'Installer.' + $match.Groups['key'].Value
+        if (!$catalog.ContainsKey($key)) { throw "Unknown installer localization key in ${file}: $key" }
         $references++
     }
 }

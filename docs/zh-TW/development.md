@@ -41,7 +41,7 @@ pwsh -File scripts/update-core.ps1 -Channel main -Test
 
 ## 語系
 
-同時修改 `localization/en-US.json`、`zh-TW.json` 與 `zh-CN.json`，維持相同的鍵與 `{0}` 格式參數。新增語言時加入 `languages.json`，語言選單會讀取這份清單；兩端直接嵌入共用檔案，不另產生副本。
+同時修改 `localization/en-US.json`、`zh-TW.json` 與 `zh-CN.json`，維持相同的鍵與 `{0}` 格式參數。新增語言時在 `languages.json` 加入語言與 Inno Setup 對應。C# 與 Go 直接嵌入共用檔案；封裝會將 `Installer.*` 轉為安裝器文案。只修改 JSON，不修改 `artifacts/` 裡的產生檔案。
 
 C# 使用 `Strings.Get`／`Strings.Format`，XAML 使用 `{loc:Localize Key=...}`，Go 使用 `localization.Text`。
 

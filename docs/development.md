@@ -41,7 +41,7 @@ pwsh -File scripts/update-core.ps1 -Channel main -Test
 
 ## Localization
 
-Edit `localization/en-US.json`, `zh-TW.json` and `zh-CN.json` together. Keep keys and `{0}` format arguments aligned. Add languages to `languages.json`; the language selector reads this list. Catalogs are embedded from these files without generated copies.
+Edit `localization/en-US.json`, `zh-TW.json` and `zh-CN.json` together. Keep keys and `{0}` format arguments aligned. Add languages and their Inno Setup mapping to `languages.json`. C# and Go embed these files; packaging converts the `Installer.*` entries into Inno Setup messages. Edit the JSON sources, not the generated file in `artifacts/`.
 
 Use `Strings.Get` / `Strings.Format` in C#, `{loc:Localize Key=...}` in XAML and `localization.Text` in Go.
 

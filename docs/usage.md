@@ -4,7 +4,7 @@
 
 ## Downloads
 
-Choose **New download** or press Ctrl+N, paste a link and select a folder. One link per line creates a batch. Ctrl+V and drag-and-drop accept links and Torrent files.
+Choose **Add download** or press Ctrl+N, paste a link and select a folder. One link per line creates a batch. Ctrl+V and drag-and-drop accept links and Torrent files.
 
 The first action checks the file; **Start download** begins the transfer. Torrent files can be selected individually. The lower-left arrow expands options within the window; HTTP headers and advanced sections are collapsed initially. The expanded area scrolls when needed.
 

@@ -4,7 +4,7 @@
 
 ## Unreleased
 
-- Move shared language catalogs into `localization/` and read language options from one manifest.
+- Move shared language catalogs into `localization/`, including installer text, and read language options from one manifest.
 - Separate download form initialization, request handling and pickers; separate Windows browser, startup and file-type integration.
 - Split engine startup, authenticated control endpoints and session persistence.
 - Use typed statistics shared by progress and details views; update the official Gopeed module to `main` at `ba84a04a434b`.
