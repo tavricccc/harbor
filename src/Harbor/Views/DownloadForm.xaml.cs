@@ -26,8 +26,9 @@ public sealed partial class DownloadForm : UserControl
  public DownloadForm(CoreClient core, JsonObject? initial = null, nint? owner = null, bool compact = false)
  {
   this.core = core; this.initial = initial; this.owner = owner ?? App.WindowHandle; InitializeComponent();
-  OptionsSurface.Children.Add(requestOptions);
+  OptionsContent.Children.Add(requestOptions);
   requestOptions.RequestChanged += InvalidateResolution;
+  requestOptions.LayoutChanged += () => LayoutChanged?.Invoke();
   Headers.TextChanged += (_, _) => InvalidateResolution();
   FormContent.SizeChanged += (_, _) => LayoutChanged?.Invoke();
   if (compact) { Links.AcceptsReturn = false; Links.TextWrapping = TextWrapping.NoWrap; Links.MinHeight = 32; Links.MaxHeight = double.PositiveInfinity; ManualActions.Visibility = Visibility.Collapsed; }
@@ -68,6 +69,14 @@ public sealed partial class DownloadForm : UserControl
  {
   ManualActions.Children.Remove(AdvancedButton);
   return AdvancedButton;
+ }
+ private void ToggleOptions(object sender, RoutedEventArgs e)
+ {
+  var expanded = OptionsSurface.Visibility != Visibility.Visible;
+  OptionsSurface.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+  OptionsArrow.Glyph = expanded ? "\uE70E" : "\uE70D";
+  Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(AdvancedButton, Strings.Get(expanded ? "Common.Collapse" : "Common.Expand"));
+  LayoutChanged?.Invoke();
  }
  private void InputChanged(object s, TextChangedEventArgs e) { if (Files is null || lastInput == Links.Text) return; lastInput = Links.Text; InvalidateResolution(); }
  private void InvalidateResolution()

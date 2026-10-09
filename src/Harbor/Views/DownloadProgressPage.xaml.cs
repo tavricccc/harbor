@@ -21,6 +21,7 @@ public sealed partial class DownloadProgressPage : Page
     private bool cancelling;
     private bool stopped;
     private bool loaded;
+    private readonly DownloadConnectionsPanel connections = new();
     public event Action? LayoutChanged;
     public event Action<string>? TitleChanged;
 
@@ -28,6 +29,8 @@ public sealed partial class DownloadProgressPage : Page
     {
         InitializeComponent();
         this.core = core; this.id = id; this.close = close; this.windowVisible = windowVisible;
+        ConnectionsHost.Content = connections;
+        connections.LayoutChanged += () => LayoutChanged?.Invoke();
         CloseAfterOpen.IsChecked = UiPreferences.Load().CloseProgressAfterOpen;
         Body.SizeChanged += (_, _) => LayoutChanged?.Invoke();
         timer.Tick += async (_, _) => { if (windowVisible()) await Refresh(); else timer.Stop(); };
@@ -51,13 +54,16 @@ public sealed partial class DownloadProgressPage : Page
             if (stopped || cancelling) return;
             var changes = item is null ? DownloadChanges.Content | DownloadChanges.Progress : item.Update(snapshot);
             item ??= new DownloadItem(snapshot);
-            if (changes == DownloadChanges.None) return;
+            if (changes != DownloadChanges.None)
+            {
             Primary.Content = item.PrimaryAction.Label;
             Primary.IsEnabled = item.CanAct && !cancelling;
             FileName.Text = item.Name; FileName.CanDrag = item.IsComplete && !item.IsProcessing;
             KindLabel.Text = item.Url.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || item.Url.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase) ? "BT" : Strings.Get("Common.File");
             ToolTipService.SetToolTip(FileName, item.Name);
-            Folder.Text = Strings.Format("Progress.SaveLocation", item.Folder); ToolTipService.SetToolTip(Folder, item.Folder); Source.Text = item.Url;
+            Folder.Text = Strings.Format("Progress.SaveLocation", item.Folder); ToolTipService.SetToolTip(Folder, item.Folder);
+            Source.Text = item.Url; ToolTipService.SetToolTip(SourceLink, item.Url);
+            SourceLink.Visibility = item.Url.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
             Transfer.Text = item.TransferSizeText;
             Speed.Text = Strings.Format("Progress.Speed", item.Uploading ? Strings.Get("Common.Upload") : Strings.Get("Common.Download"), item.SpeedText);
             Remaining.Text = item.RemainingText == "—" ? item.Status == "running" ? Strings.Get("Progress.Calculating") : item.StatusText : item.RemainingText;
@@ -83,8 +89,14 @@ public sealed partial class DownloadProgressPage : Page
             {
                 TitleChanged?.Invoke($"{item.Name} - {item.StatusText}"); LayoutChanged?.Invoke();
             }
+            }
+            if (ConnectionsSurface.Visibility == Visibility.Visible)
+            {
+                var stats = await core.GetAsync($"tasks/{id}/stats");
+                if (!stopped && ConnectionsSurface.Visibility == Visibility.Visible) connections.Update(stats, item);
+            }
             timer.Interval = TimeSpan.FromSeconds(item.CanPause || item.IsProcessing ? 1 : 5);
-            if (finished || !windowVisible()) timer.Stop();
+            if (item.IsComplete && !item.IsProcessing && !item.Uploading || !windowVisible()) timer.Stop();
         }
         catch (Exception failure) { if (!stopped && !cancelling) ShowError(failure); }
         finally { refreshing = false; }
@@ -136,6 +148,26 @@ public sealed partial class DownloadProgressPage : Page
         }
     }
     private void CopySource(object sender, RoutedEventArgs args) { if (item is not null) FileActions.Copy(item.Url); }
+    private async void OpenSource(object sender, RoutedEventArgs args)
+    {
+        if (item is null) return;
+        try
+        {
+            if (!await Windows.System.Launcher.LaunchUriAsync(new Uri(item.Url)))
+                throw new InvalidOperationException(Strings.Get("Errors.OpenSource"));
+        }
+        catch (Exception failure) { ShowError(failure); }
+    }
+    private async void ToggleConnections(object sender, RoutedEventArgs args)
+    {
+        var expanded = ConnectionsSurface.Visibility != Visibility.Visible;
+        ConnectionsSurface.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+        ConnectionsArrow.Glyph = expanded ? "\uE70E" : "\uE70D";
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(ConnectionsToggle, Strings.Get(expanded ? "Common.Collapse" : "Common.Expand"));
+        connections.ResetSamples();
+        LayoutChanged?.Invoke();
+        if (expanded) await Refresh();
+    }
     private void SaveClosePreference(object sender, RoutedEventArgs args)
     {
         var prefs = UiPreferences.Load(); prefs.CloseProgressAfterOpen = CloseAfterOpen.IsChecked == true; prefs.Save();
@@ -155,7 +187,7 @@ public sealed partial class DownloadProgressPage : Page
     public async void UpdatePollingVisibility()
     {
         if (!loaded || stopped || cancelling) return;
-        if (!windowVisible()) { timer.Stop(); return; }
+        if (!windowVisible()) { timer.Stop(); connections.ResetSamples(); return; }
         if (timer.IsEnabled || item is { IsComplete: true, IsProcessing: false, Uploading: false }) return;
         timer.Start(); await Refresh();
     }

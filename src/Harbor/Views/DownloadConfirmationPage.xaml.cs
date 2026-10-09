@@ -22,7 +22,7 @@ public sealed partial class DownloadConfirmationPage : Page
         InitializeComponent();
         form = new DownloadForm(core, request, owner, compact);
         FormHost.Content = form;
-        Actions.Children.Insert(0, form.DetachOptionsButton());
+        OptionsToggleHost.Content = form.DetachOptionsButton();
         ScheduleDate.Date = DateTimeOffset.Now.AddHours(1);
         ScheduleDate.MinDate = DateTimeOffset.Now.Date;
         ScheduleTime.Time = DateTime.Now.AddHours(1).TimeOfDay;

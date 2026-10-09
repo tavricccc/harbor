@@ -24,6 +24,7 @@ internal sealed class DownloadOptionsPanel : StackPanel
     private readonly CheckBox deleteArchive = new() { Content = Strings.Get("Archive.DeleteAfter") };
     private readonly StackPanel customProxy = new() { Spacing = 12, Visibility = Visibility.Collapsed };
     public event Action? RequestChanged;
+    public event Action? LayoutChanged;
     public DownloadOptionsPanel()
     {
         Spacing = 20;
@@ -35,15 +36,18 @@ internal sealed class DownloadOptionsPanel : StackPanel
         Children.Add(Section(Strings.Get("Archive.Extraction"), Pair(extract, archivePassword), deleteArchive));
         method.SelectionChanged += (_, _) => RequestChanged?.Invoke(); method.TextSubmitted += (_, _) => RequestChanged?.Invoke();
         body.TextChanged += (_, _) => RequestChanged?.Invoke(); trackers.TextChanged += (_, _) => RequestChanged?.Invoke();
-        proxyMode.SelectionChanged += (_, _) => { customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed; RequestChanged?.Invoke(); };
+        proxyMode.SelectionChanged += (_, _) => { customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed; RequestChanged?.Invoke(); LayoutChanged?.Invoke(); };
         host.TextChanged += (_, _) => RequestChanged?.Invoke(); user.TextChanged += (_, _) => RequestChanged?.Invoke(); password.PasswordChanged += (_, _) => RequestChanged?.Invoke(); scheme.SelectionChanged += (_, _) => RequestChanged?.Invoke();
         skipCert.Checked += (_, _) => RequestChanged?.Invoke(); skipCert.Unchecked += (_, _) => RequestChanged?.Invoke();
     }
-    private static Expander Section(string title, params UIElement[] controls)
+    private Expander Section(string title, params UIElement[] controls)
     {
         var section = new StackPanel { Spacing = 12 };
         foreach (var control in controls) section.Children.Add(control);
-        return new Expander { Header = title, Content = section, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var expander = new Expander { Header = title, Content = section, HorizontalAlignment = HorizontalAlignment.Stretch };
+        expander.Expanding += (_, _) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
+        expander.Collapsed += (_, _) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
+        return expander;
     }
     private static Grid Pair(FrameworkElement first, FrameworkElement second)
     {

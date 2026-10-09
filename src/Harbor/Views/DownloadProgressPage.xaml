@@ -5,7 +5,7 @@
       FontFamily="{StaticResource ContentControlThemeFontFamily}" FontSize="14">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
             <StackPanel x:Name="Body" Padding="24,20,24,16" Spacing="12">
                 <InfoBar x:Name="Error" Severity="Error" Visibility="Collapsed" Closed="HideError"/>
                 <Grid ColumnSpacing="10">
@@ -18,6 +18,13 @@
                     <TextBlock x:Name="FileName" Grid.Column="1" FontSize="14" VerticalAlignment="Center" MaxLines="1"
                                TextTrimming="CharacterEllipsis" DragStarting="DragFile"/>
                 </Grid>
+                <HyperlinkButton x:Name="SourceLink" Click="OpenSource" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                 AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}">
+                    <TextBlock x:Name="Source" FontSize="12" MaxLines="1" TextTrimming="CharacterEllipsis"/>
+                    <HyperlinkButton.ContextFlyout>
+                        <MenuFlyout><MenuFlyoutItem Text="{loc:Localize Key=Common.CopyUrl}" Click="CopySource"/></MenuFlyout>
+                    </HyperlinkButton.ContextFlyout>
+                </HyperlinkButton>
                 <TextBlock x:Name="Folder" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
                 <Grid x:Name="Metrics" ColumnSpacing="12" Margin="0,4,0,0">
@@ -35,27 +42,21 @@
                         <TextBlock x:Name="Percent" Grid.Column="1" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     </Grid>
                 </StackPanel>
+                <CheckBox x:Name="CloseAfterOpen" Visibility="Collapsed" Content="{loc:Localize Key=Progress.CloseAfterOpen}"
+                          Checked="SaveClosePreference" Unchecked="SaveClosePreference"/>
+                <Border x:Name="ConnectionsSurface" Visibility="Collapsed" BorderThickness="0,1,0,0"
+                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="0,16,0,0">
+                    <ContentPresenter x:Name="ConnectionsHost"/>
+                </Border>
             </StackPanel>
         </ScrollViewer>
         <Border x:Name="Footer" Grid.Row="1" Style="{StaticResource DownloadFooterStyle}">
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <Button HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource SubtleButtonStyle}"
-                        AutomationProperties.Name="{loc:Localize Key=Common.MoreOptions}" ToolTipService.ToolTip="{loc:Localize Key=Common.MoreOptions}">
-                    <FontIcon Glyph="&#xE70D;" FontSize="12"/>
-                    <Button.Flyout>
-                        <Flyout Placement="TopEdgeAlignedLeft">
-                            <ScrollViewer Width="440" MaxHeight="300">
-                                <StackPanel Spacing="16">
-                                    <TextBlock Text="{loc:Localize Key=Common.SourceUrl}"/>
-                                    <TextBlock x:Name="Source" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
-                                    <Button Content="{loc:Localize Key=Common.CopyUrl}" Click="CopySource" HorizontalAlignment="Left"/>
-                                    <CheckBox x:Name="CloseAfterOpen" Content="{loc:Localize Key=Progress.CloseAfterOpen}"
-                                              Checked="SaveClosePreference" Unchecked="SaveClosePreference"/>
-                                </StackPanel>
-                            </ScrollViewer>
-                        </Flyout>
-                    </Button.Flyout>
+                <Button x:Name="ConnectionsToggle" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource SubtleButtonStyle}"
+                        Click="ToggleConnections" AutomationProperties.AutomationId="ToggleConnectionProgress"
+                        AutomationProperties.Name="{loc:Localize Key=Progress.ConnectionsTitle}" ToolTipService.ToolTip="{loc:Localize Key=Progress.ConnectionsTitle}">
+                    <FontIcon x:Name="ConnectionsArrow" Glyph="&#xE70D;" FontSize="12"/>
                 </Button>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                     <Button x:Name="Browse" Content="{loc:Localize Key=Common.OpenFolder}" Visibility="Collapsed" Click="BrowseClick"/>

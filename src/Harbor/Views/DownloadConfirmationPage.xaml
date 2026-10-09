@@ -11,7 +11,10 @@
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <ContentPresenter x:Name="FormHost" Margin="24,20,24,16"/>
         <Border x:Name="Footer" Grid.Row="1" Style="{StaticResource DownloadFooterStyle}">
-            <StackPanel x:Name="Actions" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <ContentPresenter x:Name="OptionsToggleHost" VerticalAlignment="Center"/>
+            <StackPanel x:Name="Actions" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                 <Button Content="{loc:Localize Key=Common.Cancel}" Click="Cancel" AutomationProperties.AutomationId="CancelDownload"/>
                 <Button x:Name="LaterButton" Content="{loc:Localize Key=Schedule.Later}" Click="DownloadLater" ToolTipService.ToolTip="{loc:Localize Key=Schedule.LaterHint}"/>
                 <Button x:Name="ScheduleButton" Content="{loc:Localize Key=Schedule.Button}">
@@ -29,6 +32,7 @@
                 <Button x:Name="StartButton" Content="{loc:Localize Key=Download.CheckLink}"
                         Style="{StaticResource AccentButtonStyle}" Click="Start" AutomationProperties.AutomationId="StartDownload"/>
             </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </Page>
