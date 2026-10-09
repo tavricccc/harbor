@@ -63,7 +63,13 @@ public partial class App : Application
         Services.LegacyMigration.Run();
         Strings.Initialize(Services.UiPreferences.Load().Language, Windows.System.UserProfile.GlobalizationPreferences.Languages);
         Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = Strings.Language;
-        if (commandLine.Contains("--register-integrations")) { Services.WindowsIntegration.InstallBrowserHost(); Services.WindowsIntegration.RegisterFileTypes(); Exit(); return; }
+        if (commandLine.Contains("--register-integrations"))
+        {
+            Services.WindowsIntegration.InstallBrowserHost();
+            Services.WindowsIntegration.RegisterFileTypes();
+            if (Services.WindowsIntegration.StartsWithWindows) Services.WindowsIntegration.SetStartup(true);
+            Exit(); return;
+        }
         if (commandLine.Contains("--unregister-integrations")) { Services.WindowsIntegration.Unregister(); Exit(); return; }
         if (!Services.WindowsIntegration.IsBrowserHostRegistered()) Services.WindowsIntegration.InstallBrowserHost();
         var profileKey = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Services.CoreClient.DataDirectory.ToUpperInvariant())));

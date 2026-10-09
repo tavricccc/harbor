@@ -72,13 +72,23 @@ public static class WindowsIntegration
             var path = BrowserKeys[index] + "\\" + HostName;
             using var key = Registry.CurrentUser.OpenSubKey(path, true);
             if (key?.GetValue("") as string != expected) continue;
-            if (backup.TryGetValue(BrowserKeys[index], out var previous) && previous is not null) key.SetValue("", previous); else Registry.CurrentUser.DeleteSubKeyTree(path, false);
+            if (backup.TryGetValue(BrowserKeys[index], out var previous) && previous is not null && File.Exists(previous) && !IsOwnManifest(previous))
+                key.SetValue("", previous);
+            else Registry.CurrentUser.DeleteSubKeyTree(path, false);
         }
         using var registered = Registry.CurrentUser.OpenSubKey(@"Software\RegisteredApplications", true); registered?.DeleteValue("Harbor", false);
         Registry.CurrentUser.DeleteSubKeyTree(@"Software\Harbor\Capabilities", false);
         foreach (var name in new[] { "Torrent", "Magnet", "Ed2k" }) Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\Harbor." + name, false);
         using var startup = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true); startup?.DeleteValue("Harbor", false);
         if (File.Exists(BackupPath)) File.Delete(BackupPath);
+        foreach (var name in new[] { "browser-host.json", "browser-host-firefox.json" })
+            File.Delete(Path.Combine(CoreClient.DataDirectory, name));
+    }
+    private static bool IsOwnManifest(string path)
+    {
+        var legacyData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GopeedNative");
+        return string.Equals(Path.GetDirectoryName(path), CoreClient.DataDirectory, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(Path.GetDirectoryName(path), legacyData, StringComparison.OrdinalIgnoreCase);
     }
     public static void OpenDefaultApps() => Process.Start(new ProcessStartInfo("ms-settings:defaultapps?registeredAppUser=Harbor") { UseShellExecute = true });
 }
