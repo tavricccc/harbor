@@ -29,6 +29,8 @@ public static class Strings
         }
         foreach (var language in systemLanguages)
         {
+            var exact = SupportedLanguages.FirstOrDefault(supported => string.Equals(supported, language, StringComparison.OrdinalIgnoreCase));
+            if (exact is not null) return exact;
             var parts = language.ToLowerInvariant().Split('-');
             if (parts[0] == "en")
                 return "en-US";

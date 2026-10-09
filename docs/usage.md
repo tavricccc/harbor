@@ -1,41 +1,33 @@
-# Harbor 使用指南
+# Usage
 
-本文件對應 Harbor 0.9.0；操作名稱以繁體中文介面為例。
+[繁體中文](zh-TW/usage.md) · [Home](../README.md)
 
-## 加入下載
+## Downloads
 
-按「新增下載」或 Ctrl+N，貼上網址並選擇存放位置。每行一個連結可批次加入；按 Ctrl+V 可直接從剪貼簿帶入網址或 Torrent 檔案。Torrent 也可以拖入清單，或從工具列的更多選單選取。
+Choose **New download** or press Ctrl+N, paste a link and select a folder. One link per line creates a batch. Ctrl+V and drag-and-drop accept links and Torrent files.
 
-單一連結預設先檢查名稱、大小與檔案清單，再按開始。Torrent 解析完成後可挑選內含檔案。「下載選項」提供連線數、HTTP 標頭、方法、Tracker、代理與解壓縮設定，各區可展開；啟用「略過連結檢查」會在開始後才解析，無法預先挑選檔案。
+The first action checks the file; **Start download** begins the transfer. Torrent files can be selected individually. The lower-left arrow expands options within the window; HTTP headers and advanced sections are collapsed initially. The expanded area scrolls when needed.
 
-選「稍後下載」會保存請求並暫時不建立下載任務。選「排程」可指定一次性的開始時間；可從更多選單開啟待下載清單，再右鍵調整時間或立即開始。
+In a progress window, click the source URL to open it or right-click to copy it. The lower-left arrow shows connection progress and sampled speeds. **Cancel** removes the active task and keeps partial files. Closing the window leaves the task running.
 
-排程需要背景核心執行，不會喚醒睡眠或關機的電腦。到期後若核心尚未執行，下次啟動會補執行。排程失敗會保留項目及錯誤原因，修正來源後可手動重試。
+## Queue and schedule
 
-## 管理清單
+**Download later** saves a request without starting it. **Schedule** sets a one-time start. Open the deferred list from **More** to start, retry or change the time.
 
-清單上方可篩選狀態、搜尋檔名或來源，以及調整排序。「進行中」包含等待、下載、做種和解壓縮；「已完成」排除仍在做種或解壓縮的項目。解壓縮失敗會出現在失敗篩選中，原始下載檔仍可開啟。
+Schedules need the background engine. Missed schedules run the next time Harbor starts; Harbor does not wake a sleeping or powered-off computer.
 
-選取任務後，工具列的繼續、暫停與移除依狀態啟用。Ctrl 或 Shift 可多選；Ctrl+A 全選目前顯示的項目。全部暫停／繼續與清除完成紀錄放在更多選單中。全部繼續不會提早啟動已有指定時間的排程。
+## Settings
 
-每列右側第一個按鈕隨狀態變成暫停、繼續、重試或開啟。完成後可在資料夾中顯示。雙擊或按 Enter 會開啟下載進度；下載、做種及解壓縮都結束後，改為開啟檔案。同一任務再次開啟進度時會使用原視窗。
+Save applies changes; Cancel discards them. **Interface** controls language, theme and startup. Reopen the windows after changing language. Category folders are available only when saving by category is enabled.
 
-右鍵可查看完整檔案、連線和來源資訊。HTTP 連結失效時，先暫停或在失敗狀態下修改來源；也可等待下一次瀏覽器連結來更新原任務。
+Use the tray's Quit command to stop Harbor completely. Uninstall removes application settings, task records and registrations; downloaded files are kept.
 
-移除下載時可另外勾選刪除檔案。清除已完成只移除紀錄。進度視窗的「取消」會停止並移除未結束的下載、保留已下載檔案；按視窗右上角關閉只關閉介面，下載仍繼續。
+## Browser integration
 
-## 設定
+Install the official Gopeed extension in your browser:
 
-「下載」頁先顯示儲存位置、連線數、同時下載數與啟動行為；HTTP、BitTorrent／Tracker、eD2k 細節可另外展開。「介面」頁控制語言、主題、Windows 啟動、通知與完成後行為。
+- [Chrome](https://chromewebstore.google.com/detail/gopeed/mijpgljlfcapndmchhjffkpckknofcnd)
+- [Edge](https://microsoftedge.microsoft.com/addons/detail/dkajnckekendchdleoaenoophcobooce)
+- [Firefox](https://addons.mozilla.org/firefox/addon/gopeed-extension)
 
-語言預設「跟隨 Windows」，也可指定「繁體中文」、「English」或「简体中文」。按儲存後關閉所有 Harbor 視窗，再從系統匣或捷徑重新開啟，背景下載會繼續。英文介面的入口是 Settings → Interface → Language；簡體中文是「设置 → 界面 → 语言」。已保存的分類名稱、路徑與檔名不會隨語言改寫。
-
-代理預設跟隨系統；選自訂才顯示主機與認證欄位。Webhook 或完成後執行程式，啟用後才顯示網址與路徑。收合或切換設定不會清空已輸入的值，按儲存才套用；取消會關閉設定視窗。
-
-「關於」會顯示 Harbor 和正在執行的 Gopeed 核心版本，並提供更新、記錄資料夾及停止所有下載後結束的操作。
-
-## 瀏覽器與背景執行
-
-瀏覽器接管使用 Gopeed 官方擴充套件，需另行安裝；Harbor 安裝包會註冊本機 host。詳細步驟見 [瀏覽器接管](browser-integration.md)。一般接管不需填寫位址或 Token；進階的本機 HTTP API 僅綁定 `127.0.0.1`。
-
-最小化主窗或進度窗會停止該介面的資料輪詢，恢復時重新取得資料；下載核心持續執行。關閉所有介面後仍可透過系統匣開啟 Harbor。要完全結束，使用系統匣或關於頁的停止操作。
+Harbor registers its local host during installation. If downloads stop reaching Harbor, open **Settings → Network** and choose **Repair registration**. Then confirm the extension is enabled in the browser. The extension's [documentation](https://github.com/GopeedLab/browser-extension) covers its own settings.
