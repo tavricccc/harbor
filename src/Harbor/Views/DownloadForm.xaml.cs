@@ -42,7 +42,8 @@ public sealed partial class DownloadForm : UserControl
    var config = (await core.GetAsync("config"))!; Destination.Text = config["downloadDir"]?.GetValue<string>() ?? "";
    requestOptions.Load(initial, config); Connections.Value = config["protocolConfig"]?["http"]?["connections"]?.GetValue<int>() ?? 8;
    DirectDownload.IsChecked = config["extra"]?["defaultDirectDownload"]?.GetValue<bool>() == true;
-   foreach (var category in CategoriesEditor.Read(config)) Category.Items.Add(new ComboBoxItem { Content = category.Name, Tag = category.Path });
+   if (CategoriesEditor.UsesCategories(config))
+    foreach (var category in CategoriesEditor.Read(config)) Category.Items.Add(new ComboBoxItem { Content = category.Name, Tag = category.Path });
    CategoryLabel.Visibility = Category.Visibility = Category.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
    var prefs = UiPreferences.Load();
    if (prefs.RememberDownloadDirectory && prefs.LastDownloadDirectory.Length > 0) Destination.Text = prefs.LastDownloadDirectory;

@@ -10,6 +10,7 @@ public sealed class UiPreferences
     public bool CloseProgressAfterOpen { get; set; } = true;
     public int ApiPort { get; set; } = 18762;
     public bool CheckForUpdates { get; set; } = true;
+    public bool StartWithWindows { get; set; } = true;
     public List<string> RecentLinks { get; set; } = [];
     public string PendingUpdateTaskId { get; set; } = "";
     public bool KeepFilesOnRemove { get; set; } = true;

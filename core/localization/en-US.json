@@ -29,6 +29,8 @@
   "Categories.AddPresets": "Add common categories",
   "Categories.Archive": "Archives",
   "Categories.Description": "Assign save locations to download categories. Click Save to apply added or updated categories.",
+  "Categories.SaveByCategory": "Save downloads by category",
+  "Categories.SaveByCategoryHint": "Off by default. Downloads use the selected folder. Enable this to choose a category folder when adding a download.",
   "Categories.Document": "Documents",
   "Categories.Music": "Music",
   "Categories.Name": "Category name",

@@ -29,6 +29,8 @@
   "Categories.AddPresets": "添加常用分类",
   "Categories.Archive": "压缩包",
   "Categories.Description": "为下载分类指定保存位置。添加或更新分类后，按「保存」应用。",
+  "Categories.SaveByCategory": "按分类保存下载",
+  "Categories.SaveByCategoryHint": "默认关闭，下载会使用选定的文件夹。启用后，添加下载时可选择分类目录。",
   "Categories.Document": "文档",
   "Categories.Music": "音乐",
   "Categories.Name": "分类名称",

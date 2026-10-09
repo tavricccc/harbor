@@ -29,6 +29,8 @@
   "Categories.AddPresets": "加入常用分類",
   "Categories.Archive": "壓縮檔",
   "Categories.Description": "為下載分類指定儲存位置。新增或更新分類後，按「儲存」套用。",
+  "Categories.SaveByCategory": "依分類儲存下載",
+  "Categories.SaveByCategoryHint": "預設關閉，下載會使用選定的資料夾。啟用後，新增下載時可選擇分類目錄。",
   "Categories.Document": "文件",
   "Categories.Music": "音樂",
   "Categories.Name": "分類名稱",

@@ -17,10 +17,13 @@ internal sealed class CategoriesEditor : StackPanel
     private readonly TextBox name = new();
     private readonly TextBox path = new();
     private readonly InfoBar message = new() { Severity = InfoBarSeverity.Error, IsClosable = true };
+    private readonly CheckBox enabled = new() { Content = Strings.Get("Categories.SaveByCategory") };
 
     public CategoriesEditor(nint windowHandle)
     {
         Spacing = 20;
+        Children.Add(enabled);
+        Children.Add(SettingsFields.Description(Strings.Get("Categories.SaveByCategoryHint")));
         NativeInfoBars.CollapseWhenClosed(message);
         AutomationProperties.SetName(name, Strings.Get("Categories.Name")); AutomationProperties.SetName(path, Strings.Get("Common.SaveLocation"));
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
@@ -95,7 +98,16 @@ internal sealed class CategoriesEditor : StackPanel
         Children.Add(presets);
     }
 
-    public void Load(JsonObject config) { list.Items.Clear(); foreach (var item in Read(config)) list.Items.Add(item); }
-    public void Save(JsonObject config) => ConfigJson.Set(config, "extra.downloadCategories", new JsonArray(list.Items.Cast<DownloadCategory>().Select(x => (JsonNode?)new JsonObject { ["name"] = x.Name, ["path"] = x.Path, ["isBuiltIn"] = false, ["isDeleted"] = false }).ToArray()));
+    public void Load(JsonObject config)
+    {
+        enabled.IsChecked = UsesCategories(config);
+        list.Items.Clear(); foreach (var item in Read(config)) list.Items.Add(item);
+    }
+    public void Save(JsonObject config)
+    {
+        ConfigJson.Set(config, "extra.harborCategorizedDownloads", JsonValue.Create(enabled.IsChecked == true));
+        ConfigJson.Set(config, "extra.downloadCategories", new JsonArray(list.Items.Cast<DownloadCategory>().Select(x => (JsonNode?)new JsonObject { ["name"] = x.Name, ["path"] = x.Path, ["isBuiltIn"] = false, ["isDeleted"] = false }).ToArray()));
+    }
+    public static bool UsesCategories(JsonNode config) => ConfigJson.Get(config, "extra.harborCategorizedDownloads")?.GetValue<bool>() == true;
     public static IReadOnlyList<DownloadCategory> Read(JsonNode config) => (ConfigJson.Get(config, "extra.downloadCategories")?.AsArray() ?? []).Where(x => x?["isDeleted"]?.GetValue<bool>() != true).Select(x => new DownloadCategory(x!["name"]?.GetValue<string>() is { Length: > 0 } title ? title : x["nameKey"]?.GetValue<string>() switch { "categoryMusic" => Strings.Get("Categories.Music"), "categoryVideo" => Strings.Get("Categories.Video"), "categoryDocument" => Strings.Get("Categories.Document"), "categoryProgram" => Strings.Get("Categories.Program"), "categoryArchive" => Strings.Get("Categories.Archive"), _ => Strings.Get("Categories.Other") }, x["path"]!.GetValue<string>())).ToList();
 }

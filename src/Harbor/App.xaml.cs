@@ -67,10 +67,12 @@ public partial class App : Application
         {
             Services.WindowsIntegration.InstallBrowserHost();
             Services.WindowsIntegration.RegisterFileTypes();
-            if (Services.WindowsIntegration.StartsWithWindows) Services.WindowsIntegration.SetStartup(true);
+            Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);
             Exit(); return;
         }
         if (commandLine.Contains("--unregister-integrations")) { Services.WindowsIntegration.Unregister(); Exit(); return; }
+        if (Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY") is null)
+            Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);
         if (!Services.WindowsIntegration.IsBrowserHostRegistered()) Services.WindowsIntegration.InstallBrowserHost();
         var profileKey = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Services.CoreClient.DataDirectory.ToUpperInvariant())));
         var instance = AppInstance.FindOrRegisterForKey("Harbor.Main." + profileKey);
