@@ -7,15 +7,21 @@ namespace Harbor.Models;
 
 public sealed partial class ConnectionProgress : ObservableObject
 {
-    [ObservableProperty] private string label = "";
-    [ObservableProperty] private string transferText = "";
-    [ObservableProperty] private string statusText = "";
-    [ObservableProperty] private string speedText = "—";
-    [ObservableProperty] private double percent;
-    [ObservableProperty] private bool isIndeterminate;
+    [ObservableProperty] public partial string Label { get; set; }
+    [ObservableProperty] public partial string TransferText { get; set; }
+    [ObservableProperty] public partial string StatusText { get; set; }
+    [ObservableProperty] public partial string SpeedText { get; set; }
+    [ObservableProperty] public partial double Percent { get; set; }
+    [ObservableProperty] public partial bool IsIndeterminate { get; set; }
     private long lastDownloaded;
     private long lastSample;
     private int lastRetries;
+
+    public ConnectionProgress()
+    {
+        Label = TransferText = StatusText = "";
+        SpeedText = "—";
+    }
 
     public void UpdateHttp(JsonNode connection, int index, long now, bool running)
     {

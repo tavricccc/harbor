@@ -54,46 +54,11 @@ public sealed partial class DownloadProgressPage : Page
             if (stopped || cancelling) return;
             var changes = item is null ? DownloadChanges.Content | DownloadChanges.Progress : item.Update(snapshot);
             item ??= new DownloadItem(snapshot);
-            if (changes != DownloadChanges.None)
-            {
-            Primary.Content = item.PrimaryAction.Label;
-            Primary.IsEnabled = item.CanAct && !cancelling;
-            FileName.Text = item.Name; FileName.CanDrag = item.IsComplete && !item.IsProcessing;
-            KindLabel.Text = item.Url.StartsWith("magnet:", StringComparison.OrdinalIgnoreCase) || item.Url.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase) ? "BT" : Strings.Get("Common.File");
-            ToolTipService.SetToolTip(FileName, item.Name);
-            Folder.Text = Strings.Format("Progress.SaveLocation", item.Folder); ToolTipService.SetToolTip(Folder, item.Folder);
-            Source.Text = item.Url; ToolTipService.SetToolTip(SourceLink, item.Url);
-            SourceLink.Visibility = item.Url.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-            Transfer.Text = item.TransferSizeText;
-            Speed.Text = Strings.Format("Progress.Speed", item.Uploading ? Strings.Get("Common.Upload") : Strings.Get("Common.Download"), item.SpeedText);
-            Remaining.Text = item.RemainingText == "—" ? item.Status == "running" ? Strings.Get("Progress.Calculating") : item.StatusText : item.RemainingText;
-            var finished = item.IsComplete && !item.IsProcessing && !item.Uploading;
-            Cancel.Content = finished ? Strings.Get("Common.Close") : Strings.Get("Common.Cancel");
-            Cancel.IsEnabled = !cancelling;
-            ToolTipService.SetToolTip(Cancel, finished ? Strings.Get("Progress.CloseWindow") : Strings.Get("Progress.CancelHint"));
-            Primary.Style = (Style)Application.Current.Resources[finished || item.Status == "error" ? "AccentButtonStyle" : "DefaultButtonStyle"];
-            Speed.Visibility = finished ? Visibility.Collapsed : Visibility.Visible;
-            Remaining.Visibility = item.IsComplete ? Visibility.Collapsed : Visibility.Visible;
-            Metrics.ColumnDefinitions[1].Width = finished ? new GridLength(0) : GridLength.Auto;
-            Metrics.ColumnDefinitions[2].Width = item.IsComplete ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
-            Status.Text = item.IsProcessing ? item.ExtractionText : item.ExtractionStatus == "error"
-                ? Strings.Get("Progress.ExtractFailed") : item.Uploading ? Strings.Format("Progress.Seeding", DownloadItem.FormatBytes(item.Uploaded)) : item.StatusText;
-            Percent.Text = item.Size > 0 && !item.IsComplete ? $"{item.Percent:0.0}%" : "";
-            Progress.Value = item.IsProcessing ? item.Data["progress"]?["extractProgress"]?.GetValue<double>() ?? 0 : item.Percent;
-            Progress.IsIndeterminate = item.IsIndeterminate && !item.IsProcessing;
-            Progress.Visibility = item.IsProcessing || item.IsComplete || item.Size > 0 || item.IsIndeterminate ? Visibility.Visible : Visibility.Collapsed;
-            CloseAfterOpen.Visibility = finished ? Visibility.Visible : Visibility.Collapsed;
-            Browse.Visibility = item.IsComplete ? Visibility.Visible : Visibility.Collapsed;
-            StopSeed.Visibility = item.Uploading ? Visibility.Visible : Visibility.Collapsed;
-            if ((changes & DownloadChanges.Content) != 0)
-            {
-                TitleChanged?.Invoke($"{item.Name} - {item.StatusText}"); LayoutChanged?.Invoke();
-            }
-            }
+            if (changes != DownloadChanges.None) UpdatePresentation(item, changes);
             if (ConnectionsSurface.Visibility == Visibility.Visible)
             {
                 var stats = await core.GetAsync($"tasks/{id}/stats");
-                if (!stopped && ConnectionsSurface.Visibility == Visibility.Visible) connections.Update(stats, item);
+                if (!stopped && !cancelling && ConnectionsSurface.Visibility == Visibility.Visible) connections.Update(stats, item);
             }
             timer.Interval = TimeSpan.FromSeconds(item.CanPause || item.IsProcessing ? 1 : 5);
             if (item.IsComplete && !item.IsProcessing && !item.Uploading || !windowVisible()) timer.Stop();
