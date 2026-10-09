@@ -9,7 +9,10 @@ namespace Harbor.Services;
 
 public sealed partial class CoreClient : IDisposable
 {
-    public static string DataDirectory { get; } = Path.GetFullPath(Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY")
+    public static string DataDirectory
+    {
+        get;
+    } = Path.GetFullPath(Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY")
         ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Harbor"));
     private readonly HttpClient http = new() { Timeout = TimeSpan.FromSeconds(60) };
     private JsonObject session = null!;
@@ -24,12 +27,14 @@ public sealed partial class CoreClient : IDisposable
     public async Task<JsonNode?> SendAsync(HttpMethod method, string route, JsonNode? body = null, CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(method, route);
-        if (body is not null) request.Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
+        if (body is not null)
+            request.Content = new StringContent(body.ToJsonString(), Encoding.UTF8, "application/json");
         using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         var result = (await JsonNode.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false))!.AsObject();
-        if (result["code"]!.GetValue<int>() != 0) throw new DownloadApiException(result["msg"]!.GetValue<string>());
+        if (result["code"]!.GetValue<int>() != 0)
+            throw new DownloadApiException(result["msg"]!.GetValue<string>());
         result.Remove("data", out var data);
         return data;
     }
@@ -37,7 +42,8 @@ public sealed partial class CoreClient : IDisposable
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, "proxy");
         request.Headers.Add("X-Target-Uri", url);
-        using var response = await http.SendAsync(request); response.EnsureSuccessStatusCode();
+        using var response = await http.SendAsync(request);
+        response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
 

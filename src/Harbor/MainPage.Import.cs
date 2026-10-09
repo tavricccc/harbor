@@ -11,7 +11,8 @@ public sealed partial class MainPage
 {
     private void PasteShortcut(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        if (FocusManager.GetFocusedElement(XamlRoot) is TextBox or PasswordBox || !ViewModel.IsConnected) return;
+        if (FocusManager.GetFocusedElement(XamlRoot) is TextBox or PasswordBox || !ViewModel.IsConnected)
+            return;
         PasteDownload(sender, new RoutedEventArgs());
         args.Handled = true;
     }
@@ -23,7 +24,8 @@ public sealed partial class MainPage
             picker.FileTypeFilter.Add(".torrent");
             WinRT.Interop.InitializeWithWindow.Initialize(picker, App.WindowHandle);
             var files = await picker.PickMultipleFilesAsync();
-            if (files.Count == 0) return;
+            if (files.Count == 0)
+                return;
             await AddDownloadAsync(new JsonObject { ["req"] = new JsonObject { ["url"] = string.Join("\n", files.Select(file => file.Path)) } });
         }
         catch (Exception error) { ViewModel.Error = UserError.Message(error); }

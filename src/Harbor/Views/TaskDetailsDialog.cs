@@ -19,7 +19,8 @@ public sealed class TaskDetailsDialog : ContentDialog
 
     public TaskDetailsDialog(CoreClient core, DownloadItem item)
     {
-        Title = Strings.Get("Details.Title"); CloseButtonText = Strings.Get("Common.Close");
+        Title = Strings.Get("Details.Title");
+        CloseButtonText = Strings.Get("Common.Close");
         NativeInfoBars.CollapseWhenClosed(errorBar);
         var tabs = new Pivot { MaxHeight = 440, MinWidth = 460 };
         tabs.Items.Add(new PivotItem { Header = Strings.Get("Details.Information"), Content = Scroll(Information(item)) });
@@ -30,7 +31,8 @@ public sealed class TaskDetailsDialog : ContentDialog
         }
         tabs.Items.Add(new PivotItem { Header = Strings.Get("Common.File"), Content = Scroll(Files(item)) });
         var connections = new StackPanel { Spacing = 12, Padding = new Thickness(0, 12, 12, 16) };
-        var loading = SettingsFields.Description(Strings.Get("Details.LoadingConnections")); connections.Children.Add(loading);
+        var loading = SettingsFields.Description(Strings.Get("Details.LoadingConnections"));
+        connections.Children.Add(loading);
         tabs.Items.Add(new PivotItem { Header = Strings.Get("Settings.Network"), Content = Scroll(connections) });
         Content = new StackPanel { Spacing = 16, Children = { errorBar, tabs } };
         Opened += async (_, _) =>
@@ -39,7 +41,11 @@ public sealed class TaskDetailsDialog : ContentDialog
             {
                 var data = await core.GetAsync<TaskStatistics>("tasks/" + item.Id + "/stats");
                 connections.Children.Clear();
-                if (data is null) { connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections"))); return; }
+                if (data is null)
+                {
+                    connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections")));
+                    return;
+                }
                 if (item.Protocol == "BT" && data.Snapshot is { } snapshot)
                 {
                     var details = new NativeFormGrid(labelWidth: 88);
@@ -58,7 +64,8 @@ public sealed class TaskDetailsDialog : ContentDialog
                         details.AddText(Strings.Format("Details.Connection", index + 1), Strings.Format("Details.ConnectionStats", DownloadItem.FormatBytes(connection.Downloaded), Strings.Get(connection.Completed ? "Status.Completed" : connection.Failed ? "Status.Retrying" : "Status.Downloading"), connection.RetryTimes));
                     connections.Children.Add(details);
                 }
-                else connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections")));
+                else
+                    connections.Children.Add(SettingsFields.Description(Strings.Get("Details.NoConnections")));
             }
             catch (Exception error) { connections.Children.Clear(); connections.Children.Add(SettingsFields.Description(UserError.Message(error))); }
         };
@@ -102,28 +109,41 @@ public sealed class TaskDetailsDialog : ContentDialog
         open.IsEnabled = folder.IsEnabled = share.IsEnabled = false;
         list.SelectionChanged += (_, _) =>
         {
-            var entry = list.SelectedItem as FileEntry; selectedPath.Text = entry?.Path ?? "";
+            var entry = list.SelectedItem as FileEntry;
+            selectedPath.Text = entry?.Path ?? "";
             folder.IsEnabled = entry is not null;
             open.IsEnabled = share.IsEnabled = item.IsComplete && !item.IsProcessing && entry is not null && File.Exists(entry.Path);
         };
         open.Click += (_, _) => { if (list.SelectedItem is FileEntry entry) Run(() => FileActions.Open(entry.Path)); };
         folder.Click += (_, _) => { if (list.SelectedItem is FileEntry entry) Run(() => FileActions.Reveal(entry.Path, item.Folder)); };
         share.Click += (_, _) => { if (list.SelectedItem is FileEntry entry) Run(() => ShareFiles.Show(App.WindowHandle, entry.Path)); };
-        commands.Children.Add(folder); commands.Children.Add(share); commands.Children.Add(open);
+        commands.Children.Add(folder);
+        commands.Children.Add(share);
+        commands.Children.Add(open);
         var files = new StackPanel { Spacing = 16, Padding = new Thickness(0, 12, 0, 16) };
-        if (entries.Count == 0) files.Children.Add(SettingsFields.Description(Strings.Get("Details.FilesPending")));
-        else { files.Children.Add(list); files.Children.Add(selectedPath); list.SelectedIndex = 0; }
-        files.Children.Add(commands); return files;
+        if (entries.Count == 0)
+            files.Children.Add(SettingsFields.Description(Strings.Get("Details.FilesPending")));
+        else
+        {
+            files.Children.Add(list);
+            files.Children.Add(selectedPath);
+            list.SelectedIndex = 0;
+        }
+        files.Children.Add(commands);
+        return files;
     }
 
     private static List<FileEntry> ReadFiles(DownloadItem item)
     {
-        var entries = new List<FileEntry>(); var resource = item.Data["meta"]?["res"];
+        var entries = new List<FileEntry>();
+        var resource = item.Data["meta"]?["res"];
         var selection = item.Data["meta"]?["opts"]?["selectFiles"]?.AsArray().Select(x => x!.GetValue<int>()).ToHashSet() ?? [];
         var index = 0;
         foreach (var file in resource?["files"]?.AsArray() ?? [])
         {
-            var fileIndex = index++; if (selection.Count > 0 && !selection.Contains(fileIndex)) continue;
+            var fileIndex = index++;
+            if (selection.Count > 0 && !selection.Contains(fileIndex))
+                continue;
             var relative = Path.Combine(file!["path"]?.GetValue<string>() ?? "", file["name"]!.GetValue<string>());
             var path = resource?["name"]?.GetValue<string>() is { Length: > 0 } ? Path.Combine(item.FilePath, relative.TrimStart('/', '\\')) : item.FilePath;
             entries.Add(new FileEntry(relative, path, file["size"]!.GetValue<long>()));
@@ -133,13 +153,18 @@ public sealed class TaskDetailsDialog : ContentDialog
 
     private static ScrollViewer Scroll(UIElement content) => new()
     {
-        Content = content, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-        HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, HorizontalScrollMode = ScrollMode.Disabled
+        Content = content,
+        VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+        HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        HorizontalScrollMode = ScrollMode.Disabled
     };
 
     private void Run(Action action)
     {
-        try { action(); }
+        try
+        {
+            action();
+        }
         catch (Exception error) { errorBar.Message = UserError.Message(error); errorBar.IsOpen = true; }
     }
 }

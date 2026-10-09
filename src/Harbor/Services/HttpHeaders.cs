@@ -12,7 +12,8 @@ public static class HttpHeaders
         foreach (var line in text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
         {
             var separator = line.IndexOf(':');
-            if (separator < 1) throw new FormatException(Strings.Get("Errors.HeaderFormat"));
+            if (separator < 1)
+                throw new FormatException(Strings.Get("Errors.HeaderFormat"));
             headers[line[..separator].Trim()] = line[(separator + 1)..].Trim();
         }
         return headers;

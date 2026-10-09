@@ -6,12 +6,36 @@ namespace Harbor.Models;
 
 public sealed partial class ConnectionProgress : ObservableObject
 {
-    [ObservableProperty] public partial string Label { get; set; }
-    [ObservableProperty] public partial string TransferText { get; set; }
-    [ObservableProperty] public partial string StatusText { get; set; }
-    [ObservableProperty] public partial string SpeedText { get; set; }
-    [ObservableProperty] public partial double Percent { get; set; }
-    [ObservableProperty] public partial bool IsIndeterminate { get; set; }
+    [ObservableProperty]
+    public partial string Label
+    {
+        get; set;
+    }
+    [ObservableProperty]
+    public partial string TransferText
+    {
+        get; set;
+    }
+    [ObservableProperty]
+    public partial string StatusText
+    {
+        get; set;
+    }
+    [ObservableProperty]
+    public partial string SpeedText
+    {
+        get; set;
+    }
+    [ObservableProperty]
+    public partial double Percent
+    {
+        get; set;
+    }
+    [ObservableProperty]
+    public partial bool IsIndeterminate
+    {
+        get; set;
+    }
     private long lastDownloaded;
     private long lastSample;
     private int lastRetries;
@@ -38,7 +62,9 @@ public sealed partial class ConnectionProgress : ObservableObject
         var elapsed = lastSample == 0 ? 0 : Stopwatch.GetElapsedTime(lastSample, now).TotalSeconds;
         SpeedText = !running || completed || failed ? "0 B/s" : elapsed > 0 && retries == lastRetries && downloaded >= lastDownloaded
             ? DownloadItem.FormatBytes((long)((downloaded - lastDownloaded) / elapsed)) + "/s" : "—";
-        lastSample = now; lastDownloaded = downloaded; lastRetries = retries;
+        lastSample = now;
+        lastDownloaded = downloaded;
+        lastRetries = retries;
     }
 
     public void UpdatePeer(PeerStatistics peer)

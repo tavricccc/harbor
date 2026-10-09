@@ -9,7 +9,10 @@ using Windows.Storage.Pickers;
 
 namespace Harbor.Views;
 
-public sealed record DownloadCategory(string Name, string Path) { public override string ToString() => $"{Name} · {Path}"; }
+public sealed record DownloadCategory(string Name, string Path)
+{
+    public override string ToString() => $"{Name} · {Path}";
+}
 
 internal sealed class CategoriesEditor : StackPanel
 {
@@ -24,7 +27,8 @@ internal sealed class CategoriesEditor : StackPanel
         Spacing = 20;
         Children.Add(enabled);
         NativeInfoBars.CollapseWhenClosed(message);
-        AutomationProperties.SetName(name, Strings.Get("Categories.Name")); AutomationProperties.SetName(path, Strings.Get("Common.SaveLocation"));
+        AutomationProperties.SetName(name, Strings.Get("Categories.Name"));
+        AutomationProperties.SetName(path, Strings.Get("Common.SaveLocation"));
         list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters = { new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch) } };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
@@ -41,11 +45,16 @@ internal sealed class CategoriesEditor : StackPanel
         heading.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(104) });
         heading.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         var location = SettingsFields.Description(Strings.Get("Common.SaveLocation"));
-        heading.Children.Add(SettingsFields.Description(Strings.Get("Common.Category"))); Grid.SetColumn(location, 1); heading.Children.Add(location);
-        table.Children.Add(heading); table.Children.Add(list); Children.Add(table);
+        heading.Children.Add(SettingsFields.Description(Strings.Get("Common.Category")));
+        Grid.SetColumn(location, 1);
+        heading.Children.Add(location);
+        table.Children.Add(heading);
+        table.Children.Add(list);
+        Children.Add(table);
         Children.Add(message);
 
-        var form = new NativeFormGrid(); form.AddField(Strings.Get("Common.Name"), name);
+        var form = new NativeFormGrid();
+        form.AddField(Strings.Get("Common.Name"), name);
         var folderRow = new Grid { ColumnSpacing = 8 };
         folderRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         folderRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -55,44 +64,67 @@ internal sealed class CategoriesEditor : StackPanel
         {
             try
             {
-                var picker = new FolderPicker(); picker.FileTypeFilter.Add("*");
+                var picker = new FolderPicker();
+                picker.FileTypeFilter.Add("*");
                 WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
-                var folder = await picker.PickSingleFolderAsync(); if (folder is not null) path.Text = folder.Path;
+                var folder = await picker.PickSingleFolderAsync();
+                if (folder is not null)
+                    path.Text = folder.Path;
             }
             catch (Exception error) { message.Message = UserError.Message(error); message.IsOpen = true; }
         };
-        Grid.SetColumn(browse, 1); folderRow.Children.Add(browse); form.AddField(Strings.Get("Common.SaveTo"), folderRow); Children.Add(form);
+        Grid.SetColumn(browse, 1);
+        folderRow.Children.Add(browse);
+        form.AddField(Strings.Get("Common.SaveTo"), folderRow);
+        Children.Add(form);
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         var add = NativeButtons.Create(Strings.Get("Categories.Add"), "\uE710");
-        var remove = NativeButtons.Create(Strings.Get("Categories.Remove"), "\uE74D"); remove.IsEnabled = false;
-        var clear = NativeButtons.Create(Strings.Get("Common.ClearSelection"), "\uE711"); clear.IsEnabled = false;
+        var remove = NativeButtons.Create(Strings.Get("Categories.Remove"), "\uE74D");
+        remove.IsEnabled = false;
+        var clear = NativeButtons.Create(Strings.Get("Common.ClearSelection"), "\uE711");
+        clear.IsEnabled = false;
         list.SelectionChanged += (_, _) =>
         {
             var selected = list.SelectedItem as DownloadCategory;
-            name.Text = selected?.Name ?? ""; path.Text = selected?.Path ?? "";
+            name.Text = selected?.Name ?? "";
+            path.Text = selected?.Path ?? "";
             remove.IsEnabled = clear.IsEnabled = selected is not null;
             NativeButtons.SetContent(add, selected is null ? Strings.Get("Categories.Add") : Strings.Get("Categories.Update"), selected is null ? "\uE710" : "\uE74E");
         };
         add.Click += (_, _) =>
         {
             if (name.Text.Trim().Length == 0 || !System.IO.Path.IsPathFullyQualified(path.Text))
-            { message.Message = Strings.Get("Errors.Category"); message.IsOpen = true; return; }
+            {
+                message.Message = Strings.Get("Errors.Category");
+                message.IsOpen = true;
+                return;
+            }
             var item = new DownloadCategory(name.Text.Trim(), path.Text.Trim());
             var selected = list.SelectedIndex;
-            if (selected >= 0) list.Items[selected] = item; else list.Items.Add(item);
-            list.SelectedIndex = -1; name.Text = ""; path.Text = ""; message.IsOpen = false;
+            if (selected >= 0)
+                list.Items[selected] = item;
+            else
+                list.Items.Add(item);
+            list.SelectedIndex = -1;
+            name.Text = "";
+            path.Text = "";
+            message.IsOpen = false;
         };
         remove.Click += (_, _) => { if (list.SelectedIndex >= 0) list.Items.RemoveAt(list.SelectedIndex); };
         clear.Click += (_, _) => list.SelectedIndex = -1;
-        actions.Children.Add(add); actions.Children.Add(remove); actions.Children.Add(clear); Children.Add(actions);
+        actions.Children.Add(add);
+        actions.Children.Add(remove);
+        actions.Children.Add(clear);
+        Children.Add(actions);
 
         var presets = NativeButtons.Create(Strings.Get("Categories.AddPresets"), "\uE8B7");
         presets.Click += (_, _) =>
         {
             var root = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
             foreach (var label in new[] { Strings.Get("Categories.Music"), Strings.Get("Categories.Video"), Strings.Get("Categories.Document"), Strings.Get("Categories.Program"), Strings.Get("Categories.Archive"), Strings.Get("Categories.Other") })
-                if (!list.Items.Cast<DownloadCategory>().Any(x => x.Name == label)) list.Items.Add(new DownloadCategory(label, System.IO.Path.Combine(root, label)));
+                if (!list.Items.Cast<DownloadCategory>().Any(x => x.Name == label))
+                    list.Items.Add(new DownloadCategory(label, System.IO.Path.Combine(root, label)));
         };
         Children.Add(presets);
     }
@@ -100,7 +132,9 @@ internal sealed class CategoriesEditor : StackPanel
     public void Load(JsonObject config)
     {
         enabled.IsChecked = UsesCategories(config);
-        list.Items.Clear(); foreach (var item in Read(config)) list.Items.Add(item);
+        list.Items.Clear();
+        foreach (var item in Read(config))
+            list.Items.Add(item);
     }
     public void Save(JsonObject config)
     {

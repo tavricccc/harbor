@@ -40,7 +40,8 @@ public sealed class DownloadSourceDialog : ContentDialog
         form.AddField(Strings.Get("Common.HttpHeaders"), headers);
         Content = new StackPanel
         {
-            Spacing = 20, MinWidth = 460,
+            Spacing = 20,
+            MinWidth = 460,
             Children =
             {
                 error,
@@ -63,7 +64,8 @@ public sealed class DownloadSourceDialog : ContentDialog
             request["extra"] ??= new JsonObject();
             request["extra"]!["header"] = HttpHeaders.Parse(headers.Text);
             await core.SendAsync(HttpMethod.Patch, "tasks/" + item.Id, new JsonObject { ["req"] = request.DeepClone() });
-            if (resume.IsChecked == true) await core.SendAsync(HttpMethod.Put, "tasks/" + item.Id + "/continue");
+            if (resume.IsChecked == true)
+                await core.SendAsync(HttpMethod.Put, "tasks/" + item.Id + "/continue");
         }
         catch (Exception exception)
         {

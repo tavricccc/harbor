@@ -20,22 +20,33 @@ public sealed partial class MainPage
     }
     private async void EditSchedule(object sender, RoutedEventArgs args)
     {
-        if (ContextItem(sender) is not { IsDeferred: true } item) return;
+        if (ContextItem(sender) is not { IsDeferred: true } item)
+            return;
         var initial = (item.ScheduledAt ?? DateTimeOffset.Now.AddHours(1)).ToLocalTime();
         var date = new CalendarDatePicker { Header = Strings.Get("Common.Date"), Date = initial, MinDate = DateTimeOffset.Now.Date };
         var time = new TimePicker { Header = Strings.Get("Common.Time"), Time = initial.TimeOfDay, ClockIdentifier = "24HourClock" };
         var error = new InfoBar { Severity = InfoBarSeverity.Error };
         NativeInfoBars.CollapseWhenClosed(error);
-        var dialog = new ContentDialog {
-            Title = Strings.Get("Schedule.EditTitle"), PrimaryButtonText = Strings.Get("Schedule.Save"), SecondaryButtonText = Strings.Get("Schedule.MakeLater"), CloseButtonText = Strings.Get("Common.Cancel"),
-            Content = new StackPanel { Spacing = 12, Children = { error, new TextBlock { Text = item.Name, TextWrapping = TextWrapping.Wrap }, date, time,
-                SettingsFields.Description(Strings.Get("Schedule.Description")) } }
+        var dialog = new ContentDialog
+        {
+            Title = Strings.Get("Schedule.EditTitle"),
+            PrimaryButtonText = Strings.Get("Schedule.Save"),
+            SecondaryButtonText = Strings.Get("Schedule.MakeLater"),
+            CloseButtonText = Strings.Get("Common.Cancel"),
+            Content = new StackPanel
+            {
+                Spacing = 12,
+                Children = { error, new TextBlock { Text = item.Name, TextWrapping = TextWrapping.Wrap }, date, time,
+                SettingsFields.Description(Strings.Get("Schedule.Description")) }
+            }
         };
         async Task Save(ContentDialogButtonClickEventArgs click, bool schedule)
         {
             var deferral = click.GetDeferral();
-            try {
-                if (schedule && date.Date is null) throw new FormatException(Strings.Get("Errors.ScheduleDate"));
+            try
+            {
+                if (schedule && date.Date is null)
+                    throw new FormatException(Strings.Get("Errors.ScheduleDate"));
                 var startAt = schedule ? new DateTimeOffset(DateTime.SpecifyKind(date.Date!.Value.Date + time.Time, DateTimeKind.Local)) : (DateTimeOffset?)null;
                 await ViewModel.Core.SendAsync(HttpMethod.Patch, "native/queue/" + item.Id, new JsonObject { ["startAt"] = startAt?.ToString("O") });
             }

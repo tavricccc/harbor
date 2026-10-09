@@ -23,17 +23,21 @@ public static class Strings
     {
         if (preference.Length > 0)
         {
-            if (!SupportedLanguages.Contains(preference)) throw new ArgumentException("Unsupported language", nameof(preference));
+            if (!SupportedLanguages.Contains(preference))
+                throw new ArgumentException("Unsupported language", nameof(preference));
             return preference;
         }
         foreach (var language in systemLanguages)
         {
             var parts = language.ToLowerInvariant().Split('-');
-            if (parts[0] == "en") return "en-US";
+            if (parts[0] == "en")
+                return "en-US";
             if (parts[0] == "zh")
             {
-                if (parts.Contains("hant")) return "zh-TW";
-                if (parts.Contains("hans")) return "zh-CN";
+                if (parts.Contains("hant"))
+                    return "zh-TW";
+                if (parts.Contains("hans"))
+                    return "zh-CN";
                 return parts.Intersect(["tw", "hk", "mo"]).Any() ? "zh-TW" : "zh-CN";
             }
         }

@@ -26,12 +26,16 @@ internal sealed class DownloadConnectionsPanel : Grid
         ScrollViewer.SetVerticalScrollBarVisibility(list, ScrollBarVisibility.Auto);
         ScrollViewer.SetHorizontalScrollMode(list, ScrollMode.Disabled);
         ScrollViewer.SetHorizontalScrollBarVisibility(list, ScrollBarVisibility.Disabled);
-        list.ItemContainerStyle = new Style { TargetType = typeof(ListViewItem), Setters =
+        list.ItemContainerStyle = new Style
+        {
+            TargetType = typeof(ListViewItem),
+            Setters =
         {
             new Setter(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch),
             new Setter(Control.PaddingProperty, new Thickness(0)),
             new Setter(FrameworkElement.MinHeightProperty, 0d)
-        }};
+        }
+        };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                 <Grid Padding="0,6" ColumnSpacing="12">
@@ -49,8 +53,10 @@ internal sealed class DownloadConnectionsPanel : Grid
                 </Grid>
             </DataTemplate>
             """);
-        SetRow(message, 1); SetRow(list, 1);
-        Children.Add(message); Children.Add(list);
+        SetRow(message, 1);
+        SetRow(list, 1);
+        Children.Add(message);
+        Children.Add(list);
     }
 
     public void Update(TaskStatistics? stats, DownloadItem item)
@@ -60,19 +66,28 @@ internal sealed class DownloadConnectionsPanel : Grid
         var peers = stats?.Runtime?.Peers ?? [];
         var count = http ? connections.Length : peers.Length;
         var changed = rows.Count != count;
-        while (rows.Count > count) rows.RemoveAt(rows.Count - 1);
-        while (rows.Count < count) rows.Add(new ConnectionProgress());
+        while (rows.Count > count)
+            rows.RemoveAt(rows.Count - 1);
+        while (rows.Count < count)
+            rows.Add(new ConnectionProgress());
         var now = Stopwatch.GetTimestamp();
         for (var index = 0; index < count; index++)
         {
-            if (http) rows[index].UpdateHttp(connections[index], index, now, item.Status == "running");
-            else rows[index].UpdatePeer(peers[index]);
+            if (http)
+                rows[index].UpdateHttp(connections[index], index, now, item.Status == "running");
+            else
+                rows[index].UpdatePeer(peers[index]);
         }
         message.Text = Strings.Get("Details.NoConnections");
         message.Visibility = count == 0 ? Visibility.Visible : Visibility.Collapsed;
         list.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        if (changed) LayoutChanged?.Invoke();
+        if (changed)
+            LayoutChanged?.Invoke();
     }
 
-    public void ResetSamples() { foreach (var row in rows) row.ResetSample(); }
+    public void ResetSamples()
+    {
+        foreach (var row in rows)
+            row.ResetSample();
+    }
 }

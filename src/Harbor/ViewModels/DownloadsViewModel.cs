@@ -13,10 +13,18 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     private readonly CancellationTokenSource lifetime = new();
     public ObservableCollection<DownloadItem> VisibleItems { get; } = [];
     public IEnumerable<DownloadItem> AllItems => items.Values;
-    [ObservableProperty] public partial DownloadItem? Selected { get; set; }
+    [ObservableProperty]
+    public partial DownloadItem? Selected
+    {
+        get; set;
+    }
     [ObservableProperty] public partial string Summary { get; set; } = Strings.Get("Downloads.Loading");
     [ObservableProperty] public partial string Error { get; set; } = "";
-    [ObservableProperty] public partial bool IsConnected { get; set; }
+    [ObservableProperty]
+    public partial bool IsConnected
+    {
+        get; set;
+    }
     public string Filter { get; set; } = "all";
     public string Search { get; set; } = "";
     public string Sort { get; set; } = "newest";
@@ -41,26 +49,48 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public string EmptyHint => items.Count == 0 ? Strings.Get("Downloads.EmptyHint") : Strings.Get("Downloads.NoMatchesHint");
     partial void OnSelectedChanged(DownloadItem? oldValue, DownloadItem? newValue)
     {
-        if (oldValue is not null) oldValue.PropertyChanged -= SelectionUpdated;
-        if (newValue is not null) newValue.PropertyChanged += SelectionUpdated;
+        if (oldValue is not null)
+            oldValue.PropertyChanged -= SelectionUpdated;
+        if (newValue is not null)
+            newValue.PropertyChanged += SelectionUpdated;
         SelectionUpdated(this, new System.ComponentModel.PropertyChangedEventArgs(null));
         OnPropertyChanged(nameof(HasSelection));
-        OnPropertyChanged(nameof(HasSingleSelection)); OnPropertyChanged(nameof(CanEditSource));
+        OnPropertyChanged(nameof(HasSingleSelection));
+        OnPropertyChanged(nameof(CanEditSource));
     }
-    public void SetSelection(IEnumerable<DownloadItem> values) { Selection = values.ToList(); Selected = Selection.Count == 1 ? Selection[0] : null; SelectionUpdated(this, new(null)); OnPropertyChanged(nameof(HasSelection)); OnPropertyChanged(nameof(HasSingleSelection)); UpdateSummary(); }
+    public void SetSelection(IEnumerable<DownloadItem> values)
+    {
+        Selection = values.ToList();
+        Selected = Selection.Count == 1 ? Selection[0] : null;
+        SelectionUpdated(this, new(null));
+        OnPropertyChanged(nameof(HasSelection));
+        OnPropertyChanged(nameof(HasSingleSelection));
+        UpdateSummary();
+    }
     private void SelectionUpdated(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (!string.IsNullOrEmpty(e.PropertyName)) return;
-        OnPropertyChanged(nameof(CanPauseSelected)); OnPropertyChanged(nameof(CanResumeSelected));
+        if (!string.IsNullOrEmpty(e.PropertyName))
+            return;
+        OnPropertyChanged(nameof(CanPauseSelected));
+        OnPropertyChanged(nameof(CanResumeSelected));
         OnPropertyChanged(nameof(CanOpenSelected));
         OnPropertyChanged(nameof(CanEditSource));
         OnPropertyChanged(nameof(CanShowProgress));
-        OnPropertyChanged(nameof(PrimaryActionLabel)); OnPropertyChanged(nameof(PrimaryActionGlyph)); OnPropertyChanged(nameof(CanActSelected));
+        OnPropertyChanged(nameof(PrimaryActionLabel));
+        OnPropertyChanged(nameof(PrimaryActionGlyph));
+        OnPropertyChanged(nameof(CanActSelected));
     }
 
     public async Task InitializeAsync()
     {
-        try { await Core.ConnectAsync(); IsConnected = true; await RefreshAsync(); if (Error.Length == 0) UpdateSummary(); }
+        try
+        {
+            await Core.ConnectAsync();
+            IsConnected = true;
+            await RefreshAsync();
+            if (Error.Length == 0)
+                UpdateSummary();
+        }
         catch (Exception e) { Error = UserError.Message(e); Summary = Strings.Get("Errors.LoadDownloads"); }
     }
     private void UpdateSummary()
@@ -74,7 +104,9 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         lifetime.Cancel();
-        if (Selected is not null) Selected.PropertyChanged -= SelectionUpdated;
-        Core.Dispose(); lifetime.Dispose();
+        if (Selected is not null)
+            Selected.PropertyChanged -= SelectionUpdated;
+        Core.Dispose();
+        lifetime.Dispose();
     }
 }

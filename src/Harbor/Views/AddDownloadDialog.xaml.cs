@@ -19,8 +19,12 @@ public sealed partial class AddDownloadDialog : ContentDialog
         args.Cancel = true;
         var deferral = args.GetDeferral();
         bool complete;
-        try { complete = await form.SubmitAsync(); }
+        try
+        {
+            complete = await form.SubmitAsync();
+        }
         finally { deferral.Complete(); }
-        if (complete) Hide();
+        if (complete)
+            Hide();
     }
 }

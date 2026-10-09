@@ -68,19 +68,27 @@ public partial class App : Application
             Services.WindowsIntegration.InstallBrowserHost();
             Services.WindowsIntegration.RegisterFileTypes();
             Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);
-            Exit(); return;
+            Exit();
+            return;
         }
-        if (commandLine.Contains("--unregister-integrations")) { Services.WindowsIntegration.Unregister(); Exit(); return; }
+        if (commandLine.Contains("--unregister-integrations"))
+        {
+            Services.WindowsIntegration.Unregister();
+            Exit();
+            return;
+        }
         if (Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY") is null)
             Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);
-        if (!Services.WindowsIntegration.IsBrowserHostRegistered()) Services.WindowsIntegration.InstallBrowserHost();
+        if (!Services.WindowsIntegration.IsBrowserHostRegistered())
+            Services.WindowsIntegration.InstallBrowserHost();
         var profileKey = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(Services.CoreClient.DataDirectory.ToUpperInvariant())));
         var instance = AppInstance.FindOrRegisterForKey("Harbor.Main." + profileKey);
         if (!instance.IsCurrent)
         {
             Services.WindowActivation.AllowRedirect(instance.ProcessId);
             await instance.RedirectActivationToAsync(AppInstance.GetCurrent().GetActivatedEventArgs());
-            Exit(); return;
+            Exit();
+            return;
         }
         DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         registeredInstance = instance;
@@ -100,7 +108,8 @@ public partial class App : Application
                     var path = System.IO.Path.Combine(Services.CoreClient.DataDirectory, "pending-downloads", match.Groups[1].Value + ".json");
                     var request = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(path))!.AsObject();
                     System.IO.File.Delete(path);
-                    OpenDownloadWindow(request); return;
+                    OpenDownloadWindow(request);
+                    return;
                 }
             }
             var link = activation.Data switch
@@ -111,23 +120,32 @@ public partial class App : Application
             };
             if (link is null && activation.Data is Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs command && Services.DownloadSources.FromArguments(command.Arguments) is { } source)
             {
-                OpenDownloadWindow(new System.Text.Json.Nodes.JsonObject { ["req"] = new System.Text.Json.Nodes.JsonObject { ["url"] = source } }); return;
+                OpenDownloadWindow(new System.Text.Json.Nodes.JsonObject { ["req"] = new System.Text.Json.Nodes.JsonObject { ["url"] = source } });
+                return;
             }
             if (link is not null && Services.GopeedLink.Parse(link) is { Route: "create" } create)
             {
-                OpenDownloadWindow(create.Parameters ?? new System.Text.Json.Nodes.JsonObject()); return;
+                OpenDownloadWindow(create.Parameters ?? new System.Text.Json.Nodes.JsonObject());
+                return;
             }
             EnsureMainWindow().Activate();
-            if (link is not null) ((MainWindow)Window).OpenProtocol(link);
+            if (link is not null)
+                ((MainWindow)Window).OpenProtocol(link);
         }
         catch (Exception error)
         {
-            var main = EnsureMainWindow(); main.Activate(); main.ReportError(Strings.Get("Errors.OpenDownload") + error.Message);
+            var main = EnsureMainWindow();
+            main.Activate();
+            main.ReportError(Strings.Get("Errors.OpenDownload") + error.Message);
         }
     }
     private MainWindow EnsureMainWindow()
     {
-        if (Window is null) { Window = new MainWindow(); Window.Closed += (_, _) => { Window = null!; ReleaseRegistration(); }; }
+        if (Window is null)
+        {
+            Window = new MainWindow();
+            Window.Closed += (_, _) => { Window = null!; ReleaseRegistration(); };
+        }
         return (MainWindow)Window;
     }
     internal void OpenDownloadWindow(System.Text.Json.Nodes.JsonObject request, bool compact = true)
@@ -139,9 +157,15 @@ public partial class App : Application
     internal void OpenProgressWindow(string taskId)
     {
         var window = downloadWindows.FirstOrDefault(window => window.TaskId == taskId);
-        if (window is null) { window = new Views.DownloadWindow(taskId); TrackDownloadWindow(window); }
-        if (window.AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter) presenter.Restore();
-        window.AppWindow.Show(true); window.Activate();
+        if (window is null)
+        {
+            window = new Views.DownloadWindow(taskId);
+            TrackDownloadWindow(window);
+        }
+        if (window.AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
+            presenter.Restore();
+        window.AppWindow.Show(true);
+        window.Activate();
     }
     private void TrackDownloadWindow(Views.DownloadWindow window)
     {
@@ -156,6 +180,7 @@ public partial class App : Application
     }
     private void ReleaseRegistration()
     {
-        if (Window is null && downloadWindows.Count == 0) registeredInstance?.UnregisterKey();
+        if (Window is null && downloadWindows.Count == 0)
+            registeredInstance?.UnregisterKey();
     }
 }

@@ -12,7 +12,12 @@ public static class WindowAppearance
         get
         {
             var path = Path.Combine(CoreClient.DataDirectory, "theme.txt");
-            return File.Exists(path) ? File.ReadAllText(path).Trim() switch { "1" => ElementTheme.Light, "2" => ElementTheme.Dark, _ => ElementTheme.Default } : ElementTheme.Default;
+            return File.Exists(path) ? File.ReadAllText(path).Trim() switch
+            {
+                "1" => ElementTheme.Light,
+                "2" => ElementTheme.Dark,
+                _ => ElementTheme.Default
+            } : ElementTheme.Default;
         }
     }
     public static void SetIcon(Window window) => window.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));

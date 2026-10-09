@@ -7,9 +7,19 @@ namespace Harbor.Models;
 
 public sealed partial class DownloadItem : ObservableObject
 {
-    public string Id { get; }
-    public JsonObject Data { get; private set; }
-    public DownloadItem(JsonObject data) { Id = data["id"]!.GetValue<string>(); Data = data; }
+    public string Id
+    {
+        get;
+    }
+    public JsonObject Data
+    {
+        get; private set;
+    }
+    public DownloadItem(JsonObject data)
+    {
+        Id = data["id"]!.GetValue<string>();
+        Data = data;
+    }
     public string Name => Data["name"]!.GetValue<string>();
     public string Status => Data["status"]!.GetValue<string>();
     public bool IsDeferred => Status == "deferred";
@@ -57,7 +67,8 @@ public sealed partial class DownloadItem : ObservableObject
             var name = resource?["name"]?.GetValue<string>();
             var file = resource?["files"]?.AsArray().FirstOrDefault();
             var custom = Data["meta"]?["opts"]?["name"]?.GetValue<string>();
-            if (!string.IsNullOrEmpty(name)) return Path.Combine(Folder, string.IsNullOrEmpty(custom) ? name : custom);
+            if (!string.IsNullOrEmpty(name))
+                return Path.Combine(Folder, string.IsNullOrEmpty(custom) ? name : custom);
             return Path.Combine(Folder, file?["path"]?.GetValue<string>() ?? "", string.IsNullOrEmpty(custom) ? file?["name"]?.GetValue<string>() ?? Name : custom);
         }
     }

@@ -6,12 +6,15 @@ internal static class LegacyMigration
 {
     public static void Run()
     {
-        if (Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY") is not null) return;
+        if (Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY") is not null)
+            return;
         var oldData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GopeedNative");
         if (Directory.Exists(oldData))
         {
-            if (!Directory.Exists(CoreClient.DataDirectory)) Directory.Move(oldData, CoreClient.DataDirectory);
-            else MergeData(oldData, CoreClient.DataDirectory, Path.Combine(CoreClient.DataDirectory, "legacy-migration"));
+            if (!Directory.Exists(CoreClient.DataDirectory))
+                Directory.Move(oldData, CoreClient.DataDirectory);
+            else
+                MergeData(oldData, CoreClient.DataDirectory, Path.Combine(CoreClient.DataDirectory, "legacy-migration"));
         }
 
         using (var oldBackup = Registry.CurrentUser.OpenSubKey(@"Software\GopeedNative\ProtocolBackup"))
@@ -20,7 +23,8 @@ internal static class LegacyMigration
             {
                 using var backup = Registry.CurrentUser.CreateSubKey(@"Software\Harbor\ProtocolBackup");
                 foreach (var name in oldBackup.GetValueNames())
-                    if (backup.GetValue(name) is null) backup.SetValue(name, oldBackup.GetValue(name)!, oldBackup.GetValueKind(name));
+                    if (backup.GetValue(name) is null)
+                        backup.SetValue(name, oldBackup.GetValue(name)!, oldBackup.GetValueKind(name));
             }
         }
         using var startup = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
@@ -49,7 +53,8 @@ internal static class LegacyMigration
             {
                 Directory.CreateDirectory(conflicts);
                 target = Path.Combine(conflicts, Path.GetFileName(file));
-                if (File.Exists(target)) target += "." + Guid.NewGuid().ToString("N");
+                if (File.Exists(target))
+                    target += "." + Guid.NewGuid().ToString("N");
             }
             File.Move(file, target);
         }

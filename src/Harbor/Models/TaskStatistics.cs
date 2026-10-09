@@ -5,16 +5,34 @@ public sealed record TaskStatistics(StatisticsSnapshot? Snapshot, StatisticsRunt
 public sealed record StatisticsSnapshot
 {
     public HttpConnectionStatistics[] Connections { get; init; } = [];
-    public long SeedBytes { get; init; }
-    public double SeedRatio { get; init; }
-    public long SeedTime { get; init; }
+    public long SeedBytes
+    {
+        get; init;
+    }
+    public double SeedRatio
+    {
+        get; init;
+    }
+    public long SeedTime
+    {
+        get; init;
+    }
 }
 
 public sealed record StatisticsRuntime
 {
-    public int TotalPeers { get; init; }
-    public int ActivePeers { get; init; }
-    public int ConnectedSeeders { get; init; }
+    public int TotalPeers
+    {
+        get; init;
+    }
+    public int ActivePeers
+    {
+        get; init;
+    }
+    public int ConnectedSeeders
+    {
+        get; init;
+    }
     public PeerStatistics[] Peers { get; init; } = [];
 }
 

@@ -16,7 +16,8 @@ public sealed class SettingsWindow : Window
         var root = new Grid { RequestedTheme = WindowAppearance.Theme };
         var page = new SettingsPage(viewModel, handle);
         page.CloseRequested += Close;
-        root.Children.Add(page); Content = root;
+        root.Children.Add(page);
+        Content = root;
         WindowAppearance.ApplyFrame(this, root);
 
         var scale = GetDpiForWindow(handle) / 96.0;

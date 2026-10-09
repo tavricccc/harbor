@@ -13,8 +13,14 @@ public sealed partial class MainPage
         searchTimer.Tick += (_, _) => { searchTimer.Stop(); ViewModel.ApplyFilter(); };
         timer.Tick += async (_, _) =>
         {
-            if (!WindowVisible()) { timer.Stop(); polling = false; return; }
-            if (ViewModel.IsConnected) await ViewModel.RefreshAsync();
+            if (!WindowVisible())
+            {
+                timer.Stop();
+                polling = false;
+                return;
+            }
+            if (ViewModel.IsConnected)
+                await ViewModel.RefreshAsync();
             timer.Interval = ViewModel.RefreshInterval;
         };
     }
@@ -24,13 +30,22 @@ public sealed partial class MainPage
 
     public async void UpdatePollingVisibility()
     {
-        if (!ready.Task.IsCompleted) return;
+        if (!ready.Task.IsCompleted)
+            return;
         var visible = WindowVisible() && DownloadsSurface.Visibility == Visibility.Visible;
-        if (!visible) { timer.Stop(); polling = false; return; }
-        if (polling) return;
+        if (!visible)
+        {
+            timer.Stop();
+            polling = false;
+            return;
+        }
+        if (polling)
+            return;
         polling = true;
-        if (ViewModel.IsConnected) await ViewModel.RefreshAsync();
-        if (!polling) return;
+        if (ViewModel.IsConnected)
+            await ViewModel.RefreshAsync();
+        if (!polling)
+            return;
         timer.Interval = ViewModel.RefreshInterval;
         timer.Start();
     }

@@ -9,9 +9,16 @@ public sealed partial class DownloadsViewModel
 
     public async Task RefreshAsync()
     {
-        if (refreshTask is not null) { await refreshTask; return; }
+        if (refreshTask is not null)
+        {
+            await refreshTask;
+            return;
+        }
         refreshTask = RefreshCoreAsync();
-        try { await refreshTask; }
+        try
+        {
+            await refreshTask;
+        }
         finally { refreshTask = null; }
     }
 
@@ -27,16 +34,26 @@ public sealed partial class DownloadsViewModel
             var changes = DownloadChanges.None;
             foreach (var node in tasks.Result!.AsArray().Concat(queue.Result!.AsArray()))
             {
-                var entry = node!.AsObject(); var id = entry["id"]!.GetValue<string>(); ids.Add(id);
-                if (items.TryGetValue(id, out var item)) changes |= item.Update(entry);
-                else { items[id] = new(entry); changes |= DownloadChanges.Content; }
+                var entry = node!.AsObject();
+                var id = entry["id"]!.GetValue<string>();
+                ids.Add(id);
+                if (items.TryGetValue(id, out var item))
+                    changes |= item.Update(entry);
+                else
+                {
+                    items[id] = new(entry);
+                    changes |= DownloadChanges.Content;
+                }
             }
             foreach (var id in items.Keys.Where(id => !ids.Contains(id)).ToArray())
             {
-                items.Remove(id); changes |= DownloadChanges.Content;
+                items.Remove(id);
+                changes |= DownloadChanges.Content;
             }
-            if ((changes & DownloadChanges.Content) != 0 || Sort == "progress" && changes != DownloadChanges.None) ApplyFilter();
-            else if (changes != DownloadChanges.None) UpdateSummary();
+            if ((changes & DownloadChanges.Content) != 0 || Sort == "progress" && changes != DownloadChanges.None)
+                ApplyFilter();
+            else if (changes != DownloadChanges.None)
+                UpdateSummary();
         }
         catch (OperationCanceledException) when (lifetime.IsCancellationRequested) { }
         catch (Exception e) { Error = UserError.Message(e); }

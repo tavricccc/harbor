@@ -34,16 +34,23 @@ internal sealed class DownloadOptionsPanel : StackPanel
         customProxy.Children.Add(Pair(user, password));
         Children.Add(Section(Strings.Get("Proxy.Title"), proxyMode, customProxy));
         Children.Add(Section(Strings.Get("Archive.Extraction"), Pair(extract, archivePassword), deleteArchive));
-        method.SelectionChanged += (_, _) => RequestChanged?.Invoke(); method.TextSubmitted += (_, _) => RequestChanged?.Invoke();
-        body.TextChanged += (_, _) => RequestChanged?.Invoke(); trackers.TextChanged += (_, _) => RequestChanged?.Invoke();
+        method.SelectionChanged += (_, _) => RequestChanged?.Invoke();
+        method.TextSubmitted += (_, _) => RequestChanged?.Invoke();
+        body.TextChanged += (_, _) => RequestChanged?.Invoke();
+        trackers.TextChanged += (_, _) => RequestChanged?.Invoke();
         proxyMode.SelectionChanged += (_, _) => { customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed; RequestChanged?.Invoke(); LayoutChanged?.Invoke(); };
-        host.TextChanged += (_, _) => RequestChanged?.Invoke(); user.TextChanged += (_, _) => RequestChanged?.Invoke(); password.PasswordChanged += (_, _) => RequestChanged?.Invoke(); scheme.SelectionChanged += (_, _) => RequestChanged?.Invoke();
-        skipCert.Checked += (_, _) => RequestChanged?.Invoke(); skipCert.Unchecked += (_, _) => RequestChanged?.Invoke();
+        host.TextChanged += (_, _) => RequestChanged?.Invoke();
+        user.TextChanged += (_, _) => RequestChanged?.Invoke();
+        password.PasswordChanged += (_, _) => RequestChanged?.Invoke();
+        scheme.SelectionChanged += (_, _) => RequestChanged?.Invoke();
+        skipCert.Checked += (_, _) => RequestChanged?.Invoke();
+        skipCert.Unchecked += (_, _) => RequestChanged?.Invoke();
     }
     private Expander Section(string title, params UIElement[] controls)
     {
         var section = new StackPanel { Spacing = 12 };
-        foreach (var control in controls) section.Children.Add(control);
+        foreach (var control in controls)
+            section.Children.Add(control);
         var expander = new Expander { Header = title, Content = section, HorizontalAlignment = HorizontalAlignment.Stretch };
         expander.Expanding += (_, _) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
         expander.Collapsed += (_, _) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
@@ -62,26 +69,49 @@ internal sealed class DownloadOptionsPanel : StackPanel
     private static ComboBox Choice(string title) => new() { Header = title, Items = { Strings.Get("Common.UseDefault"), Strings.Get("Common.Enable"), Strings.Get("Common.Disable") }, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
     public void Load(JsonObject? initial, JsonNode config)
     {
-        var req = initial?["req"]; method.Text = req?["extra"]?["method"]?.GetValue<string>() ?? "GET"; body.Text = req?["extra"]?["body"]?.GetValue<string>() ?? "";
+        var req = initial?["req"];
+        method.Text = req?["extra"]?["method"]?.GetValue<string>() ?? "GET";
+        body.Text = req?["extra"]?["body"]?.GetValue<string>() ?? "";
         skipCert.IsChecked = req?["skipVerifyCert"]?.GetValue<bool>() == true;
         trackers.Text = string.Join("\n", req?["extra"]?["trackers"]?.AsArray().Select(x => x!.GetValue<string>()) ?? []);
-        proxyMode.SelectedIndex = req?["proxy"]?["mode"]?.GetValue<string>() switch { "none" => 1, "custom" => 2, _ => 0 };
-        scheme.SelectedIndex = req?["proxy"]?["scheme"]?.GetValue<string>() switch { "https" => 1, "socks5" => 2, _ => 0 };
-        host.Text = req?["proxy"]?["host"]?.GetValue<string>() ?? ""; user.Text = req?["proxy"]?["usr"]?.GetValue<string>() ?? ""; password.Password = req?["proxy"]?["pwd"]?.GetValue<string>() ?? "";
-        foreach (var (control, key) in new[] { (autoTorrent, "autoTorrent"), (deleteTorrent, "deleteTorrentAfterDownload"), (extract, "autoExtract") }) control.SelectedIndex = initial?["opts"]?["extra"]?[key] is JsonValue value ? value.GetValue<bool>() ? 1 : 2 : 0;
+        proxyMode.SelectedIndex = req?["proxy"]?["mode"]?.GetValue<string>() switch
+        {
+            "none" => 1,
+            "custom" => 2,
+            _ => 0
+        };
+        scheme.SelectedIndex = req?["proxy"]?["scheme"]?.GetValue<string>() switch
+        {
+            "https" => 1,
+            "socks5" => 2,
+            _ => 0
+        };
+        host.Text = req?["proxy"]?["host"]?.GetValue<string>() ?? "";
+        user.Text = req?["proxy"]?["usr"]?.GetValue<string>() ?? "";
+        password.Password = req?["proxy"]?["pwd"]?.GetValue<string>() ?? "";
+        foreach (var (control, key) in new[] { (autoTorrent, "autoTorrent"), (deleteTorrent, "deleteTorrentAfterDownload"), (extract, "autoExtract") })
+            control.SelectedIndex = initial?["opts"]?["extra"]?[key] is JsonValue value ? value.GetValue<bool>() ? 1 : 2 : 0;
         archivePassword.Password = initial?["opts"]?["extra"]?["archivePassword"]?.GetValue<string>() ?? "";
         deleteArchive.IsChecked = initial?["opts"]?["extra"]?["deleteAfterExtract"]?.GetValue<bool>() ?? config["archive"]?["deleteAfterExtract"]?.GetValue<bool>() ?? false;
     }
     public void Apply(JsonObject request)
     {
-        var req = request["req"]!.AsObject(); req["extra"] ??= new JsonObject(); var extra = req["extra"]!.AsObject();
-        extra["method"] = method.Text.Trim().Length == 0 ? "GET" : method.Text.Trim().ToUpperInvariant(); extra["body"] = body.Text;
-        if (trackers.Text.Length > 0) extra["trackers"] = ConfigJson.Array(ConfigJson.Lines(trackers.Text));
+        var req = request["req"]!.AsObject();
+        req["extra"] ??= new JsonObject();
+        var extra = req["extra"]!.AsObject();
+        extra["method"] = method.Text.Trim().Length == 0 ? "GET" : method.Text.Trim().ToUpperInvariant();
+        extra["body"] = body.Text;
+        if (trackers.Text.Length > 0)
+            extra["trackers"] = ConfigJson.Array(ConfigJson.Lines(trackers.Text));
         req["skipVerifyCert"] = skipCert.IsChecked == true;
-        if (proxyMode.SelectedIndex == 2 && host.Text.Trim().Length == 0) throw new FormatException(Strings.Get("Errors.ProxyHost"));
+        if (proxyMode.SelectedIndex == 2 && host.Text.Trim().Length == 0)
+            throw new FormatException(Strings.Get("Errors.ProxyHost"));
         req["proxy"] = new JsonObject { ["mode"] = proxyMode.SelectedIndex switch { 1 => "none", 2 => "custom", _ => "follow" }, ["scheme"] = scheme.SelectedItem?.ToString() ?? "http", ["host"] = host.Text.Trim(), ["usr"] = user.Text, ["pwd"] = password.Password };
-        var opts = request["opts"]!.AsObject(); opts["extra"] ??= new JsonObject();
-        foreach (var (control, key) in new[] { (autoTorrent, "autoTorrent"), (deleteTorrent, "deleteTorrentAfterDownload"), (extract, "autoExtract") }) opts["extra"]![key] = control.SelectedIndex == 0 ? null : JsonValue.Create(control.SelectedIndex == 1);
-        opts["extra"]!["archivePassword"] = archivePassword.Password; opts["extra"]!["deleteAfterExtract"] = deleteArchive.IsChecked == true;
+        var opts = request["opts"]!.AsObject();
+        opts["extra"] ??= new JsonObject();
+        foreach (var (control, key) in new[] { (autoTorrent, "autoTorrent"), (deleteTorrent, "deleteTorrentAfterDownload"), (extract, "autoExtract") })
+            opts["extra"]![key] = control.SelectedIndex == 0 ? null : JsonValue.Create(control.SelectedIndex == 1);
+        opts["extra"]!["archivePassword"] = archivePassword.Password;
+        opts["extra"]!["deleteAfterExtract"] = deleteArchive.IsChecked == true;
     }
 }

@@ -3,7 +3,10 @@ using System.Text.Json.Nodes;
 namespace Harbor.Models;
 
 [Flags]
-public enum DownloadChanges { None = 0, Content = 1, Progress = 2 }
+public enum DownloadChanges
+{
+    None = 0, Content = 1, Progress = 2
+}
 
 public sealed partial class DownloadItem
 {
@@ -16,7 +19,8 @@ public sealed partial class DownloadItem
 
     public DownloadChanges Update(JsonObject data)
     {
-        if (JsonNode.DeepEquals(Data, data)) return DownloadChanges.None;
+        if (JsonNode.DeepEquals(Data, data))
+            return DownloadChanges.None;
         // Progress is the only rapidly changing subtree. A metadata or lifecycle
         // change refreshes all bindings; byte/speed ticks only touch live metrics.
         var contentChanged = Data.Count != data.Count || Data.Any(field => field.Key != "progress" && !JsonNode.DeepEquals(field.Value, data[field.Key]));
@@ -27,7 +31,8 @@ public sealed partial class DownloadItem
             OnPropertyChanged(string.Empty);
             return DownloadChanges.Content | DownloadChanges.Progress;
         }
-        foreach (var property in progressProperties) OnPropertyChanged(property);
+        foreach (var property in progressProperties)
+            OnPropertyChanged(property);
         if (IsProcessing)
         {
             OnPropertyChanged(nameof(ExtractionText));

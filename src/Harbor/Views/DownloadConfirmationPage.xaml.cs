@@ -31,22 +31,37 @@ public sealed partial class DownloadConfirmationPage : Page
     }
     private async void Start(object sender, RoutedEventArgs e)
     {
-        if (!await form.SubmitAsync()) return;
-        if (form.CreatedTaskId is { } id) Started?.Invoke(id);
-        else Cancelled?.Invoke();
+        if (!await form.SubmitAsync())
+            return;
+        if (form.CreatedTaskId is { } id)
+            Started?.Invoke(id);
+        else
+            Cancelled?.Invoke();
     }
     private void Cancel(object sender, RoutedEventArgs e) => Cancelled?.Invoke();
     private async void DownloadLater(object sender, RoutedEventArgs e)
     {
-        if (await form.SubmitAsync(defer: true)) Deferred?.Invoke();
+        if (await form.SubmitAsync(defer: true))
+            Deferred?.Invoke();
     }
     private async void ScheduleDownload(object sender, RoutedEventArgs e)
     {
-        if (ScheduleDate.Date is not { } date) return;
+        if (ScheduleDate.Date is not { } date)
+            return;
         var local = DateTime.SpecifyKind(date.Date + ScheduleTime.Time, DateTimeKind.Local);
         ScheduleButton.Flyout.Hide();
-        if (await form.SubmitAsync(defer: true, startAt: new DateTimeOffset(local))) Deferred?.Invoke();
+        if (await form.SubmitAsync(defer: true, startAt: new DateTimeOffset(local)))
+            Deferred?.Invoke();
     }
-    private void CancelShortcut(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args) { Cancelled?.Invoke(); args.Handled = true; }
-    private void StartShortcut(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args) { if (StartButton.IsEnabled) Start(sender,new()); args.Handled = true; }
+    private void CancelShortcut(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+    {
+        Cancelled?.Invoke();
+        args.Handled = true;
+    }
+    private void StartShortcut(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (StartButton.IsEnabled)
+            Start(sender, new());
+        args.Handled = true;
+    }
 }

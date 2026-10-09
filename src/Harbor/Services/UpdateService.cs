@@ -13,7 +13,12 @@ public static class UpdateService
         foreach (var release in releases.Where(x => x?["draft"]?.GetValue<bool>() != true))
         {
             var tag = release!["tag_name"]!.GetValue<string>();
-            if (Version.TryParse(tag.TrimStart('v'), out var version) && version > current) { var asset = release["assets"]!.AsArray().FirstOrDefault(x => x?["name"]?.GetValue<string>() == $"Harbor-Setup-{version.ToString(3)}-x64.exe"); if (asset is not null) return new(tag, release["html_url"]!.GetValue<string>(), asset["browser_download_url"]!.GetValue<string>()); }
+            if (Version.TryParse(tag.TrimStart('v'), out var version) && version > current)
+            {
+                var asset = release["assets"]!.AsArray().FirstOrDefault(x => x?["name"]?.GetValue<string>() == $"Harbor-Setup-{version.ToString(3)}-x64.exe");
+                if (asset is not null)
+                    return new(tag, release["html_url"]!.GetValue<string>(), asset["browser_download_url"]!.GetValue<string>());
+            }
         }
         return null;
     }
@@ -21,7 +26,12 @@ public static class UpdateService
     {
         var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog { Title = $"Harbor {update.Version}", Content = Strings.Get("Update.Description"), PrimaryButtonText = Strings.Get("Update.DownloadInstaller"), SecondaryButtonText = Strings.Get("Update.ReleaseNotes"), CloseButtonText = Strings.Get("Common.Later") };
         var result = await NativeDialogs.ShowAsync(dialog, root);
-        if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Secondary) System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(update.Url) { UseShellExecute = true });
-        else if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary) { var config = (await core.GetAsync("config"))!; ((App)Microsoft.UI.Xaml.Application.Current).OpenDownloadWindow(new JsonObject { ["req"] = new JsonObject { ["url"] = GitHubMirror.Apply(update.Installer, config) }, ["opts"] = new JsonObject { ["path"] = Path.Combine(CoreClient.DataDirectory, "Updates"), ["name"] = Path.GetFileName(new Uri(update.Installer).LocalPath) } }); }
+        if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Secondary)
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(update.Url) { UseShellExecute = true });
+        else if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+        {
+            var config = (await core.GetAsync("config"))!;
+            ((App)Microsoft.UI.Xaml.Application.Current).OpenDownloadWindow(new JsonObject { ["req"] = new JsonObject { ["url"] = GitHubMirror.Apply(update.Installer, config) }, ["opts"] = new JsonObject { ["path"] = Path.Combine(CoreClient.DataDirectory, "Updates"), ["name"] = Path.GetFileName(new Uri(update.Installer).LocalPath) } });
+        }
     }
 }

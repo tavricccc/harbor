@@ -36,8 +36,14 @@ func runCore(options coreOptions) error {
 	if err != nil {
 		return err
 	}
-	defer api.Close()
-	defer rest.Stop()
+	sessionPath := ""
+	defer func() {
+		api.Close()
+		rest.Stop()
+		if sessionPath != "" {
+			os.Remove(sessionPath)
+		}
+	}()
 	port := listener.Addr().(*net.TCPAddr).Port
 	api.Handler = browserConfirmation(api.Handler, token, func(body []byte) (string, error) {
 		return openDownloadRequest(options.root, options.ui, body)
@@ -48,7 +54,6 @@ func runCore(options coreOptions) error {
 		return err
 	}
 	api.Handler = queue.handler(api.Handler, token)
-	queueStop, queueDone := startDeferredQueue(queue)
 	go api.Serve(listener)
 	lifecycle := trackLifecycle(rest.Downloader)
 	if err := configureDownloadFolder(); err != nil {
@@ -62,12 +67,12 @@ func runCore(options coreOptions) error {
 		return err
 	}
 	defer control.Close()
-	sessionPath, err := saveSession(options.root, session{port, token, os.Getpid(), controlPort})
+	sessionPath, err = saveSession(options.root, session{port, token, os.Getpid(), controlPort})
 	if err != nil {
 		return err
 	}
-	defer os.Remove(sessionPath)
 	startExtras(rest.Downloader, port, token)
+	queueStop, queueDone := startDeferredQueue(queue)
 	fmt.Println("Harbor core ready")
 	if options.ui == "" {
 		<-stop

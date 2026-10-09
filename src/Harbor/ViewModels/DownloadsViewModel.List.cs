@@ -24,15 +24,23 @@ public sealed partial class DownloadsViewModel
         var visible = ordered.ToList();
         var keep = visible.ToHashSet();
         for (var index = VisibleItems.Count - 1; index >= 0; index--)
-            if (!keep.Contains(VisibleItems[index])) VisibleItems.RemoveAt(index);
+            if (!keep.Contains(VisibleItems[index]))
+                VisibleItems.RemoveAt(index);
         for (var index = 0; index < visible.Count; index++)
         {
-            if (index < VisibleItems.Count && ReferenceEquals(VisibleItems[index], visible[index])) continue;
+            if (index < VisibleItems.Count && ReferenceEquals(VisibleItems[index], visible[index]))
+                continue;
             var current = VisibleItems.IndexOf(visible[index]);
-            if (current < 0) VisibleItems.Insert(index, visible[index]); else VisibleItems.Move(current, index);
+            if (current < 0)
+                VisibleItems.Insert(index, visible[index]);
+            else
+                VisibleItems.Move(current, index);
         }
         SetSelection(Selection.Where(keep.Contains));
-        OnPropertyChanged(nameof(CanPauseAll)); OnPropertyChanged(nameof(CanResumeAll)); OnPropertyChanged(nameof(CanClearCompleted));
-        OnPropertyChanged(nameof(EmptyTitle)); OnPropertyChanged(nameof(EmptyHint));
+        OnPropertyChanged(nameof(CanPauseAll));
+        OnPropertyChanged(nameof(CanResumeAll));
+        OnPropertyChanged(nameof(CanClearCompleted));
+        OnPropertyChanged(nameof(EmptyTitle));
+        OnPropertyChanged(nameof(EmptyHint));
     }
 }

@@ -20,16 +20,24 @@ public static class UserError
                 _ when text.StartsWith("pending download not found:") => "Errors.DeferredNotFound",
                 _ => null
             };
-            if (key is not null) return Strings.Get(key);
-            if (text.Contains("header")) return Strings.Get("Errors.InvalidHeaders");
-            if (text.Contains("not found")) return Strings.Get("Errors.SourceMissing");
-            if (text.Contains("permission") || text.Contains("access is denied")) return Strings.Get("Errors.FileWrite");
-            if (text.Contains("unsupported") || text.Contains("invalid url")) return Strings.Get("Errors.InvalidLink");
+            if (key is not null)
+                return Strings.Get(key);
+            if (text.Contains("header"))
+                return Strings.Get("Errors.InvalidHeaders");
+            if (text.Contains("not found"))
+                return Strings.Get("Errors.SourceMissing");
+            if (text.Contains("permission") || text.Contains("access is denied"))
+                return Strings.Get("Errors.FileWrite");
+            if (text.Contains("unsupported") || text.Contains("invalid url"))
+                return Strings.Get("Errors.InvalidLink");
             return Strings.Get("Errors.DownloadOperation");
         }
-        if (error is HttpRequestException or TaskCanceledException) return Strings.Get("Errors.Connection");
-        if (error is UnauthorizedAccessException) return Strings.Get("Errors.FileAccess");
-        if (error is FormatException or IOException or TimeoutException) return error.Message;
+        if (error is HttpRequestException or TaskCanceledException)
+            return Strings.Get("Errors.Connection");
+        if (error is UnauthorizedAccessException)
+            return Strings.Get("Errors.FileAccess");
+        if (error is FormatException or IOException or TimeoutException)
+            return error.Message;
         return Strings.Get("Errors.Operation");
     }
 }

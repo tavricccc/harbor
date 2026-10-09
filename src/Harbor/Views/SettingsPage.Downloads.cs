@@ -21,19 +21,25 @@ public sealed partial class SettingsPage
         folderRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         destination.Children.Remove(folder);
         destination.Children.Add(new TextBlock { Text = Strings.Get("Settings.DownloadFolder") });
-        folder.Header = null; folderRow.Children.Add(folder);
+        folder.Header = null;
+        folderRow.Children.Add(folder);
         var browse = NativeButtons.Create(Strings.Get("Common.Browse"), "\uE8B7");
         browse.Click += async (_, _) =>
         {
             try
             {
-                var picker = new FolderPicker(); picker.FileTypeFilter.Add("*");
+                var picker = new FolderPicker();
+                picker.FileTypeFilter.Add("*");
                 WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
-                var picked = await picker.PickSingleFolderAsync(); if (picked is not null) folder.Text = picked.Path;
+                var picked = await picker.PickSingleFolderAsync();
+                if (picked is not null)
+                    folder.Text = picked.Path;
             }
             catch (Exception error) { Report(error); }
         };
-        Grid.SetColumn(browse, 1); folderRow.Children.Add(browse); destination.Children.Add(folderRow);
+        Grid.SetColumn(browse, 1);
+        folderRow.Children.Add(browse);
+        destination.Children.Add(folderRow);
         var (connections, concurrency) = SettingsFields.Columns(panel);
         fields.Number(connections, Strings.Get("Settings.Connections"), "protocolConfig.http.connections", 8, 1, 256);
         fields.Number(concurrency, Strings.Get("Settings.Concurrent"), "maxRunning", 5, 1, 256);
@@ -58,10 +64,12 @@ public sealed partial class SettingsPage
             try
             {
                 var trackers = new List<string>();
-                var current = (await vm.Core.GetAsync("config"))!.AsObject(); mirrors.Save(current);
+                var current = (await vm.Core.GetAsync("config"))!.AsObject();
+                mirrors.Save(current);
                 foreach (var url in ConfigJson.Lines(subscriptions.Text))
                 {
-                    if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https")) throw new FormatException(Strings.Get("Errors.TrackerUrl"));
+                    if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https"))
+                        throw new FormatException(Strings.Get("Errors.TrackerUrl"));
                     trackers.AddRange(ConfigJson.Lines(await vm.Core.FetchTextAsync(GitHubMirror.Apply(url, current))));
                 }
                 var config = (await vm.Core.GetAsync("config"))!.AsObject();
@@ -69,7 +77,8 @@ public sealed partial class SettingsPage
                 ConfigJson.Set(config, "extra.bt.trackerSubscribeUrls", ConfigJson.Array(ConfigJson.Lines(subscriptions.Text)));
                 ConfigJson.Set(config, "extra.bt.lastTrackerUpdateTime", JsonValue.Create(DateTimeOffset.UtcNow.ToString("O")));
                 ConfigJson.Set(config, "protocolConfig.bt.trackers", ConfigJson.Array(trackers.Concat(ConfigJson.Lines(customTrackers.Text)).Distinct()));
-                await vm.Core.SendAsync(HttpMethod.Put, "config", config); Success(Strings.Format("Settings.TrackersUpdated", trackers.Distinct().Count()));
+                await vm.Core.SendAsync(HttpMethod.Put, "config", config);
+                Success(Strings.Format("Settings.TrackersUpdated", trackers.Distinct().Count()));
             }
             catch (Exception error) { Report(error); }
             finally { update.IsEnabled = true; }
@@ -80,7 +89,8 @@ public sealed partial class SettingsPage
         fields.Number(ratio, Strings.Get("Settings.SeedRatio"), "protocolConfig.bt.seedRatio", 0, 0, 10000, fractional: true);
         fields.Number(seedTime, Strings.Get("Settings.SeedTime"), "protocolConfig.bt.seedTime", 0, 0, 100000000, 60);
         var defaults = NativeButtons.Create(Strings.Get("Settings.DefaultTorrentApp"), "\uE713");
-        defaults.Click += (_, _) => WindowsIntegration.OpenDefaultApps(); bt.Children.Add(defaults);
+        defaults.Click += (_, _) => WindowsIntegration.OpenDefaultApps();
+        bt.Children.Add(defaults);
 
         var ed2k = SettingsFields.Advanced(panel, Strings.Get("Settings.Ed2k"));
         var (tcp, udp) = SettingsFields.Columns(ed2k);
@@ -96,7 +106,9 @@ public sealed partial class SettingsPage
         var panel = Section(Strings.Get("Settings.Interface"));
         panel.Children.Add(language);
         panel.Children.Add(SettingsFields.Description(Strings.Get("Settings.LanguageHint")));
-        panel.Children.Add(theme); panel.Children.Add(startup); panel.Children.Add(closeProgress);
+        panel.Children.Add(theme);
+        panel.Children.Add(startup);
+        panel.Children.Add(closeProgress);
         fields.Toggle(panel, Strings.Get("Settings.Notifications"), "extra.desktopNotification", true);
         var archive = SettingsFields.Group(panel, Strings.Get("Settings.ArchivesTorrent"));
         fields.Toggle(archive, Strings.Get("Settings.ExtractAfter"), "archive.autoExtract");

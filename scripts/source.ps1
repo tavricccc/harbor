@@ -27,13 +27,13 @@ try {
         Copy-Item -LiteralPath (Join-Path $repo $file) -Destination (Join-Path $source $file) -Force
     }
     $revision = git -C $repo rev-parse HEAD
-    [IO.File]::WriteAllText((Join-Path $source 'SOURCE-REVISION.txt'), "Harbor: $revision`nGopeed release: $($upstream.Release)`nGo module: $($upstream.Version)`nModule checksum: $($upstream.Sum)`n")
+    [IO.File]::WriteAllText((Join-Path $source 'SOURCE-REVISION.txt'), "Harbor: $revision`nGopeed source: $($upstream.Release)`nGo module: $($upstream.Version)`nModule checksum: $($upstream.Sum)`n")
     Compress-Archive -Path (Join-Path $source '*') -DestinationPath $output -Force
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $archive = [IO.Compression.ZipFile]::OpenRead($output)
     try {
         $names = @($archive.Entries.FullName | ForEach-Object { $_.Replace('\','/') })
-        foreach ($required in @('.github/workflows/windows.yml','core/cmd/browser-host/main.go','core/upstream.json','scripts/update-core.ps1','scripts/installer.iss','third_party/gopeed/LICENSE','third_party/gopeed/go.mod','SOURCE-REVISION.txt')) {
+        foreach ($required in @('.github/workflows/windows.yml','go.mod','go.sum','localization/languages.json','localization/en-US.json','localization/zh-TW.json','localization/zh-CN.json','core/cmd/browser-host/main.go','core/upstream.json','scripts/update-core.ps1','scripts/installer.iss','third_party/gopeed/LICENSE','third_party/gopeed/go.mod','SOURCE-REVISION.txt')) {
             if ($names -notcontains $required) { throw "Missing source: $required" }
         }
         if ($names | Where-Object { $_ -match '(^|/)(bin|obj|work|artifacts|\.git)/|\.(db|pfx)$' }) { throw 'Generated or private files found in source archive' }

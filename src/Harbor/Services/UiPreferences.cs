@@ -14,7 +14,10 @@ public sealed class UiPreferences
     public List<string> RecentLinks { get; set; } = [];
     public string PendingUpdateTaskId { get; set; } = "";
     public bool KeepFilesOnRemove { get; set; } = true;
-    public bool BrowserSetupHintDismissed { get; set; }
+    public bool BrowserSetupHintDismissed
+    {
+        get; set;
+    }
     private static string FilePath => Path.Combine(CoreClient.DataDirectory, "preferences.json");
     public static UiPreferences Load() => File.Exists(FilePath)
         ? JsonSerializer.Deserialize<UiPreferences>(File.ReadAllText(FilePath))!
