@@ -3,6 +3,8 @@ param([switch]$SkipBuild)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 if (!$SkipBuild) { & (Join-Path $PSScriptRoot 'build.ps1') }
+. (Join-Path $PSScriptRoot 'localization.ps1')
+Write-InstallerLocalization $repo
 $project = [xml][IO.File]::ReadAllText((Join-Path $repo 'src/Harbor/Harbor.csproj'))
 $version = @($project.Project.PropertyGroup.Version | Where-Object { $_ })[0]
 $payload = Join-Path $repo 'artifacts/app'

@@ -24,36 +24,7 @@ CloseApplications=yes
 RestartApplications=no
 LicenseFile=..\artifacts\app\LICENSE-Gopeed.txt
 
-[Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "zhTW"; MessagesFile: "languages\ChineseTraditional.isl"
-Name: "zhCN"; MessagesFile: "languages\ChineseSimplified.isl"
-
-[CustomMessages]
-en.DesktopIcon=Create a desktop shortcut
-zhTW.DesktopIcon=建立桌面捷徑
-zhCN.DesktopIcon=创建桌面快捷方式
-en.LaunchHarbor=Open Harbor
-zhTW.LaunchHarbor=開啟 Harbor
-zhCN.LaunchHarbor=打开 Harbor
-en.RegistrationMissing=Harbor browser integration was not registered: %1
-zhTW.RegistrationMissing=Harbor 瀏覽器接管註冊未完成：%1
-zhCN.RegistrationMissing=Harbor 浏览器接管注册未完成：%1
-en.RegistrationOutdated=Browser integration still points to an old manifest: %1
-zhTW.RegistrationOutdated=瀏覽器接管仍指向舊的設定檔：%1
-zhCN.RegistrationOutdated=浏览器接管仍指向旧的配置文件：%1
-en.ManifestMissing=The Harbor browser integration manifest is missing.
-zhTW.ManifestMissing=Harbor 瀏覽器接管設定檔不存在。
-zhCN.ManifestMissing=Harbor 浏览器接管配置文件不存在。
-en.RegistrationLaunchFailed=Unable to start Harbor to register browser integration.
-zhTW.RegistrationLaunchFailed=無法啟動 Harbor 完成瀏覽器接管註冊。
-zhCN.RegistrationLaunchFailed=无法启动 Harbor 完成浏览器接管注册。
-en.RegistrationFailed=Harbor browser integration registration failed. Code: %1
-zhTW.RegistrationFailed=Harbor 瀏覽器接管註冊失敗，代碼：%1
-zhCN.RegistrationFailed=Harbor 浏览器接管注册失败，代码：%1
-en.CleanupFailed=Unable to remove an old Harbor file. Close Harbor and its browser integration, then retry: %1
-zhTW.CleanupFailed=無法移除 Harbor 舊檔案。請關閉 Harbor 與瀏覽器接管後重試：%1
-zhCN.CleanupFailed=无法移除 Harbor 旧文件。请关闭 Harbor 与浏览器接管后重试：%1
+#include "..\artifacts\installer-localization.iss"
 
 [Files]
 Source: "..\artifacts\app\installed-files.txt"; Flags: dontcopy

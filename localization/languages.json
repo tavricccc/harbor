@@ -1,5 +1,5 @@
 [
-  { "id": "zh-TW", "name": "繁體中文" },
-  { "id": "en-US", "name": "English" },
-  { "id": "zh-CN", "name": "简体中文" }
+  { "id": "zh-TW", "name": "繁體中文", "installerId": "zhTW", "installerMessages": "languages\\ChineseTraditional.isl" },
+  { "id": "en-US", "name": "English", "installerId": "en", "installerMessages": "compiler:Default.isl" },
+  { "id": "zh-CN", "name": "简体中文", "installerId": "zhCN", "installerMessages": "languages\\ChineseSimplified.isl" }
 ]
