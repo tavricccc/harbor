@@ -5,7 +5,8 @@ namespace Harbor.Localization;
 
 public static class Strings
 {
-    public static IReadOnlyList<string> SupportedLanguages { get; } = ["en-US", "zh-TW", "zh-CN"];
+    public static IReadOnlyList<LanguageOption> Languages { get; } = ReadResource<LanguageOption[]>("languages");
+    public static IReadOnlyList<string> SupportedLanguages { get; } = Languages.Select(language => language.Id).ToArray();
     public static string Language { get; private set; } = "en-US";
     private static Dictionary<string, string> catalog = Load(Language);
 
@@ -43,8 +44,11 @@ public static class Strings
     public static string Format(string key, params object?[] arguments) => string.Format(CultureInfo.CurrentCulture, Get(key), arguments);
 
     private static Dictionary<string, string> Load(string language)
+        => ReadResource<Dictionary<string, string>>(language);
+
+    private static T ReadResource<T>(string name)
     {
-        using var stream = typeof(Strings).Assembly.GetManifestResourceStream($"Harbor.Localization.{language}.json")!;
-        return JsonSerializer.Deserialize<Dictionary<string, string>>(stream)!;
+        using var stream = typeof(Strings).Assembly.GetManifestResourceStream($"Harbor.Localization.{name}.json")!;
+        return JsonSerializer.Deserialize<T>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
     }
 }

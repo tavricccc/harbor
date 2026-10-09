@@ -23,8 +23,8 @@ try {
     Copy-Item -Path (Join-Path $upstream.Directory '*') -Destination $vendor -Recurse -Force
     # workflow_dispatch can update the dependency before packaging. Include the
     # tested module state even when it differs from the checked-out Git revision.
-    foreach ($file in @('go.mod', 'go.sum', 'upstream.json')) {
-        Copy-Item -LiteralPath (Join-Path $repo "core/$file") -Destination (Join-Path $source "core/$file") -Force
+    foreach ($file in @('go.mod', 'go.sum', 'core/upstream.json')) {
+        Copy-Item -LiteralPath (Join-Path $repo $file) -Destination (Join-Path $source $file) -Force
     }
     $revision = git -C $repo rev-parse HEAD
     [IO.File]::WriteAllText((Join-Path $source 'SOURCE-REVISION.txt'), "Harbor: $revision`nGopeed release: $($upstream.Release)`nGo module: $($upstream.Version)`nModule checksum: $($upstream.Sum)`n")

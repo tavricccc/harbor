@@ -1,7 +1,7 @@
 # Shared source and version information for build/package scripts.
 function Get-GopeedModule {
     param([string]$Repository)
-    Push-Location (Join-Path $Repository 'core')
+    Push-Location $Repository
     try {
         $module = go list -m -json github.com/GopeedLab/gopeed | ConvertFrom-Json
         if ($LASTEXITCODE) { throw 'Cannot resolve the Gopeed module' }

@@ -1,7 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
-$catalog = [IO.File]::ReadAllText((Join-Path $repo 'core/localization/en-US.json')) | ConvertFrom-Json -AsHashtable
+$catalog = [IO.File]::ReadAllText((Join-Path $repo 'localization/en-US.json')) | ConvertFrom-Json -AsHashtable
+$languages = [IO.File]::ReadAllText((Join-Path $repo 'localization/languages.json')) | ConvertFrom-Json
+foreach ($language in $languages) {
+    $translation = [IO.File]::ReadAllText((Join-Path $repo "localization/$($language.id).json")) | ConvertFrom-Json -AsHashtable
+    $difference = Compare-Object @($catalog.Keys | Sort-Object) @($translation.Keys | Sort-Object)
+    if ($difference) { throw "Translation keys differ: $($language.id)" }
+}
 $references = 0
 foreach ($file in @(git -C $repo ls-files 'src/Harbor/*.cs' 'src/Harbor/*.xaml' 'core/*.go')) {
     $source = [IO.File]::ReadAllText((Join-Path $repo $file))

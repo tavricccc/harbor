@@ -21,7 +21,7 @@ $refs = @(git ls-remote https://github.com/GopeedLab/gopeed.git "refs/tags/$tag"
 if ($LASTEXITCODE -or !$refs.Count) { throw "Cannot resolve Gopeed $tag" }
 $peeled = $refs | Where-Object { $_.EndsWith('^{}') } | Select-Object -First 1
 $revision = (($peeled ?? $refs[0]) -split '\s+')[0]
-Push-Location (Join-Path $repo 'core')
+Push-Location $repo
 try {
     go get "github.com/GopeedLab/gopeed@$revision"
     if ($LASTEXITCODE) { throw 'Gopeed dependency update failed' }

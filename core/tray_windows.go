@@ -6,7 +6,7 @@ import (
 	"sync"
 	"syscall"
 
-	"harbor/core/localization"
+	"harbor/localization"
 
 	"github.com/getlantern/systray"
 )

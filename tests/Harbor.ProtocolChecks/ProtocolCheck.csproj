@@ -8,7 +8,8 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <Compile Include="../../src/Harbor/Localization/Strings.cs" Link="Strings.cs" />
-    <EmbeddedResource Include="../../core/localization/*.json" LogicalName="Harbor.Localization.%(Filename)%(Extension)" />
+    <Compile Include="../../src/Harbor/Localization/LanguageOption.cs" Link="LanguageOption.cs" />
+    <EmbeddedResource Include="../../localization/*.json" LogicalName="Harbor.Localization.%(Filename)%(Extension)" />
     <Compile Include="../../src/Harbor/Services/GopeedLink.cs" Link="GopeedLink.cs" />
     <Compile Include="../../src/Harbor/Services/HttpHeaders.cs" Link="HttpHeaders.cs" />
     <Compile Include="../../src/Harbor/Services/UserError.cs" Link="UserError.cs" />

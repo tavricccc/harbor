@@ -1,4 +1,4 @@
-module harbor/core
+module harbor
 
 go 1.25.4
 

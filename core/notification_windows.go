@@ -2,7 +2,7 @@ package main
 
 import (
 	"golang.org/x/sys/windows"
-	"harbor/core/localization"
+	"harbor/localization"
 	"os"
 	"unicode/utf16"
 	"unsafe"

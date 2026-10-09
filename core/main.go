@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"harbor/core/localization"
+	"harbor/localization"
 
 	"github.com/GopeedLab/gopeed/pkg/rest"
 	"github.com/GopeedLab/gopeed/pkg/rest/model"
