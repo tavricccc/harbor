@@ -95,7 +95,7 @@ var
   Files, Directories: TArrayOfString;
 begin
   // Delete owned metadata, never a user's selected download directory.
-  Files := ['api-token', 'session.json', 'session.json.tmp', 'preferences.json', 'preferences.json.tmp',
+  Files := ['api-token', 'session.json', 'session.json.tmp', 'preferences.json', 'preferences.json.tmp', 'theme.txt',
     'deferred-downloads.json', 'deferred-downloads.json.tmp', 'gopeed.db', '.torrent.bolt.db',
     'browser-host.json', 'browser-host-firefox.json', 'browser-integration-backup.json', 'frontend-error.log'];
   Directories := ['logs', 'pending-downloads', 'extensions', 'webview', 'legacy-migration'];
