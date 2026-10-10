@@ -5,7 +5,6 @@ using Harbor.Services;
 using Harbor.ViewModels;
 using System.Net.Http;
 using System.Text.Json.Nodes;
-using Windows.Storage.Pickers;
 
 namespace Harbor.Views;
 
@@ -45,7 +44,17 @@ public sealed partial class ExtensionsPage : Page
         install.Click += async (_, _) => await Install(url.Text.Trim(), install);
         actions.Children.Add(install);
         var local = new Button { Content = Strings.Get("Extensions.ChooseFolder") };
-        local.Click += async (_, _) => { var picker = new FolderPicker(); picker.FileTypeFilter.Add("*"); WinRT.Interop.InitializeWithWindow.Initialize(picker, App.WindowHandle); var picked = await picker.PickSingleFolderAsync(); if (picked is not null) await Install(picked.Path, local); };
+        local.Click += async (_, _) =>
+        {
+            local.IsEnabled = false;
+            try
+            {
+                if (await NativePickers.FolderAsync(App.WindowHandle) is { } path)
+                    await Install(path, local);
+            }
+            catch (Exception error) { Error(error); }
+            finally { local.IsEnabled = true; }
+        };
         actions.Children.Add(local);
         installPanel.Children.Add(actions);
         panel.Children.Insert(2, new Expander { Header = Strings.Get("Extensions.OtherSource"), IsExpanded = repository is not null, Content = installPanel, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch });

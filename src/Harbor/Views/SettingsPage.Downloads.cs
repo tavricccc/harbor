@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Controls;
 using Harbor.Services;
 using System.Net.Http;
 using System.Text.Json.Nodes;
-using Windows.Storage.Pickers;
 
 namespace Harbor.Views;
 
@@ -26,16 +25,14 @@ public sealed partial class SettingsPage
         var browse = NativeButtons.Create(Strings.Get("Common.Browse"), "\uE8B7");
         browse.Click += async (_, _) =>
         {
+            browse.IsEnabled = false;
             try
             {
-                var picker = new FolderPicker();
-                picker.FileTypeFilter.Add("*");
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
-                var picked = await picker.PickSingleFolderAsync();
-                if (picked is not null)
-                    folder.Text = picked.Path;
+                if (await NativePickers.FolderAsync(windowHandle, folder.Text) is { } path)
+                    folder.Text = path;
             }
             catch (Exception error) { Report(error); }
+            finally { browse.IsEnabled = true; }
         };
         Grid.SetColumn(browse, 1);
         folderRow.Children.Add(browse);

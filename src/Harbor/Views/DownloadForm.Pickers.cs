@@ -5,7 +5,6 @@ using Harbor.Services;
 using Harbor.Models;
 using System.Net.Http;
 using System.Text.Json.Nodes;
-using Windows.Storage.Pickers;
 
 namespace Harbor.Views;
 
@@ -13,21 +12,28 @@ public sealed partial class DownloadForm
 {
     private async void PickFolder(object s, RoutedEventArgs e)
     {
-        var picker = new FolderPicker();
-        picker.FileTypeFilter.Add("*");
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, owner);
-        var folder = await picker.PickSingleFolderAsync();
-        if (folder is not null)
-            Destination.Text = folder.Path;
+        var button = (Button)s;
+        button.IsEnabled = false;
+        try
+        {
+            if (await NativePickers.FolderAsync(owner, Destination.Text) is { } path)
+                Destination.Text = path;
+        }
+        catch (Exception error) { ShowError(error); }
+        finally { button.IsEnabled = true; }
     }
     private async void PickTorrent(object s, RoutedEventArgs e)
     {
-        var picker = new FileOpenPicker();
-        picker.FileTypeFilter.Add(".torrent");
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, owner);
-        var files = await picker.PickMultipleFilesAsync();
-        if (files.Count > 0)
-            Links.Text = string.Join("\n", files.Select(file => file.Path));
+        var button = (Button)s;
+        button.IsEnabled = false;
+        try
+        {
+            var files = await NativePickers.TorrentsAsync(owner);
+            if (files.Length > 0)
+                Links.Text = string.Join("\n", files);
+        }
+        catch (Exception error) { ShowError(error); }
+        finally { button.IsEnabled = true; }
     }
     private IEnumerable<string> linksForHistory() => ConfigJson.Lines(Links.Text).Where(x => !x.StartsWith("data:", StringComparison.OrdinalIgnoreCase));
     private void SelectAllFiles(object sender, RoutedEventArgs e) => Files.SelectAll();

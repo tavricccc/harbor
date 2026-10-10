@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Automation;
 using System.Text.Json.Nodes;
 using Harbor.Services;
-using Windows.Storage.Pickers;
 
 namespace Harbor.Views;
 
@@ -62,16 +61,14 @@ internal sealed class CategoriesEditor : StackPanel
         var browse = NativeButtons.Create(Strings.Get("Common.Browse"), "\uE8B7");
         browse.Click += async (_, _) =>
         {
+            browse.IsEnabled = false;
             try
             {
-                var picker = new FolderPicker();
-                picker.FileTypeFilter.Add("*");
-                WinRT.Interop.InitializeWithWindow.Initialize(picker, windowHandle);
-                var folder = await picker.PickSingleFolderAsync();
-                if (folder is not null)
-                    path.Text = folder.Path;
+                if (await NativePickers.FolderAsync(windowHandle, path.Text) is { } folder)
+                    path.Text = folder;
             }
             catch (Exception error) { message.Message = UserError.Message(error); message.IsOpen = true; }
+            finally { browse.IsEnabled = true; }
         };
         Grid.SetColumn(browse, 1);
         folderRow.Children.Add(browse);
