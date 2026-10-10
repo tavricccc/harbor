@@ -52,3 +52,11 @@ pwsh -File scripts/check-localization.ps1
 ## 本機資料
 
 程式資料位於 `%LOCALAPPDATA%\Harbor`。手動測試可用 `HARBOR_DATA_DIRECTORY` 指定獨立目錄，並在 `preferences.json` 設定不同的 `ApiPort`。Token、Cookie、使用者資料與簽章私鑰不得提交到 Git。介面變更以真正的 WinUI 畫面檢查，建置成功不等於外觀已驗收。
+
+修改瀏覽器啟動流程後，先建置，再執行本機整合測試：
+
+```powershell
+dotnet run --project tests/Harbor.ActivationChecks -c Release -- "$PWD/artifacts/app"
+```
+
+在測試視窗點「Run activation checks」，會透過官方 Native Messaging 格式檢查首次開啟、既有實例轉交與 forwarded POST 的確認視窗，驗證可見、置頂與鍵盤焦點，結束後關閉測試程序。不會開始下載或變更瀏覽器註冊。非互動桌面可加上 `--background`，只驗證可見與置頂；此模式不驗證鍵盤焦點。真正的瀏覽器擴充套件點擊須另做互動驗收。

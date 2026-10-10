@@ -13,8 +13,16 @@ import (
 
 func TestOfficialExtensionContract(t *testing.T) {
 	original := dataDir
+	originalGrant := grantForeground
 	dataDir = t.TempDir()
-	defer func() { dataDir = original }()
+	grants := 0
+	grantForeground = func(pid int) {
+		if pid != 12345 {
+			t.Errorf("foreground permission sent to wrong engine: %d", pid)
+		}
+		grants++
+	}
+	defer func() { dataDir = original; grantForeground = originalGrant }()
 	created := false
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-Api-Token") != "fixture-token" {
@@ -25,6 +33,9 @@ func TestOfficialExtensionContract(t *testing.T) {
 		}
 		switch r.URL.Path {
 		case "/api/v1/tasks":
+			if grants == 0 {
+				t.Error("download handoff preceded foreground permission")
+			}
 			var payload struct {
 				Req struct {
 					URL   string
@@ -47,7 +58,7 @@ func TestOfficialExtensionContract(t *testing.T) {
 		w.Write([]byte(`{"code":0,"data":[]}`))
 	}))
 	defer server.Close()
-	state, _ := json.Marshal(session{Port: server.Listener.Addr().(*net.TCPAddr).Port, Token: "fixture-token"})
+	state, _ := json.Marshal(session{Port: server.Listener.Addr().(*net.TCPAddr).Port, Token: "fixture-token", PID: 12345})
 	if err := os.WriteFile(filepath.Join(dataDir, "session.json"), state, 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -64,6 +75,13 @@ func TestOfficialExtensionContract(t *testing.T) {
 	}
 	if _, err := handle(message{Method: "forward", Params: json.RawMessage(`{"path":"/api/v1/tasks/pause","method":"PUT","query":{"id":["first","second"]}}`)}); err != nil {
 		t.Fatal(err)
+	}
+	if grants != 1 {
+		t.Fatal("non-creation requests must not change foreground permission")
+	}
+	forward, _ := json.Marshal(map[string]any{"path": "/api/v1/tasks", "method": "POST", "query": map[string]string{"source": "browser"}, "data": json.RawMessage(payload)})
+	if _, err := handle(message{Method: "forward", Params: forward}); err != nil || grants != 2 {
+		t.Fatalf("forwarded task with query did not relay foreground permission: %v", err)
 	}
 	if _, err := handle(message{Method: "forward", Params: json.RawMessage(`{"path":"https://example.com"}`)}); err == nil {
 		t.Fatal("external forwarding accepted")

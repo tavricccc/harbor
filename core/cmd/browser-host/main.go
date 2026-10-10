@@ -36,6 +36,7 @@ type session struct {
 
 var client = &http.Client{Timeout: 60 * time.Second}
 var dataDir = filepath.Join(os.Getenv("LOCALAPPDATA"), "Harbor")
+var grantForeground = foreground.Allow
 
 func init() {
 	if root := os.Getenv("HARBOR_DATA_DIRECTORY"); root != "" {
@@ -60,7 +61,7 @@ func request(state *session, method, route string, body []byte) ([]byte, error) 
 		return nil, err
 	}
 	if req.Method == http.MethodPost && req.URL.Path == "/api/v1/tasks" {
-		foreground.Allow(state.PID)
+		grantForeground(state.PID)
 	}
 	req.Header.Set("X-Api-Token", state.Token)
 	req.Header.Set("Content-Type", "application/json")
@@ -132,7 +133,7 @@ func handle(m message) (any, error) {
 			if err = command.Start(); err != nil {
 				return nil, err
 			}
-			foreground.Allow(command.Process.Pid)
+			grantForeground(command.Process.Pid)
 			command.Process.Release()
 		}
 		return nil, nil

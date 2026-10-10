@@ -52,3 +52,11 @@ pwsh -File scripts/check-localization.ps1
 ## Local data
 
 Application data is stored in `%LOCALAPPDATA%\Harbor`. Use `HARBOR_DATA_DIRECTORY` and a separate `ApiPort` in `preferences.json` for isolated manual runs. Keep tokens, cookies, user data and signing keys out of Git. Validate native UI changes with actual WinUI captures; build success alone does not establish visual correctness.
+
+For browser activation changes, run this local integration check after building:
+
+```powershell
+dotnet run --project tests/Harbor.ActivationChecks -c Release -- "$PWD/artifacts/app"
+```
+
+Click **Run activation checks** in the test window. It uses the official Native Messaging protocol to check a new confirmation, redirection to an existing instance and a forwarded task request, then closes its isolated processes. It checks visibility, topmost state and keyboard foreground without starting downloads or changing browser registration. Add `--background` on a noninteractive desktop to check visibility and topmost state only; that mode does not verify keyboard foreground. Actual browser-extension clicks require a separate interactive check.
