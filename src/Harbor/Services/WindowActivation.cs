@@ -11,13 +11,24 @@ internal static class WindowActivation
     internal static void ShowConfirmation(Window window)
     {
         window.AppWindow.Show(true);
+        KeepAbove(window);
         window.Activate();
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
-        // Apply Z-order after WinUI shows the HWND. Keep confirmation above the
-        // browser even when Windows declines keyboard-focus transfer.
-        SetWindowPos(hwnd, new nint(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0040);
-        SetForegroundWindow(hwnd);
+        // Activation and Z-order are separate operations. A refused foreground
+        // activation must not prevent the confirmation from becoming topmost.
+        var activated = SetForegroundWindow(hwnd);
+        KeepAbove(window);
+        if (!activated)
+        {
+            Directory.CreateDirectory(CoreClient.DataDirectory);
+            File.AppendAllText(Path.Combine(CoreClient.DataDirectory, "activation.log"),
+                $"{DateTimeOffset.Now:O} foreground-denied hwnd={hwnd} foreground={GetForegroundWindow()}\n");
+        }
     }
+
+    internal static void KeepAbove(Window window) => SetWindowPos(
+        WinRT.Interop.WindowNative.GetWindowHandle(window), new nint(-1), 0, 0, 0, 0,
+        0x0001 | 0x0002 | 0x0010); // NOSIZE | NOMOVE | NOACTIVATE
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -26,6 +37,9 @@ internal static class WindowActivation
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetForegroundWindow(nint hwnd);
+
+    [DllImport("user32.dll")]
+    private static extern nint GetForegroundWindow();
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

@@ -13,6 +13,7 @@ public sealed class DownloadWindow : Window
     private readonly CoreClient core = new();
     private readonly JsonObject request;
     private readonly bool compact;
+    private readonly ConfirmationTopmost confirmationTopmost;
     private bool closed;
     private DownloadProgressPage? progress;
     public string? TaskId
@@ -47,7 +48,8 @@ public sealed class DownloadWindow : Window
             presenter.IsMinimizable = false;
             presenter.IsAlwaysOnTop = true;
         }
-        Closed += (_, _) => { closed = true; progress?.Stop(); core.Dispose(); };
+        confirmationTopmost = new ConfirmationTopmost(this);
+        Closed += (_, _) => { closed = true; confirmationTopmost.Dispose(); progress?.Stop(); core.Dispose(); };
         Activated += (_, _) => progress?.UpdatePollingVisibility();
         AppWindow.Changed += (_, args) => { if (args.DidVisibilityChange || args.DidPresenterChange) progress?.UpdatePollingVisibility(); };
         surface.Loaded += Confirm;
@@ -56,6 +58,7 @@ public sealed class DownloadWindow : Window
     public DownloadWindow(string taskId) : this(new JsonObject(), compact: false)
     {
         TaskId = taskId;
+        confirmationTopmost.Dispose();
         Title = Strings.Get("Downloads.Progress");
         if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
         {
@@ -145,6 +148,7 @@ public sealed class DownloadWindow : Window
 
     private void ShowProgress(string id)
     {
+        confirmationTopmost.Dispose();
         TaskId = id;
         Title = Strings.Get("Downloads.Progress");
         pageHost.Children.Clear();
@@ -194,6 +198,7 @@ public sealed class DownloadWindow : Window
             AppWindow.Move(position);
             if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter fixedPresenter)
                 fixedPresenter.IsResizable = false;
+            confirmationTopmost.Refresh();
         });
     }
 
