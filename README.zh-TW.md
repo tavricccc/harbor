@@ -6,11 +6,11 @@
 
 ## 下載
 
-[Harbor 0.10.1 Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.10.1) 預覽版。
+[Harbor 0.10.2 Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.10.2) 預覽版。
 
-- [安裝器](https://github.com/tavricccc/harbor/releases/download/v0.10.1/Harbor-Setup-0.10.1-x64.exe)
-- [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.10.1/Harbor-Source-0.10.1.zip)
-- [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.10.1/SHA256SUMS.txt)
+- [安裝器](https://github.com/tavricccc/harbor/releases/download/v0.10.2/Harbor-Setup-0.10.2-x64.exe)
+- [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.10.2/Harbor-Source-0.10.2.zip)
+- [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.10.2/SHA256SUMS.txt)
 
 支援 Windows 10 1809 以上，建議使用 Windows 11。安裝器包含執行環境，安裝到使用者目錄；升級會保留下載與設定。
 

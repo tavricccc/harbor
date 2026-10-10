@@ -2,6 +2,13 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.10.2 — 2026-10-11
+
+- Keep download confirmations topmost through native frame changes, resizing and activation changes; release topmost when downloading starts or the confirmation closes.
+- Separate topmost placement from foreground activation so a refused activation does not block placement. Record refused activation in `activation.log` without download URLs or headers.
+- Replace legacy Browse/Torrent pickers with owned Windows App SDK desktop pickers, including settings, category folders and extension folders. Start Browse at the current destination, handle cancellation/errors, and prevent repeated clicks while the picker is open.
+- Extend native checks to cover foreground activation, forced Z-order demotion, folder selection/cancellation, starting a download and closing confirmations. The previous 0.10.1 build fails the demotion regression; this build passes.
+
 ## 0.10.1 — 2026-10-10
 
 - Pass foreground permission from the browser host through the background engine to the download confirmation, including activation of an existing Harbor instance.
