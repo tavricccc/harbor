@@ -1,4 +1,8 @@
 using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json.Nodes;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -38,7 +42,7 @@ internal static class Program
             finally { fixture.Close(); }
         }
         run.Click += async (_, _) => await Run();
-        if (background) fixture.Shown += async (_, _) => await Run();
+        if (background || args.Contains("--auto")) fixture.Shown += async (_, _) => await Run();
         try { Application.Run(fixture); }
         finally
         {
@@ -75,6 +79,15 @@ internal static class Program
             if (core.HasExited || DateTime.UtcNow > deadline) throw new Exception("Engine failed to start");
             await Task.Delay(100);
         }
+        var state = JsonNode.Parse(File.ReadAllText(Path.Combine(profile, "session.json")))!;
+        using var api = new HttpClient { BaseAddress = new Uri($"http://127.0.0.1:{state["port"]}/api/v1/") };
+        api.DefaultRequestHeaders.Add("X-Api-Token", state["token"]!.GetValue<string>());
+        var config = JsonNode.Parse(await api.GetStringAsync("config"))!["data"]!;
+        config["extra"] ??= new JsonObject();
+        config["extra"]!["defaultDirectDownload"] = true;
+        (await api.PutAsJsonAsync("config", config)).EnsureSuccessStatusCode();
+        var destination = Path.Combine(profile, "picked-folder");
+        Directory.CreateDirectory(destination);
         fixture.Activate();
         await Task.Delay(100);
         if (!background && GetForegroundWindow() != fixture.Handle) throw new Exception("Test fixture must own foreground before host launch");
@@ -83,9 +96,11 @@ internal static class Program
         foreach (var mode in new[] { "cold create", "warm create", "forward POST" })
         {
             fixture.Activate();
+            if (!background)
+                await Task.Run(() => System.Windows.Automation.AutomationElement.FromHandle(fixture.Handle).SetFocus());
             await Task.Delay(100);
             if (!background && GetForegroundWindow() != fixture.Handle) throw new Exception("Foreground fixture lost focus before " + mode);
-            var payload = new { req = new { url = "http://127.0.0.1:9/harbor-activation-test.zip" } };
+            var payload = new { req = new { url = "http://127.0.0.1:9/harbor-activation-test.zip" }, opts = new { path = destination } };
             object message = mode == "forward POST"
                 ? new { method = "forward", @params = (object)new { path = "/api/v1/tasks?source=activation-check", method = "POST", data = payload } }
                 : new { method = "create", @params = (object)Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(payload)) };
@@ -120,9 +135,15 @@ internal static class Program
             bool foreground = GetForegroundWindow() == confirmation;
             Console.WriteLine($"{mode}: visible={IsWindowVisible(confirmation)}, topmost={topmost}, foreground={foreground}");
             if (!topmost || (!background && !foreground)) throw new Exception(mode + ": confirmation did not retain the required window state");
+            SetWindowPos(confirmation, new nint(-2), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
+            await Task.Delay(100);
+            if ((GetWindowLongPtr(confirmation, -20).ToInt64() & 8) == 0)
+                throw new Exception(mode + ": native frame change removed confirmation topmost state");
         }
         var pending = Directory.GetFiles(Path.Combine(profile, "pending-downloads"), "*.json").Length;
         if (pending != 0) throw new Exception("Activation left unconsumed requests");
+        await DialogChecks.Run(seen.Last(), profile);
+        await DialogChecks.CancelConfirmation(seen.First());
         Console.WriteLine("PASS: cold launch, existing-instance redirection, forwarded task request; all requests consumed."
             + (background ? " Background mode: keyboard foreground was measured but not asserted." : " Keyboard foreground verified."));
     }
@@ -131,6 +152,7 @@ internal static class Program
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(nint hwnd);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern nint GetWindowLongPtr(nint hwnd, int index);
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(nint hwnd, out uint pid);
+    [DllImport("user32.dll")] private static extern bool SetWindowPos(nint hwnd, nint after, int x, int y, int width, int height, uint flags);
     private delegate bool EnumWindow(nint hwnd, nint parameter);
     [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindow callback, nint parameter);
 }
