@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"harbor/core/internal/foreground"
+
 	"github.com/GopeedLab/gopeed/pkg/rest/model"
 )
 
@@ -60,6 +62,7 @@ func openDownloadRequest(root, ui string, body []byte) (string, error) {
 		os.Remove(path)
 		return "", err
 	}
+	foreground.Allow(command.Process.Pid)
 	go command.Wait()
 	return id, nil
 }

@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"harbor/core/internal/foreground"
 )
 
 type message struct {
@@ -29,10 +31,17 @@ type response struct {
 type session struct {
 	Port  int    `json:"port"`
 	Token string `json:"token"`
+	PID   int    `json:"pid"`
 }
 
 var client = &http.Client{Timeout: 60 * time.Second}
 var dataDir = filepath.Join(os.Getenv("LOCALAPPDATA"), "Harbor")
+
+func init() {
+	if root := os.Getenv("HARBOR_DATA_DIRECTORY"); root != "" {
+		dataDir = root
+	}
+}
 
 func current() (*session, error) {
 	b, err := os.ReadFile(filepath.Join(dataDir, "session.json"))
@@ -49,6 +58,9 @@ func request(state *session, method, route string, body []byte) ([]byte, error) 
 	req, err := http.NewRequest(method, fmt.Sprintf("http://127.0.0.1:%d/api/v1/%s", state.Port, route), bytes.NewReader(body))
 	if err != nil {
 		return nil, err
+	}
+	if req.Method == http.MethodPost && req.URL.Path == "/api/v1/tasks" {
+		foreground.Allow(state.PID)
 	}
 	req.Header.Set("X-Api-Token", state.Token)
 	req.Header.Set("Content-Type", "application/json")
@@ -120,6 +132,7 @@ func handle(m message) (any, error) {
 			if err = command.Start(); err != nil {
 				return nil, err
 			}
+			foreground.Allow(command.Process.Pid)
 			command.Process.Release()
 		}
 		return nil, nil
