@@ -59,4 +59,4 @@ pwsh -File scripts/check-localization.ps1
 dotnet run --project tests/Harbor.ActivationChecks -c Release -- "$PWD/artifacts/app"
 ```
 
-在測試視窗點「Run activation checks」，會透過官方 Native Messaging 格式檢查首次開啟、既有實例轉交與 forwarded POST 的確認視窗，驗證可見、置頂與鍵盤焦點，結束後關閉測試程序。不會開始下載或變更瀏覽器註冊。非互動桌面可加上 `--background`，只驗證可見與置頂；此模式不驗證鍵盤焦點。真正的瀏覽器擴充套件點擊須另做互動驗收。
+在測試視窗點「Run activation checks」，或加上 `--auto` 在互動桌面自動執行。測試透過官方 Native Messaging 格式驗證前景、持續置頂與原生降層攔截，實際選取／取消具有擁有者的資料夾 picker，再建立並取消隔離的測試任務，確認開始下載後解除置頂。不變更瀏覽器註冊或使用個人下載資料。非互動桌面可加上 `--background`，略過鍵盤焦點斷言，仍執行其他生命週期檢查。真正的瀏覽器擴充套件點擊須另做互動驗收。前景啟用遭拒會記錄在該資料目錄的 `activation.log`，不含下載網址或標頭。
