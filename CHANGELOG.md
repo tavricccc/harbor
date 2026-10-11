@@ -2,6 +2,11 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.10.3 — 2026-10-11
+
+- Attach Esc and Ctrl+Enter to Cancel and Start so Browse and Schedule no longer inherit unrelated shortcut tooltips.
+- Show each HTTP connection's share of the whole file as a percentage and progress bar. Completed connections retain their share; unknown file sizes show transferred bytes.
+
 ## 0.10.2 — 2026-10-11
 
 - Keep download confirmations topmost through native frame changes, resizing and activation changes; release topmost when downloading starts or the confirmation closes.
