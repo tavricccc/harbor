@@ -26,8 +26,10 @@ internal static class WindowActivation
         }
     }
 
-    internal static void KeepAbove(Window window) => SetWindowPos(
-        WinRT.Interop.WindowNative.GetWindowHandle(window), new nint(-1), 0, 0, 0, 0,
+    internal static void KeepAbove(Window window) => SetTopmost(window, true);
+
+    internal static void SetTopmost(Window window, bool topmost) => SetWindowPos(
+        WinRT.Interop.WindowNative.GetWindowHandle(window), new nint(topmost ? -1 : -2), 0, 0, 0, 0,
         0x0001 | 0x0002 | 0x0010); // NOSIZE | NOMOVE | NOACTIVATE
 
     [DllImport("user32.dll")]

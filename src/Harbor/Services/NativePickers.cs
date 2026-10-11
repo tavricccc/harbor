@@ -7,6 +7,7 @@ internal static class NativePickers
 {
     internal static async Task<string?> FolderAsync(nint owner, string initialFolder = "")
     {
+        using var scope = ConfirmationTopmost.SuspendForPicker(owner);
         var picker = new FolderPicker(Microsoft.UI.Win32Interop.GetWindowIdFromWindow(owner))
         {
             CommitButtonText = Strings.Get("Common.ChooseFolder")
@@ -18,6 +19,7 @@ internal static class NativePickers
 
     internal static async Task<string[]> TorrentsAsync(nint owner)
     {
+        using var scope = ConfirmationTopmost.SuspendForPicker(owner);
         var picker = new FileOpenPicker(Microsoft.UI.Win32Interop.GetWindowIdFromWindow(owner));
         picker.FileTypeFilter.Add(".torrent");
         return (await picker.PickMultipleFilesAsync()).Select(file => file.Path).ToArray();

@@ -4,8 +4,9 @@ using System.Runtime.InteropServices;
 namespace Harbor.Services;
 
 // Owns the topmost policy for the confirmation phase, including native frame
-// changes made by WinUI while content loads, expands or opens an owned picker.
-internal sealed class ConfirmationTopmost : IDisposable
+// changes made by WinUI while content loads or expands. Native pickers temporarily
+// suspend this policy so their owner cannot compete with the modal dialog.
+internal sealed partial class ConfirmationTopmost : IDisposable
 {
     private readonly Window window;
     private readonly nint hwnd;
@@ -20,24 +21,25 @@ internal sealed class ConfirmationTopmost : IDisposable
         callback = WindowProcedure;
         if (!SetWindowSubclass(hwnd, callback, SubclassId, 0))
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        owners.Add(hwnd, this);
         window.Activated += OnActivated;
     }
 
     private void OnActivated(object sender, WindowActivatedEventArgs args)
     {
-        if (active && window.AppWindow.IsVisible)
+        if (IsEnforced && window.AppWindow.IsVisible)
             WindowActivation.KeepAbove(window);
     }
 
     internal void Refresh()
     {
-        if (active)
+        if (IsEnforced)
             WindowActivation.KeepAbove(window);
     }
 
     private nint WindowProcedure(nint handle, uint message, nuint wParam, nint lParam, nuint id, nuint data)
     {
-        if (active && message == 0x0046) // WM_WINDOWPOSCHANGING
+        if (IsEnforced && message == 0x0046) // WM_WINDOWPOSCHANGING
         {
             var position = Marshal.PtrToStructure<WindowPosition>(lParam);
             if ((position.Flags & 0x0004) == 0) // A native Z-order change.
@@ -54,6 +56,7 @@ internal sealed class ConfirmationTopmost : IDisposable
         if (!active)
             return;
         active = false;
+        owners.Remove(hwnd);
         window.Activated -= OnActivated;
         RemoveWindowSubclass(hwnd, callback, SubclassId);
     }
