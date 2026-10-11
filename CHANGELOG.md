@@ -2,6 +2,10 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.11.1 — 2026-10-11
+
+- Make Open folder follow the saved close-after-open checkbox, just like Open file. Leave the progress window open when unchecked; update the label in all three languages to describe both actions.
+
 ## 0.11.0 — 2026-10-11
 
 - Use shared .NET and Windows App Runtime; omit bundled runtimes, ReadyToRun code and installer debug symbols.
