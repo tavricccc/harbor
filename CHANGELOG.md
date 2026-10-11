@@ -2,7 +2,7 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
-## Unreleased
+## 0.11.0 — 2026-10-11
 
 - Use shared .NET and Windows App Runtime; omit bundled runtimes, ReadyToRun code and installer debug symbols.
 - Prompt for missing .NET before installation changes files, and for the matching Windows App Runtime at application startup. Register/unregister integrations without initializing WinUI.

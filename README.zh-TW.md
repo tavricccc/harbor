@@ -6,15 +6,13 @@
 
 ## 下載
 
-[Harbor 0.10.3 Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.10.3) 預覽版。
+[Harbor 0.11.0 Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.11.0) 預覽版。
 
-- [安裝器](https://github.com/tavricccc/harbor/releases/download/v0.10.3/Harbor-Setup-0.10.3-x64.exe)
-- [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.10.3/Harbor-Source-0.10.3.zip)
-- [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.10.3/SHA256SUMS.txt)
+- [安裝器](https://github.com/tavricccc/harbor/releases/download/v0.11.0/Harbor-Setup-0.11.0-x64.exe)
+- [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.11.0/Harbor-Source-0.11.0.zip)
+- [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.11.0/SHA256SUMS.txt)
 
-支援 Windows 10 1809 以上，建議使用 Windows 11。安裝器包含執行環境，安裝到使用者目錄；升級會保留下載與設定。
-
-目前原始碼建置改用共用的 .NET 10 Runtime（x64）與 Windows App Runtime。缺少 .NET 時，安裝器可開啟官方下載頁；缺少 Windows App Runtime 時，Harbor 啟動會提示安裝。目前已發布的 0.10.3 仍包含執行環境。
+支援 Windows 10 1809 以上，建議使用 Windows 11。需要共用的 [.NET 10 Runtime（x64）](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) 與 Windows App Runtime 2.5.1 以上。缺少 .NET 時，安裝器提供下載入口；缺少 Windows App Runtime 時，Harbor 啟動會提示安裝。安裝到使用者目錄，升級保留下載與設定。
 
 ## 功能
 

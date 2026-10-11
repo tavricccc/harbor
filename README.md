@@ -6,15 +6,13 @@ A native Windows download manager built with WinUI 3 and the official [Gopeed](h
 
 ## Download
 
-[Harbor 0.10.3 for Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.10.3) — preview release.
+[Harbor 0.11.0 for Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.11.0) — preview release.
 
-- [Installer](https://github.com/tavricccc/harbor/releases/download/v0.10.3/Harbor-Setup-0.10.3-x64.exe)
-- [Complete source](https://github.com/tavricccc/harbor/releases/download/v0.10.3/Harbor-Source-0.10.3.zip)
-- [SHA-256 checksums](https://github.com/tavricccc/harbor/releases/download/v0.10.3/SHA256SUMS.txt)
+- [Installer](https://github.com/tavricccc/harbor/releases/download/v0.11.0/Harbor-Setup-0.11.0-x64.exe)
+- [Complete source](https://github.com/tavricccc/harbor/releases/download/v0.11.0/Harbor-Source-0.11.0.zip)
+- [SHA-256 checksums](https://github.com/tavricccc/harbor/releases/download/v0.11.0/SHA256SUMS.txt)
 
-Windows 10 1809 or later; Windows 11 recommended. The per-user installer includes the runtime and upgrades existing installations. Downloads and settings are preserved during upgrades.
-
-Source builds now use shared .NET 10 Runtime (x64) and Windows App Runtime. The installer offers the .NET download page if it is missing; Harbor prompts for the matching Windows App Runtime at startup. The published 0.10.3 installer still bundles its runtimes.
+Windows 10 1809 or later; Windows 11 recommended. Requires shared [.NET 10 Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) and Windows App Runtime 2.5.1 or later. The installer offers the .NET download page if needed; Harbor prompts for the matching Windows App Runtime at startup. The per-user installer preserves downloads and settings during upgrades.
 
 ## Features
 
