@@ -2,6 +2,12 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## Unreleased
+
+- Use shared .NET and Windows App Runtime; omit bundled runtimes, ReadyToRun code and installer debug symbols.
+- Prompt for missing .NET before installation changes files, and for the matching Windows App Runtime at application startup. Register/unregister integrations without initializing WinUI.
+- Temporarily suspend confirmation topmost while Browse or Torrent pickers are open; restore it after selection, cancellation or failure.
+
 ## 0.10.3 — 2026-10-11
 
 - Attach Esc and Ctrl+Enter to Cancel and Start so Browse and Schedule no longer inherit unrelated shortcut tooltips.

@@ -14,6 +14,8 @@
 
 支援 Windows 10 1809 以上，建議使用 Windows 11。安裝器包含執行環境，安裝到使用者目錄；升級會保留下載與設定。
 
+目前原始碼建置改用共用的 .NET 10 Runtime（x64）與 Windows App Runtime。缺少 .NET 時，安裝器可開啟官方下載頁；缺少 Windows App Runtime 時，Harbor 啟動會提示安裝。目前已發布的 0.10.3 仍包含執行環境。
+
 ## 功能
 
 - HTTP／HTTPS 多連線下載、暫停續傳；BitTorrent、magnet 與 eD2k。

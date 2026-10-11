@@ -28,6 +28,10 @@ pwsh -File scripts/source.ps1
 
 產品版本在 `src/Harbor/Harbor.csproj` 與 `Package.appxmanifest`，更版時一起修改並更新紀錄。安裝器及原始碼包名稱從專案版本取得。
 
+發布版本使用共用 .NET 與 Windows App Runtime，停用 NativeAOT、裁剪與 ReadyToRun。語系、偏好設定及統計資料使用產生的 JSON 序列化程式碼。註冊／解除註冊整合會先於 Windows App Runtime 初始化執行，不需要 WinUI。缺少 .NET 時，安裝器在修改舊檔前提示補裝；缺少 Windows App Runtime 時，由 SDK 顯示下載提示。
+
+製作本機測試安裝器可用 `pwsh -File scripts/package.ps1 -SkipBuild -OutputDirectory artifacts/shared-runtime`，避免覆寫已發布版本的本機檔案。安裝器不包含 PDB 除錯符號。`Harbor.exe --check-dotnet` 檢查 .NET host，`Harbor.exe --check-runtime` 另檢查所需的 Windows App Runtime；兩者都不開啟介面或修改整合。
+
 ## 更新上游
 
 ```powershell

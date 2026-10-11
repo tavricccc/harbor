@@ -1,5 +1,5 @@
 #Requires -Version 7.0
-param([switch]$SkipBuild)
+param([switch]$SkipBuild, [string]$OutputDirectory)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 if (!$SkipBuild) { & (Join-Path $PSScriptRoot 'build.ps1') }
@@ -7,13 +7,18 @@ if (!$SkipBuild) { & (Join-Path $PSScriptRoot 'build.ps1') }
 Write-InstallerLocalization $repo
 $project = [xml][IO.File]::ReadAllText((Join-Path $repo 'src/Harbor/Harbor.csproj'))
 $version = @($project.Project.PropertyGroup.Version | Where-Object { $_ })[0]
+$targetFramework = @($project.Project.PropertyGroup.TargetFramework | Where-Object { $_ })[0]
+if ($targetFramework -notmatch '^net(\d+\.\d+)-windows') { throw 'Unsupported target framework' }
+$requiredDotNet = $Matches[1]
 $payload = Join-Path $repo 'artifacts/app'
 $manifest = Join-Path $payload 'installed-files.txt'
 $files = @(Get-ChildItem -LiteralPath $payload -File -Recurse | Where-Object { $_.FullName -ne $manifest } | ForEach-Object {
-    [IO.Path]::GetRelativePath($payload, $_.FullName).ToLowerInvariant()
+    if ($_.Extension -ne '.pdb') { [IO.Path]::GetRelativePath($payload, $_.FullName).ToLowerInvariant() }
 }) + 'installed-files.txt'
 [IO.File]::WriteAllLines($manifest, @($files | Sort-Object), [Text.UTF8Encoding]::new($false))
 $compiler = Join-Path $env:LOCALAPPDATA 'Programs/Inno Setup 6/ISCC.exe'
 if (!(Test-Path -LiteralPath $compiler)) { $compiler = (Get-Command ISCC.exe -ErrorAction Stop).Source }
-& $compiler /Q "/DAppVersion=$version" (Join-Path $PSScriptRoot 'installer.iss')
+$compilerArguments = @('/Q', "/DAppVersion=$version", "/DRequiredDotNet=$requiredDotNet")
+if ($OutputDirectory) { $compilerArguments += '/O' + [IO.Path]::GetFullPath($OutputDirectory) }
+& $compiler @compilerArguments (Join-Path $PSScriptRoot 'installer.iss')
 if ($LASTEXITCODE) { throw 'Installer compilation failed' }

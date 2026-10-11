@@ -242,6 +242,8 @@
   "Extensions.UpdateConfirm": "更新 {0}？",
   "Installer.CleanupFailed": "無法移除 Harbor 舊檔案。請關閉 Harbor 與瀏覽器接管後重試：%1",
   "Installer.DesktopIcon": "建立桌面捷徑",
+  "Installer.DotNetMissing": "Harbor 需要 .NET Runtime {0}（x64）。請安裝後重新執行安裝器。",
+  "Installer.DotNetInstallPrompt": "要開啟 Microsoft 的下載頁面嗎？",
   "Installer.LaunchHarbor": "開啟 Harbor",
   "Installer.ManifestMissing": "Harbor 瀏覽器接管設定檔不存在。",
   "Installer.RegistrationFailed": "Harbor 瀏覽器接管註冊失敗，代碼：%1",

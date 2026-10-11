@@ -14,6 +14,8 @@ A native Windows download manager built with WinUI 3 and the official [Gopeed](h
 
 Windows 10 1809 or later; Windows 11 recommended. The per-user installer includes the runtime and upgrades existing installations. Downloads and settings are preserved during upgrades.
 
+Source builds now use shared .NET 10 Runtime (x64) and Windows App Runtime. The installer offers the .NET download page if it is missing; Harbor prompts for the matching Windows App Runtime at startup. The published 0.10.3 installer still bundles its runtimes.
+
 ## Features
 
 - HTTP/HTTPS connections, pause and resume; BitTorrent, magnet and eD2k.

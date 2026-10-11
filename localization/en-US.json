@@ -242,6 +242,8 @@
   "Extensions.UpdateConfirm": "Update {0}?",
   "Installer.CleanupFailed": "Unable to remove an old Harbor file. Close Harbor and its browser integration, then retry: %1",
   "Installer.DesktopIcon": "Create a desktop shortcut",
+  "Installer.DotNetMissing": "Harbor requires .NET Runtime {0} (x64). Install it, then run this installer again.",
+  "Installer.DotNetInstallPrompt": "Open Microsoft's download page?",
   "Installer.LaunchHarbor": "Open Harbor",
   "Installer.ManifestMissing": "The Harbor browser integration manifest is missing.",
   "Installer.RegistrationFailed": "Harbor browser integration registration failed. Code: %1",

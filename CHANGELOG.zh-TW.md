@@ -1,5 +1,11 @@
 # 更新紀錄
 
+## 尚未發布
+
+- 改用共用 .NET 與 Windows App Runtime，安裝包不再附帶執行環境、ReadyToRun 程式碼與除錯符號。
+- 安裝前檢查 .NET，缺少時提供下載入口；啟動時提示安裝所需的 Windows App Runtime。註冊／解除註冊整合不載入 WinUI。
+- Browse、Torrent 選擇器開啟期間暫停確認框置頂，選取、取消或失敗後恢復。
+
 ## 0.10.3（2026-10-11）
 
 - 將 Esc、Ctrl+Enter 綁定至取消與開始按鈕，避免 Browse、排程顯示無關的快捷鍵提示。

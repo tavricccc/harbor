@@ -28,6 +28,10 @@ pwsh -File scripts/source.ps1
 
 Product versions are in `src/Harbor/Harbor.csproj` and `Package.appxmanifest`. Update both and the changelogs together. Installer and source filenames read the project version.
 
+Publishing uses shared .NET and Windows App Runtime, without NativeAOT, trimming or ReadyToRun. JSON catalogs, preferences and statistics use generated serializers. Integration registration runs before Windows App Runtime initialization so installer/uninstaller commands do not need WinUI. Missing .NET blocks installation before existing files are changed; missing Windows App Runtime uses the SDK's download prompt.
+
+For a local installer that should not replace a release artifact, use `pwsh -File scripts/package.ps1 -SkipBuild -OutputDirectory artifacts/shared-runtime`. The installer omits PDB symbols. `Harbor.exe --check-dotnet` checks the .NET host; `Harbor.exe --check-runtime` also checks the matching Windows App Runtime. Both exit without showing the application or changing integrations.
+
 ## Upstream updates
 
 ```powershell

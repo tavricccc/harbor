@@ -1,6 +1,9 @@
 #ifndef AppVersion
   #error Use scripts/package.ps1 to provide AppVersion
 #endif
+#ifndef RequiredDotNet
+  #error Use scripts/package.ps1 to provide RequiredDotNet
+#endif
 [Setup]
 AppId={{B652BEF3-0741-4B5E-9066-C6F3EBF18622}
 AppName=Harbor
@@ -28,7 +31,7 @@ LicenseFile=..\artifacts\app\LICENSE-Gopeed.txt
 
 [Files]
 Source: "..\artifacts\app\installed-files.txt"; Flags: dontcopy
-Source: "..\artifacts\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\artifacts\app\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\Harbor"; Filename: "{app}\Harbor.exe"
@@ -52,6 +55,7 @@ Filename: "{app}\Harbor.exe"; Parameters: "--unregister-integrations"; Flags: ru
 [Code]
 #include "migration.iss"
 #include "cleanup.iss"
+#include "prerequisites.iss"
 procedure VerifyBrowserHost(BrowserKey, ManifestName: String);
 var Manifest: String;
 begin
@@ -85,6 +89,8 @@ end;
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var Command, Description, Icon: String;
 begin
+  Result := CheckDotNetRuntime;
+  if Result <> '' then Exit;
   StopInstalledVersions;
   if not RegKeyExists(HKCU, 'Software\Harbor\ProtocolBackup') and
     RegQueryStringValue(HKCU, 'Software\Classes\gopeed\shell\open\command', '', Command) and
