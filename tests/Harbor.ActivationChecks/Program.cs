@@ -89,6 +89,8 @@ internal static class Program
         var destination = Path.Combine(profile, "picked-folder");
         Directory.CreateDirectory(destination);
         fixture.Activate();
+        if (!background)
+            await Task.Run(() => System.Windows.Automation.AutomationElement.FromHandle(fixture.Handle).SetFocus());
         await Task.Delay(100);
         if (!background && GetForegroundWindow() != fixture.Handle) throw new Exception("Test fixture must own foreground before host launch");
         var host = Start("Engine/harbor-browser-host.exe");
@@ -133,7 +135,7 @@ internal static class Program
             await Task.Delay(800); // Allow first content load and window resizing to complete.
             bool topmost = (GetWindowLongPtr(confirmation, -20).ToInt64() & 8) != 0;
             bool foreground = GetForegroundWindow() == confirmation;
-            Console.WriteLine($"{mode}: visible={IsWindowVisible(confirmation)}, topmost={topmost}, foreground={foreground}");
+            Console.WriteLine($"{mode}: visible={IsWindowVisible(confirmation)}, topmost={topmost}, foreground={foreground}, foregroundHwnd={GetForegroundWindow()}, fixtureHwnd={fixture.Handle}, confirmationHwnd={confirmation}");
             if (!topmost || (!background && !foreground)) throw new Exception(mode + ": confirmation did not retain the required window state");
             SetWindowPos(confirmation, new nint(-2), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010);
             await Task.Delay(100);
