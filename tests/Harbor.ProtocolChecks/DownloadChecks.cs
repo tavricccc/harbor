@@ -28,6 +28,20 @@ internal static class DownloadChecks
             statistics.Runtime!.Peers[0].DownloadSpeed != 64 || statistics.Runtime.ActivePeers != 3)
             throw new Exception("Gopeed stats snapshot/runtime contract changed");
 
+        var lane = new ConnectionProgress();
+        var now = Stopwatch.GetTimestamp();
+        // A faster lane can exceed the average connection quota through work stealing.
+        lane.UpdateHttp(new(384, 256, false, false, 0), 0, now, true, 1024);
+        if (lane.Percent != 37.5 || lane.IsIndeterminate || lane.TransferText != Harbor.Localization.Strings.Format("Progress.ConnectionShare", $"{37.5:0.0}%"))
+            throw new Exception("Connection contribution must use the whole file rather than the average lane quota");
+        lane.UpdateHttp(new(384, 128, true, false, 0), 0, now, false, 1024);
+        if (lane.Percent != 37.5 || lane.SpeedText != "0 B/s")
+            throw new Exception("Completed connections must retain their contribution instead of displaying 100%");
+        lane.UpdateHttp(new(384, 256, false, false, 0), 0, now, true, 0);
+        if (lane.Percent != 0 || !lane.IsIndeterminate || lane.TransferText != DownloadItem.FormatBytes(384))
+            throw new Exception("Unknown file size must show transferred bytes without inventing a percentage");
+        Console.WriteLine("Connection checks passed: uneven work stealing, completed contribution and unknown file size.");
+
         var original = Snapshot(1);
         var item = new DownloadItem(original);
         var notified = new HashSet<string?>();

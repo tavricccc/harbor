@@ -74,7 +74,7 @@ internal sealed class DownloadConnectionsPanel : Grid
         for (var index = 0; index < count; index++)
         {
             if (http)
-                rows[index].UpdateHttp(connections[index], index, now, item.Status == "running");
+                rows[index].UpdateHttp(connections[index], index, now, item.Status == "running", item.Size);
             else
                 rows[index].UpdatePeer(peers[index]);
         }

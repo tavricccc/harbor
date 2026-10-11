@@ -259,6 +259,7 @@
   "Progress.CloseAfterOpen": "開啟檔案後關閉此視窗",
   "Progress.CloseWindow": "關閉此視窗",
   "Progress.Connecting": "正在連接…",
+  "Progress.ConnectionShare": "佔檔案 {0}",
   "Progress.ConnectionsTitle": "連線進度",
   "Progress.ExtractFailed": "解壓縮失敗，原始檔案仍可開啟。",
   "Progress.PeerCompletion": "對方持有 {0}",

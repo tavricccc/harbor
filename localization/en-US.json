@@ -259,6 +259,7 @@
   "Progress.CloseAfterOpen": "Close this window after opening the file",
   "Progress.CloseWindow": "Close this window",
   "Progress.Connecting": "Connecting…",
+  "Progress.ConnectionShare": "{0} of file",
   "Progress.ConnectionsTitle": "Connection progress",
   "Progress.ExtractFailed": "Extraction failed. The original file can still be opened.",
   "Progress.PeerCompletion": "Peer has {0}",

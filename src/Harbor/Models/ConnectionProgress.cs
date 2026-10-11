@@ -46,17 +46,18 @@ public sealed partial class ConnectionProgress : ObservableObject
         SpeedText = "—";
     }
 
-    public void UpdateHttp(HttpConnectionStatistics connection, int index, long now, bool running)
+    public void UpdateHttp(HttpConnectionStatistics connection, int index, long now, bool running, long fileSize)
     {
         var downloaded = connection.Downloaded;
-        var total = connection.Total;
         var completed = connection.Completed;
         var failed = connection.Failed;
         var retries = connection.RetryTimes;
         Label = Strings.Format("Details.Connection", index + 1);
-        TransferText = total > 0 ? $"{DownloadItem.FormatBytes(downloaded)} / {DownloadItem.FormatBytes(total)}" : DownloadItem.FormatBytes(downloaded);
-        Percent = completed ? 100 : total > 0 ? Math.Min(100, downloaded * 100.0 / total) : 0;
-        IsIndeterminate = total <= 0 && running && !completed && !failed;
+        // Work stealing changes each lane's assigned chunks. Its cumulative bytes
+        // are a contribution to the whole file, not progress toward a fixed quota.
+        Percent = fileSize > 0 ? Math.Min(100, downloaded * 100.0 / fileSize) : 0;
+        TransferText = fileSize > 0 ? Strings.Format("Progress.ConnectionShare", $"{Percent:0.0}%") : DownloadItem.FormatBytes(downloaded);
+        IsIndeterminate = fileSize <= 0 && running && !completed && !failed;
         StatusText = Strings.Get(completed ? "Status.Completed" : failed ? "Status.Retrying" : running ? "Status.Downloading" : "Status.Paused");
         // HTTP stats expose cumulative bytes. Sample each lane independently.
         var elapsed = lastSample == 0 ? 0 : Stopwatch.GetElapsedTime(lastSample, now).TotalSeconds;
