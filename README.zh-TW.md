@@ -1,3 +1,5 @@
+<img src="src/Harbor/Assets/Harbor.png" alt="Harbor 圖示" width="96" height="96">
+
 # Harbor
 
 繁體中文 · [English](README.md)
