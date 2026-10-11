@@ -6,7 +6,7 @@
 
 - Use shared .NET and Windows App Runtime; omit bundled runtimes, ReadyToRun code and installer debug symbols.
 - Prompt for missing .NET before installation changes files, and for the matching Windows App Runtime at application startup. Register/unregister integrations without initializing WinUI.
-- Temporarily suspend confirmation topmost while Browse or Torrent pickers are open; restore it after selection, cancellation or failure.
+- Pause forced Z-order updates across confirmations while Browse or Torrent pickers are open, so owned dialogs stay above all confirmations; restore the policy after selection, cancellation or failure.
 
 ## 0.10.3 — 2026-10-11
 

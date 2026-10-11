@@ -64,3 +64,13 @@ dotnet run --project tests/Harbor.ActivationChecks -c Release -- "$PWD/artifacts
 ```
 
 Click **Run activation checks** in the test window, or add `--auto` to run on an interactive desktop without clicking. The check speaks the official Native Messaging protocol, verifies foreground/topmost state and refusal of native Z-order demotion, selects/cancels an owned folder picker, then starts and cancels an isolated test task to verify topmost release. It does not change browser registration or use personal download data. Add `--background` on a noninteractive desktop to omit keyboard-foreground assertions; the remaining lifecycle checks still run. Actual browser-extension clicks require a separate interactive check. Refused foreground activation is recorded in the profile's `activation.log` without request URLs or headers.
+
+The picker check compares actual Z-order against every confirmation, including multiple open requests. Shared-runtime failure checks use an isolated host variant so the machine's installed runtimes and firewall settings remain unchanged:
+
+```powershell
+dotnet publish src/Harbor/Harbor.csproj -c Release -r win-x64 -p:Platform=x64 -p:AppHostDotNetSearch=EnvironmentVariable -o artifacts/tests/missing-dotnet-app
+pwsh -File tests/Harbor.ActivationChecks/RuntimeChecks.ps1 -ApplicationDirectory artifacts/app -MissingDotNetDirectory artifacts/tests/missing-dotnet-app
+dotnet run --project tests/Harbor.ActivationChecks -c Release -- "$PWD/artifacts/app" --runtime-dialogs "$PWD/artifacts/tests/missing-dotnet-app"
+```
+
+The last command verifies the actual installation prompts and declines both downloads. A blocked foreground fixture is not a passing foreground test. Keep clean-machine installer/upgrade/uninstaller checks separate from build and package verification.

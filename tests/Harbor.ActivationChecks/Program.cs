@@ -21,6 +21,11 @@ internal static class Program
     private static int Main(string[] args)
     {
         appDirectory = Path.GetFullPath(args[0]);
+        if (args.Contains("--runtime-dialogs"))
+        {
+            try { RuntimeDialogChecks.Run(appDirectory, args[2]).GetAwaiter().GetResult(); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         background = args.Contains("--background");
         profile = Path.Combine(Path.GetTempPath(), "Harbor-Activation-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(profile);
