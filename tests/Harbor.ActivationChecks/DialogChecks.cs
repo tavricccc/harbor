@@ -21,8 +21,7 @@ internal static class DialogChecks
             await Task.Delay(100);
         }
         if (dialog == 0) throw new Exception("Browse did not open an owned folder dialog");
-        if ((GetWindowLongPtr(dialog, -20).ToInt64() & 8) == 0)
-            throw new Exception("Folder dialog is hidden behind the topmost confirmation");
+        CheckPickerOrder(hwnd, dialog);
         // Dismiss the system dialog through its standard cancel message; the
         // application's async handler must return and re-enable Browse.
         PostMessage(dialog, 0x0111, 2, 0); // WM_COMMAND / IDCANCEL
@@ -33,7 +32,7 @@ internal static class DialogChecks
         if (!browse.Current.IsEnabled) throw new Exception("Browse stayed disabled after cancelling");
         if ((GetWindowLongPtr(hwnd, -20).ToInt64() & 8) == 0)
             throw new Exception("Cancelling Browse removed confirmation topmost state");
-        Console.WriteLine("PASS: Browse opens an owned topmost dialog; cancellation restores the enabled button and retains confirmation topmost.");
+        Console.WriteLine("PASS: Browse suspends owner topmost and opens above it; cancellation re-enables Browse and restores topmost.");
         await Invoke(owner, "Choose folder");
         deadline = DateTime.UtcNow.AddSeconds(10);
         dialog = 0;
@@ -47,6 +46,7 @@ internal static class DialogChecks
             await Task.Delay(100);
         }
         if (dialog == 0) throw new Exception("Second Browse invocation failed");
+        CheckPickerOrder(hwnd, dialog);
         await Invoke(AutomationElement.FromHandle(dialog), "Choose folder");
         deadline = DateTime.UtcNow.AddSeconds(10);
         while (IsWindow(dialog) && DateTime.UtcNow < deadline) await Task.Delay(100);
@@ -55,6 +55,8 @@ internal static class DialogChecks
         var selected = ((ValuePattern)destination.GetCurrentPattern(ValuePattern.Pattern)).Current.Value;
         if (!string.Equals(selected, Path.Combine(profile, "picked-folder"), StringComparison.OrdinalIgnoreCase))
             throw new Exception("Browse returned wrong folder: " + selected);
+        if ((GetWindowLongPtr(hwnd, -20).ToInt64() & 8) == 0)
+            throw new Exception("Selecting a folder did not restore confirmation topmost");
         Console.WriteLine("PASS: Browse returns the selected folder to the download form.");
         await Invoke(owner, "Start download");
         deadline = DateTime.UtcNow.AddSeconds(10);
@@ -78,6 +80,18 @@ internal static class DialogChecks
         while (IsWindow(hwnd) && DateTime.UtcNow < deadline) await Task.Delay(100);
         if (IsWindow(hwnd)) throw new Exception("Cancel did not close the pending confirmation");
         Console.WriteLine("PASS: cancelling a pending confirmation destroys its topmost window.");
+    }
+
+    private static void CheckPickerOrder(nint owner, nint dialog)
+    {
+        if ((GetWindowLongPtr(owner, -20).ToInt64() & 8) != 0)
+            throw new Exception("Confirmation stayed topmost while the picker was open");
+        // GW_HWNDNEXT walks down the actual desktop Z-order, regardless of which
+        // window currently owns keyboard focus or has the topmost style.
+        for (var below = GetWindow(dialog, 2); below != 0; below = GetWindow(below, 2))
+            if (below == owner)
+                return;
+        throw new Exception("Folder picker is below its confirmation owner");
     }
 
     private static AutomationElement Find(AutomationElement owner, string name) =>
