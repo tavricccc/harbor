@@ -3,10 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:loc="using:Harbor.Localization"
       FontFamily="{StaticResource ContentControlThemeFontFamily}" FontSize="14">
-    <Page.KeyboardAccelerators>
-        <KeyboardAccelerator Key="Escape" Invoked="CancelShortcut"/>
-        <KeyboardAccelerator Key="Enter" Modifiers="Control" Invoked="StartShortcut"/>
-    </Page.KeyboardAccelerators>
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <ContentPresenter x:Name="FormHost" Margin="24,20,24,16"/>
@@ -15,7 +11,11 @@
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <ContentPresenter x:Name="OptionsToggleHost" VerticalAlignment="Center"/>
             <StackPanel x:Name="Actions" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                <Button Content="{loc:Localize Key=Common.Cancel}" Click="Cancel" AutomationProperties.AutomationId="CancelDownload"/>
+                <Button Content="{loc:Localize Key=Common.Cancel}" Click="Cancel" AutomationProperties.AutomationId="CancelDownload">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Escape" Invoked="CancelShortcut"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
                 <Button x:Name="LaterButton" Content="{loc:Localize Key=Schedule.Later}" Click="DownloadLater" ToolTipService.ToolTip="{loc:Localize Key=Schedule.LaterHint}"/>
                 <Button x:Name="ScheduleButton" Content="{loc:Localize Key=Schedule.Button}">
                     <Button.Flyout>
@@ -30,7 +30,11 @@
                     </Button.Flyout>
                 </Button>
                 <Button x:Name="StartButton" Content="{loc:Localize Key=Download.CheckLink}"
-                        Style="{StaticResource AccentButtonStyle}" Click="Start" AutomationProperties.AutomationId="StartDownload"/>
+                        Style="{StaticResource AccentButtonStyle}" Click="Start" AutomationProperties.AutomationId="StartDownload">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" Modifiers="Control" Invoked="StartShortcut"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
             </StackPanel>
             </Grid>
         </Border>
