@@ -32,7 +32,7 @@ internal static class Program
         File.WriteAllText(Path.Combine(profile, "preferences.json"), "{\"ApiPort\":0,\"Language\":\"en-US\",\"CheckForUpdates\":false}");
         int result = 1;
         using var fixture = new Form { Text = "Harbor foreground activation test", Width = 420, Height = 180, StartPosition = FormStartPosition.CenterScreen };
-        fixture.Controls.Add(new Label { Text = "Native Messaging foreground check\nNo downloads will be started.", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter });
+        fixture.Controls.Add(new Label { Text = "Native Messaging and progress-window checks\nDownloads use isolated local test files only.", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter });
         var run = new Button { Text = "Run activation checks", Dock = DockStyle.Bottom, Height = 40 };
         fixture.Controls.Add(run);
         async Task Run()
@@ -99,6 +99,7 @@ internal static class Program
         await Task.Delay(100);
         if (!background && GetForegroundWindow() != fixture.Handle) throw new Exception("Test fixture must own foreground before host launch");
         var host = Start("Engine/harbor-browser-host.exe");
+        using var progress = new ProgressCloseChecks(profile);
         var seen = new HashSet<nint>();
         foreach (var mode in new[] { "cold create", "warm create", "forward POST" })
         {
@@ -107,7 +108,7 @@ internal static class Program
                 await Task.Run(() => System.Windows.Automation.AutomationElement.FromHandle(fixture.Handle).SetFocus());
             await Task.Delay(100);
             if (!background && GetForegroundWindow() != fixture.Handle) throw new Exception("Foreground fixture lost focus before " + mode);
-            var payload = new { req = new { url = "http://127.0.0.1:9/harbor-activation-test.zip" }, opts = new { path = destination } };
+            var payload = new { req = new { url = mode == "warm create" ? progress.SourceUrl : "http://127.0.0.1:9/harbor-activation-test.zip" }, opts = new { path = destination } };
             object message = mode == "forward POST"
                 ? new { method = "forward", @params = (object)new { path = "/api/v1/tasks?source=activation-check", method = "POST", data = payload } }
                 : new { method = "create", @params = (object)Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(payload)) };
@@ -151,6 +152,7 @@ internal static class Program
         if (pending != 0) throw new Exception("Activation left unconsumed requests");
         await DialogChecks.Run(seen.Last(), profile);
         await DialogChecks.CancelConfirmation(seen.First());
+        await progress.Run(seen.ElementAt(1));
         Console.WriteLine("PASS: cold launch, existing-instance redirection, forwarded task request; all requests consumed."
             + (background ? " Background mode: keyboard foreground was measured but not asserted." : " Keyboard foreground verified."));
     }

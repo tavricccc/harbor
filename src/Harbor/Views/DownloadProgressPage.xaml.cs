@@ -102,8 +102,11 @@ public sealed partial class DownloadProgressPage : Page
     {
         try
         {
-            if (item is not null)
-                FileActions.Reveal(item.FilePath, item.Folder);
+            if (item is null)
+                return;
+            FileActions.Reveal(item.FilePath, item.Folder);
+            if (CloseAfterOpen.IsChecked == true)
+                close();
         }
         catch (Exception failure) { ShowError(failure); }
     }

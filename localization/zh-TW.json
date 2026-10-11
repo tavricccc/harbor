@@ -258,7 +258,7 @@
   "Notification.Completed": "下載完成",
   "Progress.Calculating": "計算中",
   "Progress.CancelHint": "停止並移除下載任務，保留已下載的檔案",
-  "Progress.CloseAfterOpen": "開啟檔案後關閉此視窗",
+  "Progress.CloseAfterOpen": "開啟檔案或資料夾後關閉此視窗",
   "Progress.CloseWindow": "關閉此視窗",
   "Progress.Connecting": "正在連接…",
   "Progress.ConnectionShare": "佔檔案 {0}",

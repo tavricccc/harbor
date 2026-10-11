@@ -258,7 +258,7 @@
   "Notification.Completed": "Download complete",
   "Progress.Calculating": "Calculating",
   "Progress.CancelHint": "Stop and remove the download; keep downloaded files",
-  "Progress.CloseAfterOpen": "Close this window after opening the file",
+  "Progress.CloseAfterOpen": "Close this window after opening a file or folder",
   "Progress.CloseWindow": "Close this window",
   "Progress.Connecting": "Connecting…",
   "Progress.ConnectionShare": "{0} of file",
