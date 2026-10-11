@@ -6,35 +6,37 @@ internal sealed partial class ConfirmationTopmost
 {
     // Confirmation windows and their pickers share the UI thread.
     private static readonly Dictionary<nint, ConfirmationTopmost> owners = [];
-    private int openPickers;
+    private static int openPickers;
+    internal static bool HasOpenPicker => openPickers > 0;
     private bool IsEnforced => active && openPickers == 0;
 
-    internal static IDisposable? SuspendForPicker(nint owner)
+    internal static IDisposable SuspendForPicker(nint owner)
     {
-        if (!owners.TryGetValue(owner, out var policy))
-            return null; // Settings and other ordinary windows have no topmost policy.
-
-        policy.openPickers++;
-        if (policy.openPickers == 1)
-        {
-            if (policy.window.AppWindow.Presenter is OverlappedPresenter presenter)
-                presenter.IsAlwaysOnTop = false;
-            WindowActivation.SetTopmost(policy.window, false);
-        }
-        return new PickerScope(policy);
+        openPickers++;
+        // Keep the native owner topmost so its modal dialog inherits that band.
+        // Pause forced Z-order changes across all confirmations while it is open.
+        return new PickerScope(owner);
     }
 
-    private sealed class PickerScope(ConfirmationTopmost policy) : IDisposable
+    private void SetTopmost(bool topmost)
+    {
+        if (window.AppWindow.Presenter is OverlappedPresenter presenter)
+            presenter.IsAlwaysOnTop = topmost;
+        WindowActivation.SetTopmost(window, topmost);
+    }
+
+    private sealed class PickerScope(nint owner) : IDisposable
     {
         public void Dispose()
         {
-            policy.openPickers--;
-            // Starting a download or closing the owner ends the confirmation policy.
-            if (!policy.IsEnforced)
+            openPickers--;
+            if (HasOpenPicker)
                 return;
-            if (policy.window.AppWindow.Presenter is OverlappedPresenter presenter)
-                presenter.IsAlwaysOnTop = true;
-            policy.Refresh();
+            // Disposed confirmations have left the registry; restore only live ones.
+            foreach (var policy in owners.Values)
+                policy.SetTopmost(true);
+            if (owners.TryGetValue(owner, out var originatingWindow))
+                originatingWindow.Refresh();
         }
     }
 }

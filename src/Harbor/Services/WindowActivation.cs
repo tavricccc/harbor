@@ -10,6 +10,11 @@ internal static class WindowActivation
 
     internal static void ShowConfirmation(Window window)
     {
+        if (ConfirmationTopmost.HasOpenPicker)
+        {
+            window.AppWindow.Show(false);
+            return;
+        }
         window.AppWindow.Show(true);
         KeepAbove(window);
         window.Activate();

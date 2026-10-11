@@ -32,7 +32,7 @@ internal static class DialogChecks
         if (!browse.Current.IsEnabled) throw new Exception("Browse stayed disabled after cancelling");
         if ((GetWindowLongPtr(hwnd, -20).ToInt64() & 8) == 0)
             throw new Exception("Cancelling Browse removed confirmation topmost state");
-        Console.WriteLine("PASS: Browse suspends owner topmost and opens above it; cancellation re-enables Browse and restores topmost.");
+        Console.WriteLine("PASS: Browse opens above all confirmations; cancellation re-enables Browse and restores the confirmation policy.");
         await Invoke(owner, "Choose folder");
         deadline = DateTime.UtcNow.AddSeconds(10);
         dialog = 0;
@@ -84,8 +84,15 @@ internal static class DialogChecks
 
     private static void CheckPickerOrder(nint owner, nint dialog)
     {
-        if ((GetWindowLongPtr(owner, -20).ToInt64() & 8) != 0)
-            throw new Exception("Confirmation stayed topmost while the picker was open");
+        if ((GetWindowLongPtr(dialog, -20).ToInt64() & 8) == 0)
+            throw new Exception("Folder picker did not inherit the owner's topmost band");
+        GetWindowThreadProcessId(owner, out var ownerProcess);
+        for (var above = GetWindow(dialog, 3); above != 0; above = GetWindow(above, 3))
+        {
+            GetWindowThreadProcessId(above, out var process);
+            if (process == ownerProcess && IsWindowVisible(above))
+                throw new Exception($"Another Harbor window is above the folder picker: above={above}, ownedBy={GetWindow(above, 4)}, topmost={(GetWindowLongPtr(above, -20).ToInt64() & 8) != 0}, aboveName={AutomationElement.FromHandle(above).Current.Name}, dialogName={AutomationElement.FromHandle(dialog).Current.Name}");
+        }
         // GW_HWNDNEXT walks down the actual desktop Z-order, regardless of which
         // window currently owns keyboard focus or has the topmost style.
         for (var below = GetWindow(dialog, 2); below != 0; below = GetWindow(below, 2))
@@ -106,6 +113,7 @@ internal static class DialogChecks
     private delegate bool Callback(nint hwnd, nint data);
     [DllImport("user32.dll")] private static extern bool EnumWindows(Callback callback, nint data);
     [DllImport("user32.dll")] private static extern nint GetWindow(nint hwnd, uint command);
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(nint hwnd, out uint process);
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(nint hwnd);
     [DllImport("user32.dll")] private static extern bool IsWindow(nint hwnd);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] private static extern nint GetWindowLongPtr(nint hwnd, int index);

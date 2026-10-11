@@ -23,6 +23,8 @@ internal sealed partial class ConfirmationTopmost : IDisposable
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
         owners.Add(hwnd, this);
         window.Activated += OnActivated;
+        if (HasOpenPicker)
+            SetTopmost(false);
     }
 
     private void OnActivated(object sender, WindowActivatedEventArgs args)
