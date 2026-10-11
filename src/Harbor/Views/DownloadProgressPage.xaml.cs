@@ -64,7 +64,7 @@ public sealed partial class DownloadProgressPage : Page
                 UpdatePresentation(item, changes);
             if (ConnectionsSurface.Visibility == Visibility.Visible)
             {
-                var stats = await core.GetAsync<TaskStatistics>($"tasks/{id}/stats");
+                var stats = await core.GetStatisticsAsync($"tasks/{id}/stats");
                 if (!stopped && !cancelling && ConnectionsSurface.Visibility == Visibility.Visible)
                     connections.Update(stats, item);
             }

@@ -38,7 +38,7 @@ public static partial class WindowsIntegration
                 using var key = Registry.CurrentUser.OpenSubKey(path + "\\" + HostName);
                 backup[path] = key?.GetValue("") as string;
             }
-            File.WriteAllText(BackupPath, JsonSerializer.Serialize(backup));
+            File.WriteAllText(BackupPath, JsonSerializer.Serialize(backup, PreferencesJsonContext.Default.DictionaryStringString));
         }
         for (var index = 0; index < BrowserKeys.Length; index++)
         {
@@ -55,7 +55,7 @@ public static partial class WindowsIntegration
     }
     private static void RemoveBrowserHost()
     {
-        var backup = File.Exists(BackupPath) ? JsonSerializer.Deserialize<Dictionary<string, string?>>(File.ReadAllText(BackupPath))! : new();
+        var backup = File.Exists(BackupPath) ? JsonSerializer.Deserialize(File.ReadAllText(BackupPath), PreferencesJsonContext.Default.DictionaryStringString)! : new();
         for (var index = 0; index < BrowserKeys.Length; index++)
         {
             var expected = Path.Combine(CoreClient.DataDirectory, index == 2 ? "browser-host-firefox.json" : "browser-host.json");

@@ -22,8 +22,8 @@ public sealed partial class CoreClient : IDisposable
     public string Version { get; private set; } = "";
 
     public Task<JsonNode?> GetAsync(string route, CancellationToken cancellationToken = default) => SendAsync(HttpMethod.Get, route, cancellationToken: cancellationToken);
-    public async Task<T?> GetAsync<T>(string route, CancellationToken cancellationToken = default) where T : class
-        => (await GetAsync(route, cancellationToken))?.Deserialize<T>(System.Text.Json.JsonSerializerOptions.Web);
+    public async Task<Models.TaskStatistics?> GetStatisticsAsync(string route, CancellationToken cancellationToken = default)
+        => (await GetAsync(route, cancellationToken))?.Deserialize(Models.StatisticsJsonContext.Default.TaskStatistics);
     public async Task<JsonNode?> SendAsync(HttpMethod method, string route, JsonNode? body = null, CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(method, route);

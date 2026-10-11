@@ -9,6 +9,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <Compile Include="../../src/Harbor/Localization/Strings.cs" Link="Strings.cs" />
     <Compile Include="../../src/Harbor/Localization/LanguageOption.cs" Link="LanguageOption.cs" />
+    <Compile Include="../../src/Harbor/Localization/LocalizationJsonContext.cs" Link="LocalizationJsonContext.cs" />
     <EmbeddedResource Include="../../localization/*.json" LogicalName="Harbor.Localization.%(Filename)%(Extension)" />
     <Compile Include="../../src/Harbor/Services/GopeedLink.cs" Link="GopeedLink.cs" />
     <Compile Include="../../src/Harbor/Services/HttpHeaders.cs" Link="HttpHeaders.cs" />
@@ -17,6 +18,7 @@
     <Compile Include="../../src/Harbor/Models/DownloadItem.cs" Link="DownloadItem.cs" />
     <Compile Include="../../src/Harbor/Models/DownloadItem.Update.cs" Link="DownloadItem.Update.cs" />
     <Compile Include="../../src/Harbor/Models/TaskStatistics.cs" Link="TaskStatistics.cs" />
+    <Compile Include="../../src/Harbor/Models/StatisticsJsonContext.cs" Link="StatisticsJsonContext.cs" />
     <Compile Include="../../src/Harbor/Models/ConnectionProgress.cs" Link="ConnectionProgress.cs" />
   </ItemGroup>
 </Project>

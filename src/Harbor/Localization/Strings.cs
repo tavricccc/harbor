@@ -1,11 +1,12 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Harbor.Localization;
 
 public static class Strings
 {
-    public static IReadOnlyList<LanguageOption> Languages { get; } = ReadResource<LanguageOption[]>("languages");
+    public static IReadOnlyList<LanguageOption> Languages { get; } = ReadResource("languages", LocalizationJsonContext.Default.LanguageOptionArray);
     public static IReadOnlyList<string> SupportedLanguages { get; } = Languages.Select(language => language.Id).ToArray();
     public static string Language { get; private set; } = "en-US";
     private static Dictionary<string, string> catalog = Load(Language);
@@ -50,11 +51,11 @@ public static class Strings
     public static string Format(string key, params object?[] arguments) => string.Format(CultureInfo.CurrentCulture, Get(key), arguments);
 
     private static Dictionary<string, string> Load(string language)
-        => ReadResource<Dictionary<string, string>>(language);
+        => ReadResource(language, LocalizationJsonContext.Default.DictionaryStringString);
 
-    private static T ReadResource<T>(string name)
+    private static T ReadResource<T>(string name, JsonTypeInfo<T> typeInfo)
     {
         using var stream = typeof(Strings).Assembly.GetManifestResourceStream($"Harbor.Localization.{name}.json")!;
-        return JsonSerializer.Deserialize<T>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        return JsonSerializer.Deserialize(stream, typeInfo)!;
     }
 }

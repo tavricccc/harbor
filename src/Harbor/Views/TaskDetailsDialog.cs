@@ -39,7 +39,7 @@ public sealed class TaskDetailsDialog : ContentDialog
         {
             try
             {
-                var data = await core.GetAsync<TaskStatistics>("tasks/" + item.Id + "/stats");
+                var data = await core.GetStatisticsAsync("tasks/" + item.Id + "/stats");
                 connections.Children.Clear();
                 if (data is null)
                 {

@@ -20,12 +20,12 @@ public sealed class UiPreferences
     }
     private static string FilePath => Path.Combine(CoreClient.DataDirectory, "preferences.json");
     public static UiPreferences Load() => File.Exists(FilePath)
-        ? JsonSerializer.Deserialize<UiPreferences>(File.ReadAllText(FilePath))!
+        ? JsonSerializer.Deserialize(File.ReadAllText(FilePath), PreferencesJsonContext.Default.UiPreferences)!
         : new();
     public void Save()
     {
         Directory.CreateDirectory(CoreClient.DataDirectory);
-        File.WriteAllText(FilePath + ".tmp", JsonSerializer.Serialize(this));
+        File.WriteAllText(FilePath + ".tmp", JsonSerializer.Serialize(this, PreferencesJsonContext.Default.UiPreferences));
         File.Move(FilePath + ".tmp", FilePath, true);
     }
 }
