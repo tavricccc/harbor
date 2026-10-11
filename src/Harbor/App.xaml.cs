@@ -59,24 +59,9 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        var commandLine = Environment.GetCommandLineArgs();
         Services.LegacyMigration.Run();
         Strings.Initialize(Services.UiPreferences.Load().Language, Windows.System.UserProfile.GlobalizationPreferences.Languages);
         Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = Strings.Language;
-        if (commandLine.Contains("--register-integrations"))
-        {
-            Services.WindowsIntegration.InstallBrowserHost();
-            Services.WindowsIntegration.RegisterFileTypes();
-            Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);
-            Exit();
-            return;
-        }
-        if (commandLine.Contains("--unregister-integrations"))
-        {
-            Services.WindowsIntegration.Unregister();
-            Exit();
-            return;
-        }
         if (Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY") is null)
         {
             Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);

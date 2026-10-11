@@ -20,6 +20,15 @@
         "resolved": "0.7.0",
         "contentHash": "ZV4VfpCo+XMY4FvAZLD2aq7ZAyAuU8nqTBKjkT1oNiDRwuA82JU/6sM3wX1045frxfAun0cXU5F+nIyADvdHXQ=="
       },
+      "Microsoft.WindowsAppSDK.Runtime": {
+        "type": "Direct",
+        "requested": "[2.5.1, )",
+        "resolved": "2.5.1",
+        "contentHash": "EDzGf6Tq9njNfNsTfqKdiwmSzFF/caHItuDa99UTQiOvLXwOjCL1k75/PMLSoHbCo1cSlHh/sSqZVssJ/Z0NzA==",
+        "dependencies": {
+          "Microsoft.WindowsAppSDK.Base": "2.0.4"
+        }
+      },
       "Microsoft.WindowsAppSDK.WinUI": {
         "type": "Direct",
         "requested": "[2.3.9, )",
