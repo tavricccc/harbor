@@ -2,6 +2,12 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.12.0 — 2026-10-25
+
+- Replace the Inno Setup installer with a WinUI setup on the shared .NET and Windows App Runtime. A missing runtime shows its download prompt before anything is installed. Upgrades keep the install location and replace the old uninstaller.
+- Expire abandoned link checks after ten minutes and release the rest on shutdown, so `gopeed-prefetch-*` temporary files no longer pile up in `%TEMP%`.
+- Update Gopeed to main `b8ff5ff` and keep serving the text proxy it removed, which update checks, the extension store and tracker lists use.
+
 ## 0.11.1 — 2026-10-11
 
 - Make Open folder follow the saved close-after-open checkbox, just like Open file. Leave the progress window open when unchecked; update the label in all three languages to describe both actions.
