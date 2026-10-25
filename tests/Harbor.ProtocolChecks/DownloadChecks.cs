@@ -53,6 +53,12 @@ internal static class DownloadChecks
         if (item.Update(progress) != DownloadChanges.Progress || !notified.Contains(nameof(item.Percent)) || notified.Contains("") || item.Percent != 20)
             throw new Exception("Progress must update live metrics without resetting metadata bindings");
 
+        notified.Clear();
+        var faster = progress.DeepClone().AsObject(); faster["progress"]!["speed"] = 400000L;
+        if (item.Update(faster) != DownloadChanges.Progress || !notified.Contains(nameof(item.SpeedText)) || notified.Contains(nameof(item.Percent)) || item.Speed != 400000)
+            throw new Exception("A speed tick must refresh speed metrics only");
+        progress = faster;
+
         var renamed = progress.DeepClone().AsObject(); renamed["name"] = "改名.zip";
         if ((item.Update(renamed) & DownloadChanges.Content) == 0 || item.Name != "改名.zip")
             throw new Exception("A name change must invalidate search and sort results");

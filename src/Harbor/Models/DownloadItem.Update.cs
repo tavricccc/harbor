@@ -10,34 +10,88 @@ public enum DownloadChanges
 
 public sealed partial class DownloadItem
 {
-    private static readonly string[] progressProperties =
-    [
-        nameof(Downloaded), nameof(Speed), nameof(Percent), nameof(IsIndeterminate),
-        nameof(TransferText), nameof(TransferSizeText), nameof(RowProgressText),
-        nameof(DetailsText), nameof(Uploaded), nameof(UploadSpeed), nameof(SpeedText), nameof(RemainingText)
-    ];
+    [Flags]
+    private enum Metrics
+    {
+        None = 0, Downloaded = 1, Uploaded = 2, Speed = 4, Transfer = 8, Status = 16, Remaining = 32, Details = 64
+    }
 
     public DownloadChanges Update(JsonObject data)
     {
-        if (JsonNode.DeepEquals(Data, data))
-            return DownloadChanges.None;
         // Progress is the only rapidly changing subtree. A metadata or lifecycle
         // change refreshes all bindings; byte/speed ticks only touch live metrics.
-        var contentChanged = Data.Count != data.Count || Data.Any(field => field.Key != "progress" && !JsonNode.DeepEquals(field.Value, data[field.Key]));
-        var extractionChanged = ExtractionStatus != (data["progress"]?["extractStatus"]?.GetValue<string>() ?? "");
-        Load(data);
-        if (contentChanged || extractionChanged)
+        // Compare each field once: metadata can hold a torrent's whole file list.
+        if (!ContentEquals(Data, data))
         {
+            Load(data);
             OnPropertyChanged(string.Empty);
             return DownloadChanges.Content | DownloadChanges.Progress;
         }
-        foreach (var property in progressProperties)
-            OnPropertyChanged(property);
-        if (IsProcessing)
+        var progress = data["progress"];
+        if (JsonNode.DeepEquals(Data["progress"], progress))
+            return DownloadChanges.None;
+        if (ExtractionStatus != (progress?["extractStatus"]?.GetValue<string>() ?? ""))
         {
-            OnPropertyChanged(nameof(ExtractionText));
-            OnPropertyChanged(nameof(StatusText));
+            Load(data);
+            OnPropertyChanged(string.Empty);
+            return DownloadChanges.Content | DownloadChanges.Progress;
         }
+        var (downloaded, speed, uploaded, uploadSpeed) = (Downloaded, Speed, Uploaded, UploadSpeed);
+        var extractProgress = Data["progress"]?["extractProgress"];
+        LoadProgress(data);
+        // Every changed row raises these each tick, so skip metrics whose inputs stayed the same.
+        var changed = Metrics.None;
+        if (Downloaded != downloaded)
+            changed |= Metrics.Downloaded | Metrics.Transfer | Metrics.Status | Metrics.Remaining | Metrics.Details;
+        if (Speed != speed)
+            changed |= Metrics.Speed | Metrics.Remaining | Metrics.Details;
+        if (Uploaded != uploaded)
+            changed |= Metrics.Uploaded;
+        if (UploadSpeed != uploadSpeed)
+            changed |= Metrics.Speed | Metrics.Details;
+        if (IsProcessing && !JsonNode.DeepEquals(extractProgress, progress?["extractProgress"]))
+            changed |= Metrics.Transfer | Metrics.Status | Metrics.Details;
+        if ((changed & Metrics.Downloaded) != 0)
+        {
+            OnPropertyChanged(nameof(Downloaded));
+            OnPropertyChanged(nameof(Percent));
+        }
+        if ((changed & Metrics.Uploaded) != 0)
+            OnPropertyChanged(nameof(Uploaded));
+        if ((changed & Metrics.Speed) != 0)
+        {
+            OnPropertyChanged(nameof(Speed));
+            OnPropertyChanged(nameof(UploadSpeed));
+            OnPropertyChanged(nameof(SpeedText));
+        }
+        if ((changed & Metrics.Transfer) != 0)
+        {
+            OnPropertyChanged(nameof(TransferText));
+            OnPropertyChanged(nameof(TransferSizeText));
+        }
+        if ((changed & Metrics.Status) != 0)
+        {
+            if (IsProcessing)
+            {
+                OnPropertyChanged(nameof(ExtractionText));
+                OnPropertyChanged(nameof(StatusText));
+            }
+            OnPropertyChanged(nameof(RowProgressText));
+        }
+        if ((changed & Metrics.Remaining) != 0)
+            OnPropertyChanged(nameof(RemainingText));
+        if ((changed & Metrics.Details) != 0)
+            OnPropertyChanged(nameof(DetailsText));
         return DownloadChanges.Progress;
+    }
+
+    private static bool ContentEquals(JsonObject current, JsonObject next)
+    {
+        if (current.Count != next.Count)
+            return false;
+        foreach (var (key, value) in current)
+            if (key != "progress" && (!next.TryGetPropertyValue(key, out var other) || !JsonNode.DeepEquals(value, other)))
+                return false;
+        return true;
     }
 }
