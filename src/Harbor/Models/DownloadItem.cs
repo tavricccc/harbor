@@ -14,32 +14,69 @@ public sealed partial class DownloadItem : ObservableObject
     public JsonObject Data
     {
         get; private set;
-    }
+    } = null!;
     public DownloadItem(JsonObject data)
     {
         Id = data["id"]!.GetValue<string>();
-        Data = data;
+        Load(data);
     }
-    public string Name => Data["name"]!.GetValue<string>();
-    public string Status => Data["status"]!.GetValue<string>();
+    // Bindings, filters and sorting read these on every refresh, so each snapshot is parsed once.
+    private void Load(JsonObject data)
+    {
+        LoadProgress(data);
+        var meta = data["meta"];
+        var progress = data["progress"];
+        Name = data["name"]!.GetValue<string>();
+        Status = data["status"]!.GetValue<string>();
+        DeferredError = data["error"]?.GetValue<string>() ?? "";
+        ScheduledAt = data["scheduledAt"] is JsonValue value ? DateTimeOffset.Parse(value.GetValue<string>()) : null;
+        ExtractionStatus = progress?["extractStatus"]?.GetValue<string>() ?? "";
+        Uploading = data["uploading"]?.GetValue<bool>() == true;
+        CreatedAt = DateTimeOffset.Parse(data["createdAt"]!.GetValue<string>());
+        Url = meta?["req"]?["url"]?.GetValue<string>() ?? "";
+        Folder = meta?["opts"]?["path"]?.GetValue<string>() ?? "";
+        Protocol = data["protocol"]?.GetValue<string>().ToUpperInvariant() ?? "";
+        Size = meta?["res"]?["size"]?.GetValue<long>() ?? 0;
+        var resource = meta?["res"];
+        var resourceName = resource?["name"]?.GetValue<string>();
+        var file = resource?["files"]?.AsArray().FirstOrDefault();
+        var custom = meta?["opts"]?["name"]?.GetValue<string>();
+        FilePath = !string.IsNullOrEmpty(resourceName)
+            ? Path.Combine(Folder, string.IsNullOrEmpty(custom) ? resourceName : custom)
+            : Path.Combine(Folder, file?["path"]?.GetValue<string>() ?? "", string.IsNullOrEmpty(custom) ? file?["name"]?.GetValue<string>() ?? Name : custom);
+        FileGlyph = !string.IsNullOrEmpty(resourceName) ? "" : DownloadPresentation.FileGlyph(Name);
+        primaryAction = null;
+    }
+    // Progress ticks keep the metadata, so only the live metrics are read again.
+    private void LoadProgress(JsonObject data)
+    {
+        Data = data;
+        var progress = data["progress"];
+        Downloaded = progress?["downloaded"]?.GetValue<long>() ?? 0;
+        Speed = progress?["speed"]?.GetValue<long>() ?? 0;
+        Uploaded = progress?["uploaded"]?.GetValue<long>() ?? 0;
+        UploadSpeed = progress?["uploadSpeed"]?.GetValue<long>() ?? 0;
+    }
+    public string Name { get; private set; } = "";
+    public string Status { get; private set; } = "";
     public bool IsDeferred => Status == "deferred";
-    public string DeferredError => Data["error"]?.GetValue<string>() ?? "";
-    public DateTimeOffset? ScheduledAt => Data["scheduledAt"] is JsonValue value ? DateTimeOffset.Parse(value.GetValue<string>()) : null;
-    public string ExtractionStatus => Data["progress"]?["extractStatus"]?.GetValue<string>() ?? "";
+    public string DeferredError { get; private set; } = "";
+    public DateTimeOffset? ScheduledAt { get; private set; }
+    public string ExtractionStatus { get; private set; } = "";
     public string ExtractionText => ExtractionStatus switch { "extracting" => Strings.Format("Status.ExtractProgress", Data["progress"]?["extractProgress"]), "waitingParts" => Strings.Get("Status.WaitingParts"), "error" => Strings.Get("Status.ExtractFailed"), "done" => Strings.Get("Status.Extracted"), _ => "" };
     public bool IsProcessing => ExtractionStatus is "extracting" or "waitingParts";
-    public bool Uploading => Data["uploading"]?.GetValue<bool>() == true;
+    public bool Uploading { get; private set; }
     public string StatusText => IsDeferred ? DeferredError.Length > 0 ? Strings.Get("Status.ScheduleFailed") : ScheduledAt is { } time ? time.ToLocalTime().ToString("g") : Strings.Get("Schedule.Later") : IsProcessing ? ExtractionText : Status switch { "running" => Strings.Get("Status.Downloading"), "done" => Uploading ? Strings.Get("Status.Seeding") : Strings.Get("Status.Completed"), "pause" => Strings.Get("Status.Paused"), "error" => Strings.Get("Status.DownloadFailed"), "wait" => Strings.Get("Status.Waiting"), _ => Strings.Get("Status.Preparing") };
-    public DateTimeOffset CreatedAt => DateTimeOffset.Parse(Data["createdAt"]!.GetValue<string>());
-    public string Url => Data["meta"]?["req"]?["url"]?.GetValue<string>() ?? "";
-    public string Folder => Data["meta"]?["opts"]?["path"]?.GetValue<string>() ?? "";
-    public string Protocol => Data["protocol"]?.GetValue<string>().ToUpperInvariant() ?? "";
-    public long Size => Data["meta"]?["res"]?["size"]?.GetValue<long>() ?? 0;
-    public long Downloaded => Data["progress"]?["downloaded"]?.GetValue<long>() ?? 0;
-    public long Speed => Data["progress"]?["speed"]?.GetValue<long>() ?? 0;
+    public DateTimeOffset CreatedAt { get; private set; }
+    public string Url { get; private set; } = "";
+    public string Folder { get; private set; } = "";
+    public string Protocol { get; private set; } = "";
+    public long Size { get; private set; }
+    public long Downloaded { get; private set; }
+    public long Speed { get; private set; }
     public double Percent => Status == "done" ? 100 : Size > 0 ? Math.Min(100, Downloaded * 100.0 / Size) : 0;
     public bool IsIndeterminate => Size <= 0 && Status == "running";
-    public bool CanPause => Status is "running" or "wait" or "ready" || Data["uploading"]?.GetValue<bool>() == true;
+    public bool CanPause => Status is "running" or "wait" or "ready" || Uploading;
     public bool CanResume => IsDeferred || Status is "pause" or "error";
     public bool IsComplete => Status == "done";
     public string SizeText => Size > 0 ? FormatBytes(Size) : Strings.Get("Status.UnknownSize");
@@ -47,31 +84,21 @@ public sealed partial class DownloadItem : ObservableObject
     public string TransferSizeText => IsComplete ? SizeText : $"{FormatBytes(Downloaded)} / {SizeText}";
     public string RowProgressText => Status == "running" && Size > 0 ? $"{Percent:0}%" : StatusText;
     public string DetailsText => Strings.Format("Downloads.DetailsText", Name, StatusText, TransferText, SpeedText, RemainingText, FilePath, Url) + (DeferredError.Length > 0 ? "\n" + DeferredError : "");
-    public long Uploaded => Data["progress"]?["uploaded"]?.GetValue<long>() ?? 0;
-    public long UploadSpeed => Data["progress"]?["uploadSpeed"]?.GetValue<long>() ?? 0;
+    public long Uploaded { get; private set; }
+    public long UploadSpeed { get; private set; }
     public string SpeedText => Status == "running" ? FormatBytes(Speed) + "/s" : Uploading ? "↑ " + FormatBytes(UploadSpeed) + "/s" : "—";
     public string RemainingText => Status == "running" && Speed > 0 && Size > Downloaded ? FormatTime((Size - Downloaded) / Speed) : "—";
+    // Opening checks the disk each time; the row action keeps its check until the next snapshot.
     public string OpenPath => ExtractionStatus == "done" && !File.Exists(FilePath) && !Directory.Exists(FilePath) ? Folder : FilePath;
-    public DownloadAction PrimaryAction => IsDeferred ? new("continue", Strings.Get("Downloads.StartNow"), "\uE768") : IsProcessing ? new("none", Strings.Get("Status.Extracting"), "\uE895") : IsComplete && OpenPath == Folder ? new("open", Strings.Get("Downloads.OpenExtracted"), "\uE8B7") : DownloadPresentation.ForStatus(Status);
+    private DownloadAction? primaryAction;
+    public DownloadAction PrimaryAction => primaryAction ??= IsDeferred ? new("continue", Strings.Get("Downloads.StartNow"), "") : IsProcessing ? new("none", Strings.Get("Status.Extracting"), "") : IsComplete && OpenPath == Folder ? new("open", Strings.Get("Downloads.OpenExtracted"), "") : DownloadPresentation.ForStatus(Status);
     public string PrimaryActionLabel => PrimaryAction.Label;
     public string PrimaryActionGlyph => PrimaryAction.Glyph;
-    public string FileGlyph => Data["meta"]?["res"]?["name"]?.GetValue<string>() is { Length: > 0 } ? "\uE8B7" : DownloadPresentation.FileGlyph(Name);
+    public string FileGlyph { get; private set; } = "";
     public bool CanEditSource => Protocol == "HTTP" && (Status is "pause" or "error");
     public bool CanReveal => !IsDeferred;
     public bool CanAct => PrimaryAction.Key != "none";
-    public string FilePath
-    {
-        get
-        {
-            var resource = Data["meta"]?["res"];
-            var name = resource?["name"]?.GetValue<string>();
-            var file = resource?["files"]?.AsArray().FirstOrDefault();
-            var custom = Data["meta"]?["opts"]?["name"]?.GetValue<string>();
-            if (!string.IsNullOrEmpty(name))
-                return Path.Combine(Folder, string.IsNullOrEmpty(custom) ? name : custom);
-            return Path.Combine(Folder, file?["path"]?.GetValue<string>() ?? "", string.IsNullOrEmpty(custom) ? file?["name"]?.GetValue<string>() ?? Name : custom);
-        }
-    }
+    public string FilePath { get; private set; } = "";
     public override string ToString() => Name;
     public static string FormatBytes(long value) => value switch
     {

@@ -25,7 +25,7 @@ public sealed partial class DownloadItem
         // change refreshes all bindings; byte/speed ticks only touch live metrics.
         var contentChanged = Data.Count != data.Count || Data.Any(field => field.Key != "progress" && !JsonNode.DeepEquals(field.Value, data[field.Key]));
         var extractionChanged = ExtractionStatus != (data["progress"]?["extractStatus"]?.GetValue<string>() ?? "");
-        Data = data;
+        Load(data);
         if (contentChanged || extractionChanged)
         {
             OnPropertyChanged(string.Empty);
