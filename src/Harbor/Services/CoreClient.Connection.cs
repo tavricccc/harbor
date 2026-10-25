@@ -40,6 +40,13 @@ public sealed partial class CoreClient
             start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
             start.ArgumentList.Add("--language");
             start.ArgumentList.Add(Strings.Language);
+            // Wake as soon as the core publishes its session; polling remains the fallback.
+            var published = new SemaphoreSlim(0);
+            using var watcher = new FileSystemWatcher(DataDirectory, "session.json");
+            watcher.Created += (_, _) => published.Release();
+            watcher.Changed += (_, _) => published.Release();
+            watcher.Renamed += (_, _) => published.Release();
+            watcher.EnableRaisingEvents = true;
             using var child = Process.Start(start)!;
             var deadline = DateTime.UtcNow.AddSeconds(30);
             while (DateTime.UtcNow < deadline)
@@ -60,7 +67,7 @@ public sealed partial class CoreClient
                     }
                     catch (ArgumentException) { /* The old session remains until the new core publishes its session. */ }
                 }
-                await Task.Delay(100);
+                await published.WaitAsync(100);
             }
             if (session is null)
                 throw new TimeoutException(Strings.Get("Errors.CoreTimeout"));
@@ -72,8 +79,11 @@ public sealed partial class CoreClient
         {
             Content = new StringContent(new JsonObject { ["language"] = Strings.Language }.ToJsonString(), Encoding.UTF8, "application/json")
         };
-        using var languageResponse = await http.SendAsync(languageRequest);
+        var language = http.SendAsync(languageRequest);
+        var info = GetAsync("info");
+        await Task.WhenAll(language, info);
+        using var languageResponse = language.Result;
         languageResponse.EnsureSuccessStatusCode();
-        Version = (await GetAsync("info"))!["version"]!.GetValue<string>();
+        Version = info.Result!["version"]!.GetValue<string>();
     }
 }
