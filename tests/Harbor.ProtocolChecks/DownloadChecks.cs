@@ -83,6 +83,34 @@ internal static class DownloadChecks
         Action current = () => { for (var i = 0; i < count; i++) _ = items[i].Update(after[i]); };
         Measure("JSON string comparison", legacy, rounds);
         Measure("Task snapshot update", current, rounds);
+
+        // A running row: each binding rereads its own property when notified.
+        var ticks = Enumerable.Range(0, rounds + 3).Select(round => before.Select(x =>
+        {
+            var next = x.DeepClone().AsObject();
+            next["progress"]!["downloaded"] = 1000000L + round * 1000L;
+            return next;
+        }).ToArray()).ToArray();
+        foreach (var item in items)
+            item.PropertyChanged += (sender, e) =>
+            {
+                var row = (DownloadItem)sender!;
+                _ = e.PropertyName switch
+                {
+                    nameof(row.Percent) => row.Percent.ToString(),
+                    nameof(row.TransferSizeText) => row.TransferSizeText,
+                    nameof(row.RowProgressText) => row.RowProgressText,
+                    nameof(row.SpeedText) => row.SpeedText,
+                    nameof(row.DetailsText) => row.DetailsText,
+                    "" or null => row.DetailsText + row.PrimaryActionLabel + row.CanAct,
+                    _ => ""
+                };
+            };
+        var tick = 0;
+        Action progress = () => { var next = ticks[tick++]; for (var i = 0; i < count; i++) _ = items[i].Update(next[i]); };
+        Measure("Progress tick with row bindings", progress, rounds);
+        Action sort = () => _ = items.OrderByDescending(x => x.CreatedAt).ThenBy(x => x.Name).Count(x => x.Status == "running");
+        Measure("Sort and filter", sort, rounds);
     }
 
     private static void Measure(string label, Action action, int rounds)
