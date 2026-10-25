@@ -33,7 +33,7 @@ try {
     $archive = [IO.Compression.ZipFile]::OpenRead($output)
     try {
         $names = @($archive.Entries.FullName | ForEach-Object { $_.Replace('\','/') })
-        foreach ($required in @('.github/workflows/windows.yml','go.mod','go.sum','localization/languages.json','localization/en-US.json','localization/zh-TW.json','localization/zh-CN.json','core/cmd/browser-host/main.go','core/upstream.json','scripts/update-core.ps1','scripts/installer.iss','third_party/gopeed/LICENSE','third_party/gopeed/go.mod','SOURCE-REVISION.txt')) {
+        foreach ($required in @('.github/workflows/windows.yml','go.mod','go.sum','localization/languages.json','localization/en-US.json','localization/zh-TW.json','localization/zh-CN.json','core/cmd/browser-host/main.go','core/upstream.json','scripts/update-core.ps1','src/HarborSetup/HarborSetup.csproj','third_party/gopeed/LICENSE','third_party/gopeed/go.mod','SOURCE-REVISION.txt')) {
             if ($names -notcontains $required) { throw "Missing source: $required" }
         }
         if ($names | Where-Object { $_ -match '(^|/)(bin|obj|work|artifacts|\.git)/|\.(db|pfx)$' }) { throw 'Generated or private files found in source archive' }
