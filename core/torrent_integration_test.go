@@ -105,14 +105,14 @@ func TestLocalTorrentSelectedFileTransfer(t *testing.T) {
 	}
 	defer rest.Stop()
 	destination := filepath.Join(root, "downloads")
-	resolved, err := rest.Downloader.Resolve(&base.Request{URL: torrentPath}, &base.Options{Path: destination, SelectFiles: []int{0}})
+	resolved, err := rest.Downloader.Resolve(&base.Request{URL: torrentPath})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(resolved.Res.Files) != 2 || resolved.Res.Files[0].Name != "a.bin" {
 		t.Fatal("multi-file torrent did not resolve")
 	}
-	id, err := rest.Downloader.Create(resolved.ID)
+	id, err := rest.Downloader.CreateWithOptions(resolved.ID, &base.Options{Path: destination, SelectFiles: []int{0}})
 	if err != nil {
 		t.Fatal(err)
 	}
