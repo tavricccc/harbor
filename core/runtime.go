@@ -36,9 +36,16 @@ func runCore(options coreOptions) error {
 	if err != nil {
 		return err
 	}
+	resolves, err := trackResolves(rest.Downloader)
+	if err != nil {
+		rest.Stop()
+		return err
+	}
+	resolves.start(time.Minute)
 	sessionPath := ""
 	defer func() {
 		api.Close()
+		resolves.close()
 		rest.Stop()
 		if sessionPath != "" {
 			os.Remove(sessionPath)
@@ -50,6 +57,7 @@ func runCore(options coreOptions) error {
 	})
 	api.Handler = localExtensions(api.Handler, token)
 	api.Handler = textProxy(api.Handler, token)
+	api.Handler = resolves.handler(api.Handler)
 	queue, err := loadDeferredDownloads(options.root, createDeferredTask)
 	if err != nil {
 		return err
