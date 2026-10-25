@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>HarborSetup</RootNamespace>
+    <AssemblyName>HarborSetup</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\Harbor\Assets\AppIcon.ico</ApplicationIcon>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <EnableWinAppRunSupport>false</EnableWinAppRunSupport>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- package.ps1 passes the Harbor version. -->
+    <Version Condition="'$(Version)' == ''">0.0.0</Version>
+    <Product>Harbor</Product>
+    <Title>Harbor Setup</Title>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <!-- Shared .NET and Windows App Runtime, like Harbor itself. The apphost reports missing .NET;
+         Program checks the Windows App Runtime before any WinUI type loads. -->
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+    <SelfContained>false</SelfContained>
+    <WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
+    <WindowsAppSdkIncludeVersionInfo>true</WindowsAppSdkIncludeVersionInfo>
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <WindowsPackageType>None</WindowsPackageType>
+    <!-- One file to hand out; it also becomes Uninstall.exe in the install folder. -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <!-- package.ps1 points this at the zipped Harbor publish output. -->
+    <PayloadZip Condition="'$(PayloadZip)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\payload.zip</PayloadZip>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Harbor\Localization\Strings.cs" Link="Localization\Strings.cs" />
+    <Compile Include="..\Harbor\Localization\LanguageOption.cs" Link="Localization\LanguageOption.cs" />
+    <Compile Include="..\Harbor\Localization\LocalizationJsonContext.cs" Link="Localization\LocalizationJsonContext.cs" />
+    <EmbeddedResource Include="..\..\localization\*.json" LogicalName="Harbor.Localization.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="$(PayloadZip)" LogicalName="payload.zip" Condition="Exists('$(PayloadZip)')" />
+    <Content Include="..\Harbor\Assets\AppIcon.ico" Link="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\Harbor\Assets\Harbor.png" Link="Assets\Harbor.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.5.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
+  </ItemGroup>
+</Project>
