@@ -63,8 +63,9 @@ func runCore(options coreOptions) error {
 		return err
 	}
 	api.Handler = queue.handler(api.Handler, token)
-	go api.Serve(listener)
 	events := listenTasks(rest.Downloader)
+	api.Handler = trackRevision(events).handler(api.Handler, token)
+	go api.Serve(listener)
 	lifecycle := trackLifecycle(rest.Downloader, events)
 	if err := configureDownloadFolder(); err != nil {
 		return err
