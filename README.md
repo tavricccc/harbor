@@ -14,7 +14,7 @@ A native Windows download manager built with WinUI 3 and the official [Gopeed](h
 - [Complete source](https://github.com/tavricccc/harbor/releases/download/v0.11.1/Harbor-Source-0.11.1.zip)
 - [SHA-256 checksums](https://github.com/tavricccc/harbor/releases/download/v0.11.1/SHA256SUMS.txt)
 
-Windows 10 1809 or later; Windows 11 recommended. Requires shared [.NET 10 Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) and Windows App Runtime 2.5.1 or later. The installer offers the .NET download page if needed; Harbor prompts for the matching Windows App Runtime at startup. The per-user installer preserves downloads and settings during upgrades.
+Windows 10 1809 or later; Windows 11 recommended. Requires shared [.NET 10 Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) and Windows App Runtime 2.5.1 or later. If either runtime is missing, the installer shows its download prompt before installing. The per-user installer preserves downloads and settings during upgrades.
 
 ## Features
 
@@ -35,7 +35,7 @@ Startup at sign-in is enabled by default. Saving by category is off by default. 
 
 ## Build
 
-On Windows, install PowerShell 7, .NET 10 SDK, Go 1.27 and Inno Setup 6:
+On Windows, install PowerShell 7, .NET 10 SDK, and Go 1.27:
 
 ```powershell
 pwsh -File scripts/build.ps1 -Test

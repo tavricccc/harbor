@@ -14,7 +14,7 @@
 - [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.11.1/Harbor-Source-0.11.1.zip)
 - [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.11.1/SHA256SUMS.txt)
 
-支援 Windows 10 1809 以上，建議使用 Windows 11。需要共用的 [.NET 10 Runtime（x64）](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) 與 Windows App Runtime 2.5.1 以上。缺少 .NET 時，安裝器提供下載入口；缺少 Windows App Runtime 時，Harbor 啟動會提示安裝。安裝到使用者目錄，升級保留下載與設定。
+支援 Windows 10 1809 以上，建議使用 Windows 11。需要共用的 [.NET 10 Runtime（x64）](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) 與 Windows App Runtime 2.5.1 以上。缺少任一 runtime 時，安裝器會在安裝前顯示下載提示。安裝到使用者目錄，升級保留下載與設定。
 
 ## 功能
 
@@ -35,7 +35,7 @@
 
 ## 建置
 
-Windows 需安裝 PowerShell 7、.NET 10 SDK、Go 1.27 與 Inno Setup 6：
+Windows 需安裝 PowerShell 7、.NET 10 SDK 與 Go 1.27：
 
 ```powershell
 pwsh -File scripts/build.ps1 -Test

@@ -2,13 +2,14 @@
 
 [繁體中文](zh-TW/development.md) · [Home](../README.md)
 
-Use Windows, PowerShell 7, .NET 10 SDK, Go 1.27 and Inno Setup 6. Work on `winui-native`.
+Use Windows, PowerShell 7, .NET 10 SDK, and Go 1.27. Work on `winui-native`.
 
 ## Ownership
 
 | Path | Responsibility |
 | --- | --- |
 | `src/Harbor/` | WinUI views, models and Windows services |
+| `src/HarborSetup/` | Per-user WinUI setup and uninstaller |
 | `core/` | Engine lifecycle, tray, browser handoff and deferred queue |
 | `localization/` | One JSON catalog per language, shared by C# and Go |
 | `go.mod`, `go.sum`, `core/upstream.json` | Locked upstream dependency and provenance |
@@ -28,9 +29,9 @@ pwsh -File scripts/source.ps1
 
 Product versions are in `src/Harbor/Harbor.csproj` and `Package.appxmanifest`. Update both and the changelogs together. Installer and source filenames read the project version.
 
-Publishing uses shared .NET and Windows App Runtime, without NativeAOT, trimming or ReadyToRun. JSON catalogs, preferences and statistics use generated serializers. Integration registration runs before Windows App Runtime initialization so installer/uninstaller commands do not need WinUI. Missing .NET blocks installation before existing files are changed; missing Windows App Runtime uses the SDK's download prompt.
+Publishing uses shared .NET and Windows App Runtime, without NativeAOT, trimming or ReadyToRun. JSON catalogs, preferences and statistics use generated serializers. Integration registration runs before Windows App Runtime initialization so installer/uninstaller commands do not need WinUI. The setup is itself a framework-dependent WinUI app: missing .NET shows the .NET host's download prompt and missing Windows App Runtime shows the SDK's, both before any file is changed. Its UI is built in code because a single-file app extracts compiled XAML away from the executable, where WinUI does not look for it.
 
-For a local installer that should not replace a release artifact, use `pwsh -File scripts/package.ps1 -SkipBuild -OutputDirectory artifacts/shared-runtime`. The installer omits PDB symbols. `Harbor.exe --check-dotnet` checks the .NET host; `Harbor.exe --check-runtime` also checks the matching Windows App Runtime. Both exit without showing the application or changing integrations.
+For a local installer that should not replace a release artifact, use `pwsh -File scripts/package.ps1 -SkipBuild -OutputDirectory artifacts/shared-runtime`. The setup embeds the published app as a zip with `installed-files.txt`, removes files the new version no longer ships, and copies itself to `Uninstall.exe`; it omits PDB symbols. Upgrades from the Inno Setup installer (0.11 and earlier) keep its install location and remove its uninstaller and entry. `Harbor.exe --check-dotnet` checks the .NET host; `Harbor.exe --check-runtime` also checks the matching Windows App Runtime. Both exit without showing the application or changing integrations.
 
 ## Upstream updates
 
@@ -45,7 +46,7 @@ pwsh -File scripts/update-core.ps1 -Channel main -Test
 
 ## Localization
 
-Edit `localization/en-US.json`, `zh-TW.json` and `zh-CN.json` together. Keep keys and `{0}` format arguments aligned. Add languages and their Inno Setup mapping to `languages.json`. C# and Go embed these files; packaging converts the `Installer.*` entries into Inno Setup messages. Edit the JSON sources, not the generated file in `artifacts/`.
+Edit `localization/en-US.json`, `zh-TW.json` and `zh-CN.json` together. Keep keys and `{0}` format arguments aligned. Add languages to `languages.json`. C#, the setup and Go embed these files; the setup uses the `Installer.*` entries.
 
 Use `Strings.Get` / `Strings.Format` in C#, `{loc:Localize Key=...}` in XAML and `localization.Text` in Go.
 
