@@ -64,7 +64,8 @@ func runCore(options coreOptions) error {
 	}
 	api.Handler = queue.handler(api.Handler, token)
 	go api.Serve(listener)
-	lifecycle := trackLifecycle(rest.Downloader)
+	events := listenTasks(rest.Downloader)
+	lifecycle := trackLifecycle(rest.Downloader, events)
 	if err := configureDownloadFolder(); err != nil {
 		return err
 	}
@@ -80,7 +81,7 @@ func runCore(options coreOptions) error {
 	if err != nil {
 		return err
 	}
-	startExtras(rest.Downloader, port, token)
+	startExtras(rest.Downloader, events, port, token)
 	queueStop, queueDone := startDeferredQueue(queue)
 	fmt.Println("Harbor core ready")
 	if options.ui == "" {

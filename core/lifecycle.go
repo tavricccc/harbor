@@ -17,9 +17,9 @@ type lifecycle struct {
 	changed    chan struct{}
 }
 
-func trackLifecycle(d *download.Downloader) *lifecycle {
+func trackLifecycle(d *download.Downloader, events *taskEvents) *lifecycle {
 	l := &lifecycle{downloader: d, pending: map[string]bool{}, changed: make(chan struct{}, 1)}
-	d.Listener(func(event *download.Event) {
+	events.add(func(event *download.Event) {
 		l.mutex.Lock()
 		switch event.Key {
 		case download.EventKeyStart:

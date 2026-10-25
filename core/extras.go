@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func startExtras(d *download.Downloader, port int, token string) {
+func startExtras(d *download.Downloader, events *taskEvents, port int, token string) {
 	config, err := d.GetConfig()
 	if err != nil {
 		return
@@ -21,7 +21,7 @@ func startExtras(d *download.Downloader, port int, token string) {
 			d.Logger.Error().Err(err).Msg("resume downloads")
 		}
 	}
-	d.Listener(func(event *download.Event) {
+	events.add(func(event *download.Event) {
 		if event.Key != download.EventKeyDone {
 			return
 		}
