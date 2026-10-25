@@ -55,6 +55,8 @@ public sealed partial class DownloadProgressPage : Page
         refreshing = true;
         try
         {
+            // The task and its connection statistics are independent reads.
+            var statistics = ConnectionsSurface.Visibility == Visibility.Visible ? core.GetStatisticsAsync($"tasks/{id}/stats") : null;
             var snapshot = (await core.GetAsync("tasks/" + id))!.AsObject();
             if (stopped || cancelling)
                 return;
@@ -62,9 +64,9 @@ public sealed partial class DownloadProgressPage : Page
             item ??= new DownloadItem(snapshot);
             if (changes != DownloadChanges.None)
                 UpdatePresentation(item, changes);
-            if (ConnectionsSurface.Visibility == Visibility.Visible)
+            if (statistics is not null)
             {
-                var stats = await core.GetStatisticsAsync($"tasks/{id}/stats");
+                var stats = await statistics;
                 if (!stopped && !cancelling && ConnectionsSurface.Visibility == Visibility.Visible)
                     connections.Update(stats, item);
             }
