@@ -20,7 +20,7 @@ public sealed partial class MainPage
                 return;
             }
             if (ViewModel.IsConnected)
-                await ViewModel.RefreshAsync();
+                await ViewModel.RefreshAsync(full: false);
             timer.Interval = ViewModel.RefreshInterval;
         };
     }
