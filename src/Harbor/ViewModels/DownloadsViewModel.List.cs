@@ -30,8 +30,11 @@ public sealed partial class DownloadsViewModel
         {
             if (index < VisibleItems.Count && ReferenceEquals(VisibleItems[index], visible[index]))
                 continue;
-            var current = VisibleItems.IndexOf(visible[index]);
-            if (current < 0)
+            // Earlier positions already hold their items, so search only the rest.
+            var current = index + 1;
+            while (current < VisibleItems.Count && !ReferenceEquals(VisibleItems[current], visible[index]))
+                current++;
+            if (current >= VisibleItems.Count)
                 VisibleItems.Insert(index, visible[index]);
             else
                 VisibleItems.Move(current, index);
