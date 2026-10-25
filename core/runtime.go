@@ -49,6 +49,7 @@ func runCore(options coreOptions) error {
 		return openDownloadRequest(options.root, options.ui, body)
 	})
 	api.Handler = localExtensions(api.Handler, token)
+	api.Handler = textProxy(api.Handler, token)
 	queue, err := loadDeferredDownloads(options.root, createDeferredTask)
 	if err != nil {
 		return err
