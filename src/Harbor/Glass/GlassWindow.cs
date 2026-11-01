@@ -347,7 +347,8 @@ internal sealed partial class GlassWindow : IDisposable
             source.SetRegionRects(NonClientRegionKind.Caption, captionRects);
             source.SetRegionRects(NonClientRegionKind.Passthrough, passRects);
             // The island covers the whole window and answers every point as client area, so the resize grips only
-            // reach HitTest where they are registered here too. Corners go with the top and bottom bands.
+            // reach HitTest where they are registered here too. A corner square goes in both of its bands: where two bands
+            // overlap, the pointer source answers with the corner.
             GetWindowRect(Handle, out var r);
             bool grips = resizable && glide is null;
             int w = r.Right - r.Left, h = r.Bottom - r.Top, edge = (int)(EdgeDip * Dpi), corner = (int)(CornerDip * Dpi);
