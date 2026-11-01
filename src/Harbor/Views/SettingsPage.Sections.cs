@@ -32,7 +32,7 @@ public sealed partial class SettingsPage
         var remote = SettingsFields.Advanced(panel, Strings.Get("Settings.LocalApi"));
         remote.Children.Add(new TextBox { Header = Strings.Get("Settings.ServerAddress"), IsReadOnly = true, Text = new Uri(vm.Core.ApiAddress).Authority });
         remote.Children.Add(new PasswordBox { Header = "API Token", Password = vm.Core.Token, PasswordRevealMode = PasswordRevealMode.Peek });
-        var copy = NativeButtons.Create(Strings.Get("Settings.CopyToken"), "\uE8C8");
+        var copy = NativeButtons.Create(Strings.Get("Settings.CopyToken"));
         copy.Click += (_, _) => { FileActions.Copy(vm.Core.Token); Success(Strings.Get("Settings.TokenCopied")); };
         remote.Children.Add(copy);
         remote.Children.Add(apiPort);
@@ -46,7 +46,7 @@ public sealed partial class SettingsPage
         panel.Children.Add(webhook);
         SettingsFields.Reveal(webhookEnabled, webhook);
         var urls = fields.Text(webhook, Strings.Get("Settings.WebhookUrls"), "webhook.urls", true);
-        var test = NativeButtons.Create(Strings.Get("Settings.TestWebhook"), "\uE724");
+        var test = NativeButtons.Create(Strings.Get("Settings.TestWebhook"));
         test.Click += async (_, _) =>
         {
             test.IsEnabled = false;
@@ -78,12 +78,12 @@ public sealed partial class SettingsPage
     private void BuildAbout()
     {
         var panel = Section(Strings.Get("Settings.About"));
-        panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"] });
+        panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["CompactSectionTitleStyle"] });
         panel.Children.Add(SettingsFields.Description(Strings.Format("Settings.CoreVersion", vm.Core.Version)));
         var credits = SettingsFields.Group(panel, Strings.Get("Settings.Credits"));
         credits.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
         panel.Children.Add(checkUpdates);
-        var update = NativeButtons.Create(Strings.Get("Update.Check"), "\uE72C");
+        var update = NativeButtons.Create(Strings.Get("Update.Check"));
         update.Click += async (_, _) =>
         {
             update.IsEnabled = false;
@@ -103,10 +103,10 @@ public sealed partial class SettingsPage
         links.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.Project"), NavigateUri = new Uri("https://github.com/tavricccc/harbor"), Padding = new Thickness(0) });
         links.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.License"), NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
         panel.Children.Add(links);
-        var logs = NativeButtons.Create(Strings.Get("Settings.OpenLogs"), "\uE8B7");
+        var logs = NativeButtons.Create(Strings.Get("Settings.OpenLogs"));
         logs.Click += (_, _) => FileActions.Open(Path.Combine(CoreClient.DataDirectory, "logs"));
         panel.Children.Add(logs);
-        var stop = NativeButtons.Create(Strings.Get("Settings.Quit"), "\uE7E8");
+        var stop = NativeButtons.Create(Strings.Get("Settings.Quit"));
         stop.Click += async (_, _) =>
         {
             var dialog = new ContentDialog { Title = Strings.Get("Settings.QuitConfirm"), Content = Strings.Get("Settings.QuitDescription"), PrimaryButtonText = Strings.Get("Settings.QuitAction"), CloseButtonText = Strings.Get("Common.Cancel") };

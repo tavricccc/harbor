@@ -44,12 +44,12 @@
                 </StackPanel>
             </Button>
             <StackPanel x:Name="DownloadsCommands" Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                <Button Click="AddDownload" Height="28" Margin="0,0,6,0" Padding="10,0,12,0"
+                <Button Style="{StaticResource PaneAccentButton}" Click="AddDownload" Height="28" Margin="0,0,6,0" Padding="10,0,12,0"
                         IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}" AutomationProperties.AutomationId="AddDownload"
                         AutomationProperties.Name="{loc:Localize Key=Downloads.Add}" ToolTipService.ToolTip="Ctrl+N">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <controls:Icon Glyph="plus" Width="13" Height="13"/>
-                        <TextBlock Text="{loc:Localize Key=Downloads.Add}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{loc:Localize Key=Downloads.Add}"/>
                     </StackPanel>
                 </Button>
                 <Button Style="{StaticResource PaneIconButton}" Click="PasteDownload" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"
@@ -92,7 +92,7 @@
         <StackPanel Grid.Row="1" Padding="20,0,20,0" Spacing="10">
             <InfoBar x:Name="BrowserSetupHint" IsOpen="False" Severity="Informational" IsClosable="True" Visibility="Collapsed"
                      Title="{loc:Localize Key=Browser.HintTitle}" Message="{loc:Localize Key=Browser.HintMessage}" Closed="BrowserSetupHintClosed">
-                <InfoBar.ActionButton><Button Content="{loc:Localize Key=Browser.Setup}" Click="OpenBrowserSetup"/></InfoBar.ActionButton>
+                <InfoBar.ActionButton><Button Style="{StaticResource PaneAccentButton}" Height="28" Content="{loc:Localize Key=Browser.Setup}" Click="OpenBrowserSetup"/></InfoBar.ActionButton>
             </InfoBar>
             <InfoBar x:Name="ErrorBar" IsOpen="False" Severity="Error" IsClosable="True" Visibility="Collapsed"/>
             <Grid x:Name="Toolbar" ColumnSpacing="8" Margin="0,0,0,8">

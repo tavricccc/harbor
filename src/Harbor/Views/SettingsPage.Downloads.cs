@@ -22,7 +22,7 @@ public sealed partial class SettingsPage
         destination.Children.Add(new TextBlock { Text = Strings.Get("Settings.DownloadFolder") });
         folder.Header = null;
         folderRow.Children.Add(folder);
-        var browse = NativeButtons.Create(Strings.Get("Common.Browse"), "\uE8B7");
+        var browse = NativeButtons.Create(Strings.Get("Common.Browse"));
         browse.Click += async (_, _) =>
         {
             browse.IsEnabled = false;
@@ -54,7 +54,7 @@ public sealed partial class SettingsPage
         customTrackers = fields.Text(bt, Strings.Get("Settings.CustomTrackers"), "extra.bt.customTrackers", true);
         var subscriptions = fields.Text(bt, Strings.Get("Settings.TrackerUrls"), "extra.bt.trackerSubscribeUrls", true);
         fields.Toggle(bt, Strings.Get("Settings.UpdateTrackersDaily"), "extra.bt.autoUpdateTrackers", true);
-        var update = NativeButtons.Create(Strings.Get("Settings.UpdateTrackers"), "\uE72C");
+        var update = NativeButtons.Create(Strings.Get("Settings.UpdateTrackers"));
         update.Click += async (_, _) =>
         {
             update.IsEnabled = false;
@@ -85,7 +85,7 @@ public sealed partial class SettingsPage
         var (ratio, seedTime) = SettingsFields.Columns(bt);
         fields.Number(ratio, Strings.Get("Settings.SeedRatio"), "protocolConfig.bt.seedRatio", 0, 0, 10000, fractional: true);
         fields.Number(seedTime, Strings.Get("Settings.SeedTime"), "protocolConfig.bt.seedTime", 0, 0, 100000000, 60);
-        var defaults = NativeButtons.Create(Strings.Get("Settings.DefaultTorrentApp"), "\uE713");
+        var defaults = NativeButtons.Create(Strings.Get("Settings.DefaultTorrentApp"));
         defaults.Click += (_, _) => WindowsIntegration.OpenDefaultApps();
         bt.Children.Add(defaults);
 

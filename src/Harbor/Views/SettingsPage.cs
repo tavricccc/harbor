@@ -61,9 +61,9 @@ public sealed partial class SettingsPage : Page
         surface.Children.Add(sections);
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };
-        var cancel = NativeButtons.Create(Strings.Get("Common.Cancel"), "\uE711");
+        var cancel = NativeButtons.Create(Strings.Get("Common.Cancel"));
         cancel.Click += (_, _) => CloseRequested?.Invoke();
-        saveButton = NativeButtons.Create(Strings.Get("Common.Save"), "\uE74E", true);
+        saveButton = NativeButtons.Create(Strings.Get("Common.Save"), true);
         saveButton.Click += Save;
         sections.IsEnabled = saveButton.IsEnabled = false;
         actions.Children.Add(cancel);

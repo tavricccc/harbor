@@ -103,9 +103,9 @@ public sealed class TaskDetailsDialog : ContentDialog
             """);
         var selectedPath = new TextBlock { TextWrapping = TextWrapping.Wrap, IsTextSelectionEnabled = true, Style = (Style)Application.Current.Resources["SecondaryTextBlockStyle"] };
         var commands = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right };
-        var open = NativeButtons.Create(Strings.Get("Common.Open"), "\uE8E5", true);
-        var folder = NativeButtons.Create(Strings.Get("Common.RevealFile"), "\uE8B7");
-        var share = NativeButtons.Create(Strings.Get("Common.Share"), "\uE72D");
+        var open = NativeButtons.Create(Strings.Get("Common.Open"), true);
+        var folder = NativeButtons.Create(Strings.Get("Common.RevealFile"));
+        var share = NativeButtons.Create(Strings.Get("Common.Share"));
         open.IsEnabled = folder.IsEnabled = share.IsEnabled = false;
         list.SelectionChanged += (_, _) =>
         {

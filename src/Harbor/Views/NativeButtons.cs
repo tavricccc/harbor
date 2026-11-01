@@ -3,22 +3,20 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Harbor.Views;
 
+/// <summary>Pane text buttons for code-built views; the primary one is the accent button.</summary>
 internal static class NativeButtons
 {
-    public static Button Create(string label, string glyph, bool primary = false)
+    public static Button Create(string label, bool primary = false)
     {
         var button = new Button();
         if (primary)
-            button.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
-        SetContent(button, label, glyph);
+            button.Style = (Style)Application.Current.Resources["PanePrimaryButton"];
+        SetContent(button, label);
         return button;
     }
-    public static void SetContent(Button button, string label, string glyph)
+    public static void SetContent(Button button, string label)
     {
-        if (button.Tag?.ToString() == label)
-            return;
-        button.Tag = label;
-        button.Content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { new FontIcon { Glyph = glyph, FontSize = 16 }, new TextBlock { Text = label } } };
+        button.Content = label;
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(button, label);
     }
 }

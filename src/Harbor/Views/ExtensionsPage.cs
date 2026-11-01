@@ -40,7 +40,7 @@ public sealed partial class ExtensionsPage : Page
         var installPanel = new StackPanel { Spacing = 12 };
         installPanel.Children.Add(url);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        var install = NativeButtons.Create(Strings.Get("Common.Install"), "\uE896", true);
+        var install = NativeButtons.Create(Strings.Get("Common.Install"), true);
         install.Click += async (_, _) => await Install(url.Text.Trim(), install);
         actions.Children.Add(install);
         var local = new Button { Content = Strings.Get("Extensions.ChooseFolder") };
@@ -108,7 +108,7 @@ public sealed partial class ExtensionsPage : Page
                 var section = new StackPanel { Spacing = 8 };
                 section.Children.Add(new TextBlock { Text = $"{ext["title"]}  {ext["version"]}", Style = (Style)Application.Current.Resources["CompactSectionTitleStyle"], TextWrapping = TextWrapping.Wrap });
                 section.Children.Add(new TextBlock { Text = ext["description"]?.ToString() ?? "", TextWrapping = TextWrapping.Wrap });
-                section.Children.Add(new TextBlock { Text = Strings.Format("Extensions.Stats", ext["author"], ext["stars"], ext["installCount"]), Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"] });
+                section.Children.Add(new TextBlock { Text = Strings.Format("Extensions.Stats", ext["author"], ext["stars"], ext["installCount"]), Style = (Style)Application.Current.Resources["SecondaryTextBlockStyle"] });
                 var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
                 var identity = ext["author"] + "@" + ext["name"];
                 var button = new Button { Content = identities.Contains(identity) ? Strings.Get("Extensions.Installed") : Strings.Get("Common.Install"), IsEnabled = !identities.Contains(identity) };

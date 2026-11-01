@@ -58,7 +58,7 @@ internal sealed class CategoriesEditor : StackPanel
         folderRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         folderRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         folderRow.Children.Add(path);
-        var browse = NativeButtons.Create(Strings.Get("Common.Browse"), "\uE8B7");
+        var browse = NativeButtons.Create(Strings.Get("Common.Browse"));
         browse.Click += async (_, _) =>
         {
             browse.IsEnabled = false;
@@ -76,10 +76,10 @@ internal sealed class CategoriesEditor : StackPanel
         Children.Add(form);
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        var add = NativeButtons.Create(Strings.Get("Categories.Add"), "\uE710");
-        var remove = NativeButtons.Create(Strings.Get("Categories.Remove"), "\uE74D");
+        var add = NativeButtons.Create(Strings.Get("Categories.Add"));
+        var remove = NativeButtons.Create(Strings.Get("Categories.Remove"));
         remove.IsEnabled = false;
-        var clear = NativeButtons.Create(Strings.Get("Common.ClearSelection"), "\uE711");
+        var clear = NativeButtons.Create(Strings.Get("Common.ClearSelection"));
         clear.IsEnabled = false;
         list.SelectionChanged += (_, _) =>
         {
@@ -87,7 +87,7 @@ internal sealed class CategoriesEditor : StackPanel
             name.Text = selected?.Name ?? "";
             path.Text = selected?.Path ?? "";
             remove.IsEnabled = clear.IsEnabled = selected is not null;
-            NativeButtons.SetContent(add, selected is null ? Strings.Get("Categories.Add") : Strings.Get("Categories.Update"), selected is null ? "\uE710" : "\uE74E");
+            NativeButtons.SetContent(add, selected is null ? Strings.Get("Categories.Add") : Strings.Get("Categories.Update"));
         };
         add.Click += (_, _) =>
         {
@@ -115,7 +115,7 @@ internal sealed class CategoriesEditor : StackPanel
         actions.Children.Add(clear);
         Children.Add(actions);
 
-        var presets = NativeButtons.Create(Strings.Get("Categories.AddPresets"), "\uE8B7");
+        var presets = NativeButtons.Create(Strings.Get("Categories.AddPresets"));
         presets.Click += (_, _) =>
         {
             var root = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");

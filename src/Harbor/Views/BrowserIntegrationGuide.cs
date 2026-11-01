@@ -7,7 +7,7 @@ namespace Harbor.Views;
 
 internal sealed class BrowserIntegrationGuide : StackPanel
 {
-    private readonly Button enable = NativeButtons.Create(Strings.Get("Browser.Enable"), "\uE774");
+    private readonly Button enable = NativeButtons.Create(Strings.Get("Browser.Enable"));
     private readonly InfoBar message = new() { IsClosable = true };
 
     internal BrowserIntegrationGuide()

@@ -46,7 +46,7 @@ internal sealed class MirrorsEditor : StackPanel
         form.AddField(Strings.Get("Common.Url"), url);
         Children.Add(form);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        var add = NativeButtons.Create(Strings.Get("Mirrors.Add"), "\uE710");
+        var add = NativeButtons.Create(Strings.Get("Mirrors.Add"));
         add.Click += (_, _) =>
         {
             if (!Uri.TryCreate(url.Text.Trim(), UriKind.Absolute, out var uri) || uri.Scheme is not ("https" or "http"))
@@ -59,7 +59,7 @@ internal sealed class MirrorsEditor : StackPanel
             url.Text = "";
             message.IsOpen = false;
         };
-        var first = NativeButtons.Create(Strings.Get("Mirrors.MakeFirst"), "\uE74A");
+        var first = NativeButtons.Create(Strings.Get("Mirrors.MakeFirst"));
         first.IsEnabled = false;
         first.Click += (_, _) =>
         {
@@ -72,7 +72,7 @@ internal sealed class MirrorsEditor : StackPanel
                 list.SelectedIndex = 0;
             }
         };
-        var remove = NativeButtons.Create(Strings.Get("Common.Remove"), "\uE74D");
+        var remove = NativeButtons.Create(Strings.Get("Common.Remove"));
         remove.IsEnabled = false;
         remove.Click += (_, _) => { if (list.SelectedIndex >= 0) list.Items.RemoveAt(list.SelectedIndex); };
         list.SelectionChanged += (_, _) => { first.IsEnabled = list.SelectedIndex > 0; remove.IsEnabled = list.SelectedIndex >= 0; };

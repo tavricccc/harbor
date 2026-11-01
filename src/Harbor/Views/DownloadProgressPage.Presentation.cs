@@ -28,7 +28,7 @@ public sealed partial class DownloadProgressPage
         Cancel.Content = Strings.Get(finished ? "Common.Close" : "Common.Cancel");
         Cancel.IsEnabled = !cancelling;
         ToolTipService.SetToolTip(Cancel, Strings.Get(finished ? "Progress.CloseWindow" : "Progress.CancelHint"));
-        Primary.Style = (Style)Application.Current.Resources[finished || task.Status == "error" ? "AccentButtonStyle" : "DefaultButtonStyle"];
+        Primary.Style = (Style)Application.Current.Resources[finished || task.Status == "error" ? "PanePrimaryButton" : "PaneTextButton"];
         Speed.Visibility = finished ? Visibility.Collapsed : Visibility.Visible;
         Remaining.Visibility = task.IsComplete ? Visibility.Collapsed : Visibility.Visible;
         Metrics.ColumnDefinitions[1].Width = finished ? new GridLength(0) : GridLength.Auto;

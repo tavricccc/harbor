@@ -10,37 +10,20 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary Source="ms-appx:///Themes/Pane.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <!-- Replaced at launch by the language's Noto Sans fallback list (Services/UiFont). -->
             <FontFamily x:Key="ContentControlThemeFontFamily">Segoe UI Variable Text, Microsoft JhengHei UI</FontFamily>
-            <FontFamily x:Key="HeadingFontFamily">Segoe UI Variable Display, Microsoft JhengHei UI</FontFamily>
-            <Style x:Key="RowActionButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Padding" Value="8,6"/>
-                <Setter Property="MinWidth" Value="0"/>
-                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-            </Style>
-            <Style x:Key="CompactPageTitleStyle" TargetType="TextBlock">
-                <Setter Property="FontFamily" Value="{StaticResource HeadingFontFamily}"/>
-                <Setter Property="FontSize" Value="20"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-            </Style>
+            <!-- Older view keys, drawn in Pane's type scale and colors. -->
+            <Style x:Key="CompactPageTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource PaneSectionTitle}"/>
             <Style x:Key="CompactSectionTitleStyle" TargetType="TextBlock">
-                <Setter Property="FontFamily" Value="{StaticResource HeadingFontFamily}"/>
-                <Setter Property="FontSize" Value="16"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="{ThemeResource PaneText1Brush}"/>
             </Style>
             <Style x:Key="SecondaryTextBlockStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-            </Style>
-            <Style x:Key="DownloadSurfaceStyle" TargetType="Grid">
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="FontSize" Value="12"/><Setter Property="Foreground" Value="{ThemeResource PaneText2Brush}"/>
             </Style>
             <Style x:Key="DownloadFooterStyle" TargetType="Border">
-                <Setter Property="BorderThickness" Value="0,1,0,0"/>
-                <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-                <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}"/>
-                <Setter Property="Padding" Value="24,14"/>
+                <Setter Property="BorderThickness" Value="0,1,0,0"/><Setter Property="BorderBrush" Value="{ThemeResource PaneStrokeBrush}"/>
+                <Setter Property="Padding" Value="20,12"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>
