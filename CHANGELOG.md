@@ -2,6 +2,12 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.12.1 — 2026-11-01
+
+- The main window can be maximized from a new title bar button or by double-clicking the title bar.
+- Window edges and corners are easier to grab for resizing; corners have a larger grip.
+- The add-download window expands and collapses downward with a short glide instead of jumping around its center.
+
 ## 0.12.0 — 2026-11-01
 
 - Redesign every window with a frosted-glass look: a new main page with filters, search and sort, Settings with a sidebar and setting cards, tabbed options when adding a download, a quieter progress window, and a matching installer and uninstaller.
