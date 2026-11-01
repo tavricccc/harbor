@@ -18,10 +18,6 @@ internal sealed class DownloadConnectionsPanel : Grid
     public DownloadConnectionsPanel()
     {
         MaxHeight = 240;
-        RowSpacing = 12;
-        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        Children.Add(new TextBlock { Text = Strings.Get("Progress.ConnectionsTitle"), FontSize = 16, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
         list = new ListView { ItemsSource = rows, SelectionMode = ListViewSelectionMode.None, Visibility = Visibility.Collapsed };
         ScrollViewer.SetVerticalScrollBarVisibility(list, ScrollBarVisibility.Auto);
         ScrollViewer.SetHorizontalScrollMode(list, ScrollMode.Disabled);
@@ -38,23 +34,14 @@ internal sealed class DownloadConnectionsPanel : Grid
         };
         list.ItemTemplate = (DataTemplate)XamlReader.Load("""
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                <Grid Padding="0,6" ColumnSpacing="12">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="88"/><ColumnDefinition Width="*"/><ColumnDefinition Width="104"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Label}" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding Label}"/>
-                    <StackPanel Grid.Column="1" Spacing="6">
-                        <Grid ColumnSpacing="8">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding TransferText}" FontSize="12" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" MaxWidth="104" TextTrimming="CharacterEllipsis"/>
-                        </Grid>
-                        <ProgressBar Value="{Binding Percent}" Maximum="100" IsIndeterminate="{Binding IsIndeterminate}" Height="4" AutomationProperties.Name="{Binding Label}"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding SpeedText}" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <Grid Padding="0,4" ColumnSpacing="12" ToolTipService.ToolTip="{Binding TransferText}">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="96"/><ColumnDefinition Width="*"/><ColumnDefinition Width="80"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <ProgressBar Grid.Column="1" Value="{Binding Percent}" Maximum="100" IsIndeterminate="{Binding IsIndeterminate}" VerticalAlignment="Center" AutomationProperties.Name="{Binding Label}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding SpeedText}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 </Grid>
             </DataTemplate>
             """);
-        SetRow(message, 1);
-        SetRow(list, 1);
         Children.Add(message);
         Children.Add(list);
     }

@@ -61,7 +61,8 @@ public sealed partial class ConnectionProgress : ObservableObject
         StatusText = Strings.Get(completed ? "Status.Completed" : failed ? "Status.Retrying" : running ? "Status.Downloading" : "Status.Paused");
         // HTTP stats expose cumulative bytes. Sample each lane independently.
         var elapsed = lastSample == 0 ? 0 : Stopwatch.GetElapsedTime(lastSample, now).TotalSeconds;
-        SpeedText = !running || completed || failed ? "0 B/s" : elapsed > 0 && retries == lastRetries && downloaded >= lastDownloaded
+        // Idle lanes say why instead of showing a zero speed.
+        SpeedText = completed || failed || !running ? StatusText : elapsed > 0 && retries == lastRetries && downloaded >= lastDownloaded
             ? DownloadItem.FormatBytes((long)((downloaded - lastDownloaded) / elapsed)) + "/s" : "—";
         lastSample = now;
         lastDownloaded = downloaded;

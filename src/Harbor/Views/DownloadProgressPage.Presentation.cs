@@ -16,34 +16,34 @@ public sealed partial class DownloadProgressPage
         ToolTipService.SetToolTip(FileName, task.Name);
         Folder.Text = Strings.Format("Progress.SaveLocation", task.Folder);
         ToolTipService.SetToolTip(Folder, task.Folder);
-        Source.Text = task.Url;
+        Source.Text = Uri.TryCreate(task.Url, UriKind.Absolute, out var source) && source.Host.Length > 0 ? source.Host : task.Url;
         ToolTipService.SetToolTip(SourceLink, task.Url);
         SourceLink.Visibility = task.Url.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         Transfer.Text = task.TransferSizeText;
-        Speed.Text = Strings.Format("Progress.Speed", task.Uploading ? Strings.Get("Common.Upload") : Strings.Get("Common.Download"), task.SpeedText);
-        Remaining.Text = task.RemainingText == "—" ? task.Status == "running" ? Strings.Get("Progress.Calculating") : task.StatusText : task.RemainingText;
+        Speed.Text = task.Uploading ? Strings.Format("Progress.Speed", Strings.Get("Common.Upload"), task.SpeedText) : task.SpeedText;
+        Remaining.Text = task.RemainingText == "—" ? task.Status == "running" ? Strings.Get("Progress.Calculating") : "" : task.RemainingText;
 
         var finished = task.IsComplete && !task.IsProcessing && !task.Uploading;
         Cancel.Content = Strings.Get(finished ? "Common.Close" : "Common.Cancel");
         Cancel.IsEnabled = !cancelling;
         ToolTipService.SetToolTip(Cancel, Strings.Get(finished ? "Progress.CloseWindow" : "Progress.CancelHint"));
-        Primary.Style = (Style)Application.Current.Resources[finished || task.Status == "error" ? "PanePrimaryButton" : "PaneTextButton"];
-        Speed.Visibility = finished ? Visibility.Collapsed : Visibility.Visible;
+        var style = (Style)Application.Current.Resources[finished || task.Status == "error" ? "PanePrimaryButton" : "PaneTextButton"];
+        if (Primary.Style != style)
+            Primary.Style = style;
+        Speed.Visibility = task.Status == "running" || task.Uploading ? Visibility.Visible : Visibility.Collapsed;
+        Folder.Visibility = task.IsComplete ? Visibility.Visible : Visibility.Collapsed;
         Remaining.Visibility = task.IsComplete ? Visibility.Collapsed : Visibility.Visible;
-        Metrics.ColumnDefinitions[1].Width = finished ? new GridLength(0) : GridLength.Auto;
-        Metrics.ColumnDefinitions[2].Width = task.IsComplete ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         Status.Text = task.IsProcessing ? task.ExtractionText : task.ExtractionStatus == "error"
             ? Strings.Get("Progress.ExtractFailed") : task.Uploading ? Strings.Format("Progress.Seeding", DownloadItem.FormatBytes(task.Uploaded)) : task.StatusText;
-        Percent.Text = task.Size > 0 && !task.IsComplete ? $"{task.Percent:0.0}%" : "";
+        Percent.Text = task.Size > 0 && !task.IsComplete ? $"{task.Percent:0}%" : "";
         Progress.Value = task.IsProcessing ? task.Data["progress"]?["extractProgress"]?.GetValue<double>() ?? 0 : task.Percent;
         Progress.IsIndeterminate = task.IsIndeterminate && !task.IsProcessing;
         Progress.Visibility = task.IsProcessing || task.IsComplete || task.Size > 0 || task.IsIndeterminate ? Visibility.Visible : Visibility.Collapsed;
-        CloseAfterOpen.Visibility = finished ? Visibility.Visible : Visibility.Collapsed;
         Browse.Visibility = task.IsComplete ? Visibility.Visible : Visibility.Collapsed;
         StopSeed.Visibility = task.Uploading ? Visibility.Visible : Visibility.Collapsed;
         if ((changes & DownloadChanges.Content) != 0)
         {
-            TitleChanged?.Invoke($"{task.Name} - {task.StatusText}");
+            TitleChanged?.Invoke(task.StatusText);
             LayoutChanged?.Invoke();
         }
     }

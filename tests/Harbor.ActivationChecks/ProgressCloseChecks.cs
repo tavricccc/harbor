@@ -47,42 +47,38 @@ internal sealed class ProgressCloseChecks : IDisposable
         await Task.Run(() => ((InvokePattern)owner.FindFirst(TreeScope.Descendants,
             new PropertyCondition(AutomationElement.NameProperty, "Start download"))
             .GetCurrentPattern(InvokePattern.Pattern)).Invoke());
-        AutomationElement? checkbox = null;
+        AutomationElement? openFolder = null;
         var deadline = DateTime.UtcNow.AddSeconds(20);
-        while (checkbox is null && DateTime.UtcNow < deadline)
+        while (openFolder is null && DateTime.UtcNow < deadline)
         {
-            checkbox = owner.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.AutomationIdProperty, "CloseProgressAfterOpen"));
-            if (checkbox?.Current.IsOffscreen == true) checkbox = null;
+            openFolder = owner.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "ProgressOpenFolder"));
+            if (openFolder?.Current.IsOffscreen == true) openFolder = null;
             await Task.Delay(100);
         }
-        if (checkbox is null) throw new Exception("Local download did not reach the completed progress view");
-        if (checkbox.Current.Name != "Close this window after opening a file or folder")
-            throw new Exception("Progress checkbox does not describe both actions");
+        if (openFolder is null) throw new Exception("Local download did not reach the completed progress view");
         var downloaded = Path.Combine(profile, "picked-folder", "harbor-close-test.txt");
         if (File.ReadAllText(downloaded) != "Harbor progress-window test.\n")
             throw new Exception("Completed test download has unexpected contents");
-        var toggle = (TogglePattern)checkbox.GetCurrentPattern(TogglePattern.Pattern);
-        if (toggle.Current.ToggleState != ToggleState.On) throw new Exception("Default close preference changed");
-        await Task.Run(toggle.Toggle);
-        CheckPreference(false);
+        // Closing after open is a global preference set in Settings; the window reads it on each click.
+        SetPreference(false);
         await OpenFolder(owner);
         await Task.Delay(700);
-        if (!IsWindow(hwnd)) throw new Exception("Unchecked Open folder closed the progress window");
-        await Task.Run(toggle.Toggle);
-        CheckPreference(true);
+        if (!IsWindow(hwnd)) throw new Exception("Open folder closed the progress window with the preference off");
+        SetPreference(true);
         await OpenFolder(owner);
         deadline = DateTime.UtcNow.AddSeconds(10);
         while (IsWindow(hwnd) && DateTime.UtcNow < deadline) await Task.Delay(100);
-        if (IsWindow(hwnd)) throw new Exception("Checked Open folder left the progress window open");
-        Console.WriteLine("PASS: completed local download; Open folder keeps the window when unchecked and closes it when checked; both preferences persist.");
+        if (IsWindow(hwnd)) throw new Exception("Open folder left the progress window open with the preference on");
+        Console.WriteLine("PASS: completed local download; Open folder follows the global close-after-open preference.");
     }
 
-    private void CheckPreference(bool expected)
+    private void SetPreference(bool value)
     {
-        var saved = JsonNode.Parse(File.ReadAllText(Path.Combine(profile, "preferences.json")))!;
-        if (saved["CloseProgressAfterOpen"]!.GetValue<bool>() != expected)
-            throw new Exception("Close-after-open preference was not saved");
+        var path = Path.Combine(profile, "preferences.json");
+        var saved = File.Exists(path) ? JsonNode.Parse(File.ReadAllText(path))!.AsObject() : new JsonObject();
+        saved["CloseProgressAfterOpen"] = value;
+        File.WriteAllText(path, saved.ToJsonString());
     }
 
     private static Task OpenFolder(AutomationElement owner) => Task.Run(() =>

@@ -2,40 +2,42 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:loc="using:Harbor.Localization"
+      xmlns:controls="using:Harbor.Controls"
       FontFamily="{StaticResource ContentControlThemeFontFamily}" FontSize="14">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="Body" Padding="24,20,24,16" Spacing="12">
+            <StackPanel x:Name="Body" Padding="24,6,24,16" Spacing="12">
                 <InfoBar x:Name="Error" Severity="Error" Visibility="Collapsed" Closed="HideError"/>
-                <TextBlock x:Name="FileName" FontSize="14" VerticalAlignment="Center" MaxLines="1"
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="FileName" FontSize="15" FontWeight="SemiBold" MaxLines="1"
                                TextTrimming="CharacterEllipsis" DragStarting="DragFile"/>
-                <HyperlinkButton x:Name="SourceLink" Click="OpenSource" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                 AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}">
-                    <TextBlock x:Name="Source" FontSize="12" MaxLines="1" TextTrimming="CharacterEllipsis"/>
-                    <HyperlinkButton.ContextFlyout>
-                        <MenuFlyout><MenuFlyoutItem Text="{loc:Localize Key=Common.CopyUrl}" Click="CopySource"/></MenuFlyout>
-                    </HyperlinkButton.ContextFlyout>
-                </HyperlinkButton>
-                <TextBlock x:Name="Folder" FontSize="12" Foreground="{ThemeResource PaneText2Brush}"
-                           TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
-                <Grid x:Name="Metrics" ColumnSpacing="12" Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <TextBlock x:Name="Transfer" FontSize="12" Foreground="{ThemeResource PaneText2Brush}"/>
-                    <TextBlock x:Name="Speed" Grid.Column="1" FontSize="12" HorizontalAlignment="Center" AutomationProperties.Name="{loc:Localize Key=Progress.SpeedName}"/>
-                    <TextBlock x:Name="Remaining" Grid.Column="2" FontSize="12" HorizontalAlignment="Right"
-                               Foreground="{ThemeResource PaneText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.RemainingName}"/>
-                </Grid>
-                <StackPanel x:Name="ProgressSection" Spacing="12">
-                    <ProgressBar x:Name="Progress" Maximum="100" IsIndeterminate="False" Margin="0,2,0,2" AutomationProperties.Name="{loc:Localize Key=Downloads.Progress}"/>
+                    <HyperlinkButton x:Name="SourceLink" Click="OpenSource" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                     Foreground="{ThemeResource PaneText3Brush}" AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}">
+                        <TextBlock x:Name="Source" FontSize="12" MaxLines="1" TextTrimming="CharacterEllipsis"/>
+                        <HyperlinkButton.ContextFlyout>
+                            <MenuFlyout><MenuFlyoutItem Text="{loc:Localize Key=Common.CopyUrl}" Click="CopySource"/></MenuFlyout>
+                        </HyperlinkButton.ContextFlyout>
+                    </HyperlinkButton>
+                    <TextBlock x:Name="Folder" FontSize="12" Foreground="{ThemeResource PaneText3Brush}"
+                               TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
+                </StackPanel>
+                <StackPanel x:Name="ProgressSection" Spacing="8" Margin="0,8,0,0">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock x:Name="Transfer" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="Percent" Grid.Column="1" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource PaneAccentBrush}"/>
+                    </Grid>
+                    <ProgressBar x:Name="Progress" Maximum="100" IsIndeterminate="False" AutomationProperties.Name="{loc:Localize Key=Downloads.Progress}"/>
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <TextBlock x:Name="Status" FontSize="12" TextWrapping="Wrap" Foreground="{ThemeResource PaneText2Brush}"/>
-                        <TextBlock x:Name="Percent" Grid.Column="1" FontSize="12" Foreground="{ThemeResource PaneText2Brush}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                            <TextBlock x:Name="Speed" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.SpeedName}"/>
+                            <TextBlock x:Name="Remaining" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.RemainingName}"/>
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
-                <CheckBox x:Name="CloseAfterOpen" Visibility="Collapsed" Content="{loc:Localize Key=Progress.CloseAfterOpen}" AutomationProperties.AutomationId="CloseProgressAfterOpen"
-                          Checked="SaveClosePreference" Unchecked="SaveClosePreference"/>
                 <Border x:Name="ConnectionsSurface" Visibility="Collapsed" BorderThickness="0,1,0,0"
                         BorderBrush="{ThemeResource PaneStrokeBrush}" Padding="0,16,0,0">
                     <ContentPresenter x:Name="ConnectionsHost"/>
@@ -48,7 +50,10 @@
                 <Button x:Name="ConnectionsToggle" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource PaneSubtleButton}"
                         Click="ToggleConnections" AutomationProperties.AutomationId="ToggleConnectionProgress"
                         AutomationProperties.Name="{loc:Localize Key=Progress.ConnectionsTitle}" ToolTipService.ToolTip="{loc:Localize Key=Progress.ConnectionsTitle}">
-                    <FontIcon x:Name="ConnectionsArrow" Glyph="&#xE70D;" FontSize="12"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{loc:Localize Key=Progress.Connections}"/>
+                        <controls:Icon x:Name="ConnectionsArrow" Glyph="chev-d" Width="12" Height="12"/>
+                    </StackPanel>
                 </Button>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                     <Button x:Name="Browse" Content="{loc:Localize Key=Common.OpenFolder}" Visibility="Collapsed" Click="BrowseClick" AutomationProperties.AutomationId="ProgressOpenFolder"/>

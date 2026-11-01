@@ -34,7 +34,6 @@ public sealed partial class DownloadProgressPage : Page
         this.windowVisible = windowVisible;
         ConnectionsHost.Content = connections;
         connections.LayoutChanged += () => LayoutChanged?.Invoke();
-        CloseAfterOpen.IsChecked = UiPreferences.Load().CloseProgressAfterOpen;
         Body.SizeChanged += (_, _) => LayoutChanged?.Invoke();
         timer.Tick += async (_, _) => { if (windowVisible()) await Refresh(); else timer.Stop(); };
         Loaded += (_, _) => { loaded = true; UpdatePollingVisibility(); };
@@ -88,7 +87,7 @@ public sealed partial class DownloadProgressPage : Page
             if (item.PrimaryAction.Key == "open")
             {
                 FileActions.Open(item.OpenPath);
-                if (CloseAfterOpen.IsChecked == true)
+                if (UiPreferences.Load().CloseProgressAfterOpen)
                     close();
             }
             else if (item.CanAct)
@@ -107,7 +106,7 @@ public sealed partial class DownloadProgressPage : Page
             if (item is null)
                 return;
             FileActions.Reveal(item.FilePath, item.Folder);
-            if (CloseAfterOpen.IsChecked == true)
+            if (UiPreferences.Load().CloseProgressAfterOpen)
                 close();
         }
         catch (Exception failure) { ShowError(failure); }
@@ -170,18 +169,12 @@ public sealed partial class DownloadProgressPage : Page
     {
         var expanded = ConnectionsSurface.Visibility != Visibility.Visible;
         ConnectionsSurface.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
-        ConnectionsArrow.Glyph = expanded ? "\uE70E" : "\uE70D";
+        ConnectionsArrow.Glyph = expanded ? "chev-u" : "chev-d";
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(ConnectionsToggle, Strings.Get(expanded ? "Common.Collapse" : "Common.Expand"));
         connections.ResetSamples();
         LayoutChanged?.Invoke();
         if (expanded)
             await Refresh();
-    }
-    private void SaveClosePreference(object sender, RoutedEventArgs args)
-    {
-        var prefs = UiPreferences.Load();
-        prefs.CloseProgressAfterOpen = CloseAfterOpen.IsChecked == true;
-        prefs.Save();
     }
     private async void DragFile(UIElement sender, DragStartingEventArgs args)
     {
