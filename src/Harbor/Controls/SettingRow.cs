@@ -26,9 +26,9 @@ public partial class SettingRow : UserControl
     public SettingRow()
     {
         IsTabStop = false;
-        label.Foreground = Motion.Resource("PaneText1Brush");
-        description.Foreground = Motion.Resource("PaneText3Brush");
-        divider.BorderBrush = Motion.Resource("PaneStrokeBrush");
+        Motion.Themed(label, TextBlock.ForegroundProperty, "PaneText1Brush");
+        Motion.Themed(description, TextBlock.ForegroundProperty, "PaneText3Brush");
+        Motion.Themed(divider, Border.BorderBrushProperty, "PaneStrokeBrush");
         Content = divider;
         Loaded += (_, _) => Layout();
         IsEnabledChanged += (_, _) => label.Opacity = description.Opacity = IsEnabled ? 1 : 0.4;
@@ -65,7 +65,7 @@ public sealed partial class SettingCard : StackPanel
     public SettingCard()
     {
         CornerRadius = new CornerRadius(12); BorderThickness = new Thickness(1);
-        Background = Motion.Resource("PaneFillControlBrush"); BorderBrush = Motion.Resource("PaneStrokeBrush");
+        Motion.Themed(this, BackgroundProperty, "PaneFillControlBrush"); Motion.Themed(this, BorderBrushProperty, "PaneStrokeBrush");
         Loaded += (_, _) =>
         {
             // Directly under a note (not a group title) a card needs its own gap.

@@ -23,7 +23,7 @@ internal sealed partial class WindowHeader : Grid
         Padding = new Thickness(20, 0, 8, 0);
         ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        title.Foreground = Motion.Resource("PaneText1Brush");
+        Motion.Themed(title, TextBlock.ForegroundProperty, "PaneText1Brush");
         Children.Add(title);
         var close = IconButton("close", "Common.Close");
         minimize.Click += (_, _) => MinimizeRequested?.Invoke();

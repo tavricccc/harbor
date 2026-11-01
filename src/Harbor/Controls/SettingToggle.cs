@@ -17,7 +17,7 @@ public sealed partial class SettingToggle : SettingRow
 
     public SettingToggle()
     {
-        state.Foreground = Motion.Resource("PaneText2Brush");
+        Motion.Themed(state, TextBlock.ForegroundProperty, "PaneText2Brush");
         var pair = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         pair.Children.Add(state); pair.Children.Add(toggle);
         Control = pair;

@@ -31,7 +31,9 @@ public sealed partial class Switch : UserControl
     public Switch()
     {
         IsTabStop = true;
-        var track = new Border { Width = 38, Height = 22, CornerRadius = new CornerRadius(11), BorderThickness = new Thickness(1), Background = Motion.Resource("PaneFillControlBrush"), BorderBrush = Motion.Resource("PaneStrokeBrush") };
+        var track = new Border { Width = 38, Height = 22, CornerRadius = new CornerRadius(11), BorderThickness = new Thickness(1) };
+        Motion.Themed(track, Border.BackgroundProperty, "PaneFillControlBrush");
+        Motion.Themed(track, Border.BorderBrushProperty, "PaneStrokeBrush");
         on.Background = Motion.Accent;
         var root = new Grid { Width = 38, Height = 22, Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent) };
         root.Children.Add(track); root.Children.Add(on); root.Children.Add(knob);

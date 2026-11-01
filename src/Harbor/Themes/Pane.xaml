@@ -2,9 +2,11 @@
 <!--
   Pane's design tokens and control styles for Harbor's glass windows: text, stroke and fill colors per theme,
   radii (panel 20, item 12, control 10), control heights (24 / 28 / 32 / 40) and the accent (霧藍).
-  The font is Noto Sans when installed, otherwise the system default (GlassWindow.Font).
+  The font is Noto Sans when installed, otherwise the Windows UI font for the language (Services/UiFont).
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Pane colors per theme, and the built-in controls (text boxes, drop-downs, check and radio buttons, lists, menus,
+         dialogs) aliased to them inside each theme so a runtime theme switch restyles them as well. -->
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
             <Color x:Key="PaneText1Color">#EB141418</Color>
@@ -14,6 +16,7 @@
             <Color x:Key="PaneFillHoverColor">#0B000000</Color>
             <Color x:Key="PaneFillSelectedColor">#9EFFFFFF</Color>
             <Color x:Key="PaneFillControlColor">#80FFFFFF</Color>
+            <Color x:Key="PaneSurfaceColor">#FFF6F6F8</Color>
             <SolidColorBrush x:Key="PaneText1Brush" Color="{ThemeResource PaneText1Color}"/>
             <SolidColorBrush x:Key="PaneText2Brush" Color="{ThemeResource PaneText2Color}"/>
             <SolidColorBrush x:Key="PaneText3Brush" Color="{ThemeResource PaneText3Color}"/>
@@ -21,6 +24,84 @@
             <SolidColorBrush x:Key="PaneFillHoverBrush" Color="{ThemeResource PaneFillHoverColor}"/>
             <SolidColorBrush x:Key="PaneFillSelectedBrush" Color="{ThemeResource PaneFillSelectedColor}"/>
             <SolidColorBrush x:Key="PaneFillControlBrush" Color="{ThemeResource PaneFillControlColor}"/>
+            <SolidColorBrush x:Key="PaneSurfaceBrush" Color="{ThemeResource PaneSurfaceColor}"/>
+            <SolidColorBrush x:Key="PaneAccentStateBrush" Color="#FF5874C9"/>
+            <StaticResource x:Key="TextControlBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="TextControlBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="TextControlForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlHeaderForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="ComboBoxBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="ComboBoxHeaderForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeChecked" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ProgressBarForeground" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ProgressBarBackground" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ScrollBarThumbFill" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="ListViewItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelectedPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelectedPressed" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorPointerOverBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorPressedBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="ExpanderHeaderBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ExpanderContentBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ExpanderHeaderBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ExpanderContentBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ContentDialogBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ContentDialogBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ContentDialogForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="FlyoutBorderThemeBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="MenuFlyoutItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="MenuFlyoutItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ToggleMenuFlyoutItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ToggleMenuFlyoutItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxItemPillFillBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CalendarDatePickerBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="CalendarDatePickerBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TimePickerButtonBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TimePickerButtonBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="PivotHeaderItemForegroundSelected" ResourceKey="PaneText1Brush"/>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
             <Color x:Key="PaneText1Color">#F0FFFFFF</Color>
@@ -30,6 +111,7 @@
             <Color x:Key="PaneFillHoverColor">#0FFFFFFF</Color>
             <Color x:Key="PaneFillSelectedColor">#1FFFFFFF</Color>
             <Color x:Key="PaneFillControlColor">#12FFFFFF</Color>
+            <Color x:Key="PaneSurfaceColor">#FF1C1C20</Color>
             <SolidColorBrush x:Key="PaneText1Brush" Color="{ThemeResource PaneText1Color}"/>
             <SolidColorBrush x:Key="PaneText2Brush" Color="{ThemeResource PaneText2Color}"/>
             <SolidColorBrush x:Key="PaneText3Brush" Color="{ThemeResource PaneText3Color}"/>
@@ -37,6 +119,179 @@
             <SolidColorBrush x:Key="PaneFillHoverBrush" Color="{ThemeResource PaneFillHoverColor}"/>
             <SolidColorBrush x:Key="PaneFillSelectedBrush" Color="{ThemeResource PaneFillSelectedColor}"/>
             <SolidColorBrush x:Key="PaneFillControlBrush" Color="{ThemeResource PaneFillControlColor}"/>
+            <SolidColorBrush x:Key="PaneSurfaceBrush" Color="{ThemeResource PaneSurfaceColor}"/>
+            <SolidColorBrush x:Key="PaneAccentStateBrush" Color="#FF5874C9"/>
+            <StaticResource x:Key="TextControlBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="TextControlBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="TextControlForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlHeaderForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="ComboBoxBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="ComboBoxHeaderForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeChecked" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ProgressBarForeground" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ProgressBarBackground" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ScrollBarThumbFill" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="ListViewItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelectedPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelectedPressed" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorPointerOverBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorPressedBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="ExpanderHeaderBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ExpanderContentBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ExpanderHeaderBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ExpanderContentBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ContentDialogBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ContentDialogBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ContentDialogForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="FlyoutBorderThemeBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="MenuFlyoutItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="MenuFlyoutItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ToggleMenuFlyoutItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ToggleMenuFlyoutItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxItemPillFillBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CalendarDatePickerBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="CalendarDatePickerBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TimePickerButtonBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TimePickerButtonBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="PivotHeaderItemForegroundSelected" ResourceKey="PaneText1Brush"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="HighContrast">
+            <StaticResource x:Key="PaneText1Color" ResourceKey="SystemColorWindowTextColor"/>
+            <StaticResource x:Key="PaneText2Color" ResourceKey="SystemColorWindowTextColor"/>
+            <StaticResource x:Key="PaneText3Color" ResourceKey="SystemColorGrayTextColor"/>
+            <StaticResource x:Key="PaneStrokeColor" ResourceKey="SystemColorWindowTextColor"/>
+            <StaticResource x:Key="PaneFillHoverColor" ResourceKey="SystemColorWindowColor"/>
+            <StaticResource x:Key="PaneFillSelectedColor" ResourceKey="SystemColorWindowColor"/>
+            <StaticResource x:Key="PaneFillControlColor" ResourceKey="SystemColorWindowColor"/>
+            <StaticResource x:Key="PaneSurfaceColor" ResourceKey="SystemColorWindowColor"/>
+            <SolidColorBrush x:Key="PaneText1Brush" Color="{ThemeResource PaneText1Color}"/>
+            <SolidColorBrush x:Key="PaneText2Brush" Color="{ThemeResource PaneText2Color}"/>
+            <SolidColorBrush x:Key="PaneText3Brush" Color="{ThemeResource PaneText3Color}"/>
+            <SolidColorBrush x:Key="PaneStrokeBrush" Color="{ThemeResource PaneStrokeColor}"/>
+            <SolidColorBrush x:Key="PaneFillHoverBrush" Color="{ThemeResource PaneFillHoverColor}"/>
+            <SolidColorBrush x:Key="PaneFillSelectedBrush" Color="{ThemeResource PaneFillSelectedColor}"/>
+            <SolidColorBrush x:Key="PaneFillControlBrush" Color="{ThemeResource PaneFillControlColor}"/>
+            <SolidColorBrush x:Key="PaneSurfaceBrush" Color="{ThemeResource PaneSurfaceColor}"/>
+            <SolidColorBrush x:Key="PaneAccentStateBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+            <StaticResource x:Key="TextControlBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="TextControlBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="TextControlForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForegroundPointerOver" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlPlaceholderForegroundFocused" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="TextControlHeaderForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="ComboBoxBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="ComboBoxHeaderForeground" ResourceKey="PaneText2Brush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeChecked" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ProgressBarForeground" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ProgressBarBackground" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ScrollBarThumbFill" ResourceKey="PaneText3Brush"/>
+            <StaticResource x:Key="ListViewItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelectedPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemBackgroundSelectedPressed" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorPointerOverBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemSelectionIndicatorPressedBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="ListViewItemForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="ExpanderHeaderBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ExpanderContentBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="ExpanderHeaderBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ExpanderContentBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ContentDialogBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ContentDialogBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ContentDialogForeground" ResourceKey="PaneText1Brush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="FlyoutBorderThemeBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="MenuFlyoutItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="MenuFlyoutItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ToggleMenuFlyoutItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ToggleMenuFlyoutItemBackgroundPressed" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="PaneSurfaceBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="PaneFillHoverBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="PaneFillSelectedBrush"/>
+            <StaticResource x:Key="ComboBoxItemPillFillBrush" ResourceKey="PaneAccentStateBrush"/>
+            <StaticResource x:Key="CalendarDatePickerBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="CalendarDatePickerBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="TimePickerButtonBackground" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="TimePickerButtonBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="PaneFillControlBrush"/>
+            <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="PaneStrokeBrush"/>
+            <StaticResource x:Key="PivotHeaderItemForegroundSelected" ResourceKey="PaneText1Brush"/>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
@@ -48,41 +303,10 @@
     <SolidColorBrush x:Key="PaneWarningBrush" Color="#FFF5A524"/>
     <CornerRadius x:Key="PaneRadiusItem">12</CornerRadius>
     <CornerRadius x:Key="PaneRadiusControl">10</CornerRadius>
-
-    <!-- WinUI controls (text boxes, drop-downs, number boxes, check and radio buttons) in Pane's colors:
-         neutral control fill with a thin stroke, 10 px corners, the accent only for state and focus. -->
-    <StaticResource x:Key="TextControlBackground" ResourceKey="PaneFillControlBrush"/>
-    <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="PaneFillControlBrush"/>
-    <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="PaneFillSelectedBrush"/>
-    <StaticResource x:Key="TextControlBorderBrush" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="TextControlForeground" ResourceKey="PaneText1Brush"/>
-    <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="PaneText1Brush"/>
-    <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="PaneText1Brush"/>
-    <StaticResource x:Key="TextControlPlaceholderForeground" ResourceKey="PaneText3Brush"/>
     <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
-    <StaticResource x:Key="ComboBoxBackground" ResourceKey="PaneFillControlBrush"/>
-    <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="PaneFillSelectedBrush"/>
-    <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="PaneFillSelectedBrush"/>
-    <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="ComboBoxForeground" ResourceKey="PaneText1Brush"/>
-    <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="PaneText2Brush"/>
-    <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="CheckBoxCheckBackgroundStrokeChecked" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="CheckBoxCheckBackgroundFillUnchecked" ResourceKey="PaneFillControlBrush"/>
-    <StaticResource x:Key="CheckBoxCheckBackgroundStrokeUnchecked" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="PaneFillControlBrush"/>
-    <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="PaneStrokeBrush"/>
-    <StaticResource x:Key="ProgressBarForeground" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="PaneAccentBrush"/>
-    <StaticResource x:Key="ScrollBarThumbFill" ResourceKey="PaneText3Brush"/>
+    <CornerRadius x:Key="OverlayCornerRadius">14</CornerRadius>
+    <Thickness x:Key="ContentDialogPadding">24,22,24,22</Thickness>
+
     <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
         <Setter Property="CornerRadius" Value="10"/><Setter Property="MinHeight" Value="32"/><Setter Property="FontSize" Value="12"/>
     </Style>
@@ -215,5 +439,20 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <!-- List rows: 10 px corners, neutral hover, the selected fill from the theme and the accent only as the selection mark -->
+    <Style x:Key="PaneListItem" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="10,0,8,0"/>
+        <Setter Property="Margin" Value="0,1"/>
+        <Setter Property="MinHeight" Value="56"/>
+    </Style>
+    <Style TargetType="InfoBar"><Setter Property="CornerRadius" Value="12"/></Style>
+    <Style TargetType="Expander" BasedOn="{StaticResource DefaultExpanderStyle}"><Setter Property="CornerRadius" Value="12"/></Style>
+    <Style TargetType="CalendarDatePicker" BasedOn="{StaticResource DefaultCalendarDatePickerStyle}"><Setter Property="CornerRadius" Value="10"/></Style>
+    <Style TargetType="TimePicker" BasedOn="{StaticResource DefaultTimePickerStyle}"><Setter Property="CornerRadius" Value="10"/></Style>
+    <Style TargetType="PasswordBox" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
+        <Setter Property="CornerRadius" Value="10"/><Setter Property="MinHeight" Value="32"/><Setter Property="FontSize" Value="12"/>
     </Style>
 </ResourceDictionary>

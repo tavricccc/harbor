@@ -16,7 +16,30 @@ internal static class Motion
     internal static CubicBezierEasingFunction Ease(Compositor c, (float, float, float, float) p) => c.CreateCubicBezierEasingFunction(new Vector2(p.Item1, p.Item2), new Vector2(p.Item3, p.Item4));
     /// <summary>Pane's default accent (霧藍); only control states and focus use it.</summary>
     internal static SolidColorBrush Accent => (SolidColorBrush)Application.Current.Resources["PaneAccentBrush"];
-    internal static Brush Resource(string key) => (Brush)Application.Current.Resources[key];
+    static readonly AccessibilitySettings accessibility = new();
+    /// <summary>
+    /// A Pane brush for the element's own theme: Harbor sets RequestedTheme per window, while the application dictionary
+    /// always answers for the startup theme. Kept current when the element's theme changes.
+    /// </summary>
+    internal static void Themed(FrameworkElement element, DependencyProperty property, string key)
+    {
+        element.SetValue(property, Resource(element, key));
+        element.ActualThemeChanged += (_, _) => element.SetValue(property, Resource(element, key));
+    }
+    internal static Brush Resource(FrameworkElement element, string key)
+    {
+        var theme = accessibility.HighContrast ? "HighContrast" : element.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
+        return (Brush)(Find(Application.Current.Resources, theme, key) ?? Application.Current.Resources[key]);
+    }
+    static object? Find(ResourceDictionary dictionary, string theme, string key)
+    {
+        if (dictionary.ThemeDictionaries.TryGetValue(theme, out var themed) && ((ResourceDictionary)themed).TryGetValue(key, out var value))
+            return value;
+        foreach (var merged in dictionary.MergedDictionaries)
+            if (Find(merged, theme, key) is { } found)
+                return found;
+        return null;
+    }
 }
 
 /// <summary>Keyboard focus ring like Pane's: 2 px accent at 45 % outside the control, only for Tab / arrow focus.</summary>

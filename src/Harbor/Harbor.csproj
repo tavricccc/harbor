@@ -42,6 +42,7 @@
     <Content Include="Assets\AppIcon.ico" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Harbor.svg" />
+    <Content Include="Assets\LICENSE-Lucide.txt" />
   </ItemGroup>
 
   <ItemGroup>

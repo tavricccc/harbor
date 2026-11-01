@@ -12,8 +12,9 @@ namespace Harbor.Controls;
 /// </summary>
 public sealed partial class Segmented : UserControl
 {
-    public static readonly DependencyProperty SelectedIndexProperty = DependencyProperty.Register(nameof(SelectedIndex), typeof(int), typeof(Segmented), new PropertyMetadata(0, (d, _) => ((Segmented)d).Selected(true)));
+    public static readonly DependencyProperty SelectedIndexProperty = DependencyProperty.Register(nameof(SelectedIndex), typeof(int), typeof(Segmented), new PropertyMetadata(0, (d, _) => { var s = (Segmented)d; s.Selected(true); s.SelectionChanged?.Invoke(s, EventArgs.Empty); }));
     public static readonly DependencyProperty OptionsProperty = DependencyProperty.Register(nameof(Options), typeof(string), typeof(Segmented), new PropertyMetadata("", (d, _) => ((Segmented)d).Build()));
+    public event EventHandler? SelectionChanged;
     public int SelectedIndex { get => (int)GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
     /// <summary>Segment labels separated by "|".</summary>
     public string Options { get => (string)GetValue(OptionsProperty); set => SetValue(OptionsProperty, value); }
@@ -29,7 +30,10 @@ public sealed partial class Segmented : UserControl
         var grid = new Grid();
         grid.Children.Add(layer); grid.Children.Add(row);
         var shell = new Grid();
-        shell.Children.Add(new Border { Padding = new Thickness(2), CornerRadius = new CornerRadius(Radius), Background = Motion.Resource("PaneFillControlBrush"), BorderBrush = Motion.Resource("PaneStrokeBrush"), BorderThickness = new Thickness(1), Child = grid });
+        var track = new Border { Padding = new Thickness(2), CornerRadius = new CornerRadius(Radius), BorderThickness = new Thickness(1), Child = grid };
+        Motion.Themed(track, Border.BackgroundProperty, "PaneFillControlBrush");
+        Motion.Themed(track, Border.BorderBrushProperty, "PaneStrokeBrush");
+        shell.Children.Add(track);
         Content = shell;
         FocusRing.Attach(this, shell, Radius);
         highlight = new SlidingHighlight(layer, Radius - 2);
@@ -72,7 +76,7 @@ public sealed partial class Segmented : UserControl
         for (int i = 0; i < items.Count; i++)
         {
             var t = (TextBlock)items[i].Child;
-            t.Foreground = Motion.Resource(i == SelectedIndex ? "PaneText1Brush" : "PaneText2Brush");
+            t.Foreground = Motion.Resource(t, i == SelectedIndex ? "PaneText1Brush" : "PaneText2Brush");
             t.FontWeight = i == SelectedIndex ? FontWeights.SemiBold : FontWeights.Normal;
         }
     }
