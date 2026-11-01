@@ -8,11 +8,11 @@
 
 ## 下載
 
-[Harbor 0.12.1 Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.12.1) 預覽版。
+[Harbor 0.12.2 Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.12.2) 預覽版。
 
-- [安裝器](https://github.com/tavricccc/harbor/releases/download/v0.12.1/Harbor-Setup-0.12.1-x64.exe)
-- [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.12.1/Harbor-Source-0.12.1.zip)
-- [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.12.1/SHA256SUMS.txt)
+- [安裝器](https://github.com/tavricccc/harbor/releases/download/v0.12.2/Harbor-Setup-0.12.2-x64.exe)
+- [完整原始碼](https://github.com/tavricccc/harbor/releases/download/v0.12.2/Harbor-Source-0.12.2.zip)
+- [SHA-256 校驗碼](https://github.com/tavricccc/harbor/releases/download/v0.12.2/SHA256SUMS.txt)
 
 需要 Windows 11 21H2（組建 22000）以上：毛玻璃視窗用到 Windows 10 沒有的系統背景與圓角 API。需要共用的 [.NET 10 Runtime（x64）](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) 與 Windows App Runtime 2.5.1 以上。缺少任一 runtime 時，安裝器會在安裝前顯示下載提示。安裝到使用者目錄，升級保留下載與設定。
 
