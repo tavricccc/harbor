@@ -24,13 +24,13 @@
                                 <TextBlock Text="{loc:Localize Key=Schedule.StartAt}" FontSize="14" FontWeight="SemiBold"/>
                                 <CalendarDatePicker x:Name="ScheduleDate" Header="{loc:Localize Key=Common.Date}"/>
                                 <TimePicker x:Name="ScheduleTime" Header="{loc:Localize Key=Common.Time}" ClockIdentifier="24HourClock"/>
-                                <Button Content="{loc:Localize Key=Schedule.Add}" Click="ScheduleDownload" HorizontalAlignment="Right" Style="{StaticResource PanePrimaryButton}"/>
+                                <Button Content="{loc:Localize Key=Schedule.Add}" Click="ScheduleDownload" HorizontalAlignment="Right" Style="{StaticResource UiPrimaryButton}"/>
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>
                 </Button>
                 <Button x:Name="StartButton" Content="{loc:Localize Key=Download.CheckLink}"
-                        Style="{StaticResource PanePrimaryButton}" Click="Start" AutomationProperties.AutomationId="StartDownload">
+                        Style="{StaticResource UiPrimaryButton}" Click="Start" AutomationProperties.AutomationId="StartDownload">
                     <Button.KeyboardAccelerators>
                         <KeyboardAccelerator Key="Enter" Modifiers="Control" Invoked="StartShortcut"/>
                     </Button.KeyboardAccelerators>

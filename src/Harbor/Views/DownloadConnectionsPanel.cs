@@ -36,9 +36,9 @@ internal sealed class DownloadConnectionsPanel : Grid
             <DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
                 <Grid Padding="0,4" ColumnSpacing="12" ToolTipService.ToolTip="{Binding TransferText}">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="96"/><ColumnDefinition Width="*"/><ColumnDefinition Width="80"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Label}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Label}" FontSize="12" Foreground="{ThemeResource UiText2Brush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                     <ProgressBar Grid.Column="1" Value="{Binding Percent}" Maximum="100" IsIndeterminate="{Binding IsIndeterminate}" VerticalAlignment="Center" AutomationProperties.Name="{Binding Label}"/>
-                    <TextBlock Grid.Column="2" Text="{Binding SpeedText}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="2" Text="{Binding SpeedText}" FontSize="12" Foreground="{ThemeResource UiText2Brush}" HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 </Grid>
             </DataTemplate>
             """);

@@ -11,7 +11,7 @@ using Windows.Graphics;
 
 namespace HarborSetup;
 
-/// Pane's setup layout: a bare 48 px head with minimize and close, then centred logo, title, text and an option card,
+/// Harbor's setup layout: a bare 48 px head with minimize and close, then centred logo, title, text and an option card,
 /// and the actions centred at the bottom. With --auto-update it installs at once and reopens Harbor.
 internal sealed class SetupWindow : Window
 {
@@ -38,7 +38,7 @@ internal sealed class SetupWindow : Window
         this.autoUpdate = autoUpdate && !uninstall;
         Title = Strings.Get(uninstall ? "Installer.UninstallTitle" : "Installer.Title");
         root.Language = Strings.Language;
-        root.Background = (Brush)Application.Current.Resources["PaneSurfaceBrush"];
+        root.Background = (Brush)Application.Current.Resources["UiSurfaceBrush"];
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -52,8 +52,8 @@ internal sealed class SetupWindow : Window
         badge.Children.Add(logo);
         badge.Children.Add(circle);
         badge.Children.Add(mark);
-        title.Foreground = Brush("PaneText1Brush");
-        detail.Foreground = Brush("PaneText2Brush");
+        title.Foreground = Brush("UiText1Brush");
+        detail.Foreground = Brush("UiText2Brush");
         var body = new StackPanel { Spacing = 10 };
         body.Children.Add(badge);
         body.Children.Add(title);
@@ -66,12 +66,12 @@ internal sealed class SetupWindow : Window
                 CornerRadius = new CornerRadius(12),
                 BorderThickness = new Thickness(1),
                 Padding = new Thickness(14, 10, 14, 10),
-                Background = Brush("PaneFillControlBrush"),
-                BorderBrush = Brush("PaneStrokeBrush"),
+                Background = Brush("UiFillControlBrush"),
+                BorderBrush = Brush("UiStrokeBrush"),
                 Child = desktop,
             });
             var license = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, HorizontalAlignment = HorizontalAlignment.Center };
-            license.Children.Add(new TextBlock { Text = Strings.Get("Installer.LicenseAgreement"), VerticalAlignment = VerticalAlignment.Center, Style = (Style)Application.Current.Resources["PaneNote"] });
+            license.Children.Add(new TextBlock { Text = Strings.Get("Installer.LicenseAgreement"), VerticalAlignment = VerticalAlignment.Center, Style = (Style)Application.Current.Resources["UiNote"] });
             var view = new HyperlinkButton { Content = Strings.Get("Installer.ViewLicense"), Padding = new Thickness(4, 2, 4, 2), FontSize = 11 };
             view.Click += async (_, _) => await ShowLicense();
             license.Children.Add(view);
@@ -100,7 +100,7 @@ internal sealed class SetupWindow : Window
 
     private static Button HeadButton(string glyph, string label, Action action)
     {
-        var button = new Button { Style = (Style)Application.Current.Resources["PaneIconButton"], Content = new Icon { Glyph = glyph, Width = 16, Height = 16 } };
+        var button = new Button { Style = (Style)Application.Current.Resources["UiIconButton"], Content = new Icon { Glyph = glyph, Width = 16, Height = 16 } };
         ToolTipService.SetToolTip(button, Strings.Get(label));
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(button, Strings.Get(label));
         button.Click += (_, _) => action();
@@ -215,11 +215,11 @@ internal sealed class SetupWindow : Window
         if (success is not { } ok)
             return;
         circle.CornerRadius = new CornerRadius(size / 2);
-        circle.Background = Brush(ok ? "PaneAccentBrush" : "PaneFillControlBrush");
-        circle.BorderBrush = Brush("PaneStrokeBrush");
+        circle.Background = Brush(ok ? "UiAccentBrush" : "UiFillControlBrush");
+        circle.BorderBrush = Brush("UiStrokeBrush");
         circle.BorderThickness = new Thickness(ok ? 0 : 1);
         mark.Glyph = ok ? "check" : "warn";
-        mark.Foreground = ok ? new SolidColorBrush(Microsoft.UI.Colors.White) : Brush("PaneText1Brush");
+        mark.Foreground = ok ? new SolidColorBrush(Microsoft.UI.Colors.White) : Brush("UiText1Brush");
     }
 
     private void Show(string heading, string body, params (string Label, bool Primary, Action Action)[] actions)
@@ -229,7 +229,7 @@ internal sealed class SetupWindow : Window
         buttons.Children.Clear();
         foreach (var (label, primary, action) in actions)
         {
-            var button = new Button { Content = label, Style = (Style)Application.Current.Resources[primary ? "PanePrimaryButton" : "PaneTextButton"] };
+            var button = new Button { Content = label, Style = (Style)Application.Current.Resources[primary ? "UiPrimaryButton" : "UiTextButton"] };
             button.Click += (_, _) => action();
             buttons.Children.Add(button);
         }

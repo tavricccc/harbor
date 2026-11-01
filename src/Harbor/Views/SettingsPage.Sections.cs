@@ -88,7 +88,7 @@ public sealed partial class SettingsPage
         var product = SettingsFields.Group(page);
         var updates = UpdateService.Shared;
         var action = NativeButtons.Create(Strings.Get("Update.Check"));
-        var other = new Button { Style = (Style)Application.Current.Resources["PaneTextButton"], Visibility = Visibility.Collapsed };
+        var other = new Button { Style = (Style)Application.Current.Resources["UiTextButton"], Visibility = Visibility.Collapsed };
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { other, action } };
         var row = SettingsFields.Row(product, $"Harbor {updates.CurrentVersion}", buttons, Strings.Format("Settings.CoreVersion", vm.Core.Version));
         var notes = new TextBlock { TextWrapping = TextWrapping.Wrap, MaxLines = 12, TextTrimming = TextTrimming.CharacterEllipsis, Style = (Style)Application.Current.Resources["SecondaryTextBlockStyle"] };
@@ -121,7 +121,7 @@ public sealed partial class SettingsPage
                 _ => "Update.Check",
             }));
             var accent = updates.State is UpdateState.Available or UpdateState.Ready;
-            action.Style = (Style)Application.Current.Resources[accent ? "PaneAccentButton" : "PaneTextButton"];
+            action.Style = (Style)Application.Current.Resources[accent ? "UiAccentButton" : "UiTextButton"];
             action.IsEnabled = updates.State is not (UpdateState.Checking or UpdateState.Downloading);
             // With both a stable and a pre-release, the other one can be picked instead.
             var alternative = updates.Choices.FirstOrDefault(choice => choice != latest);

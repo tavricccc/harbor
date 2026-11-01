@@ -23,29 +23,29 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="{loc:Localize Key=Common.FileName}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Foreground="{ThemeResource PaneText2Brush}"/>
+                       Foreground="{ThemeResource UiText2Brush}"/>
             <TextBox x:Name="FileName" Grid.Column="1" Margin="0,0,0,14" PlaceholderText="{loc:Localize Key=Download.FileNamePlaceholder}"
                          AutomationProperties.Name="{loc:Localize Key=Common.FileName}"/>
             <TextBlock Grid.Row="1" Text="{loc:Localize Key=Common.Source}" VerticalAlignment="Top" Margin="0,8,0,14"
-                       Foreground="{ThemeResource PaneText2Brush}"/>
+                       Foreground="{ThemeResource UiText2Brush}"/>
             <TextBox x:Name="Links" Grid.Row="1" Grid.Column="1" PlaceholderText="{loc:Localize Key=Download.LinksPlaceholder}"
                      AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" MaxHeight="120" Margin="0,0,0,14"
                      AutomationProperties.AutomationId="DownloadLinks" AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}" TextChanged="InputChanged"/>
             <TextBlock Grid.Row="2" Text="{loc:Localize Key=Common.Size}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Foreground="{ThemeResource PaneText2Brush}"/>
+                       Foreground="{ThemeResource UiText2Brush}"/>
             <Grid Grid.Row="2" Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBlock x:Name="Preview" Text="{loc:Localize Key=Download.SizeAfterCheck}" TextWrapping="Wrap" VerticalAlignment="Center"
-                           Foreground="{ThemeResource PaneText2Brush}"/>
+                           Foreground="{ThemeResource UiText2Brush}"/>
                 <ProgressRing x:Name="Busy" Grid.Column="1" IsActive="False" Width="16" Height="16"
                               Visibility="Collapsed" AutomationProperties.Name="{loc:Localize Key=Download.CheckingLink}"/>
             </Grid>
             <TextBlock x:Name="CategoryLabel" Grid.Row="3" Text="{loc:Localize Key=Common.Category}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Visibility="Collapsed" Foreground="{ThemeResource PaneText2Brush}"/>
+                       Visibility="Collapsed" Foreground="{ThemeResource UiText2Brush}"/>
             <ComboBox x:Name="Category" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,14"
                       Visibility="Collapsed" SelectionChanged="CategoryChanged" AutomationProperties.Name="{loc:Localize Key=Download.Category}"/>
             <TextBlock Grid.Row="4" Text="{loc:Localize Key=Common.SaveTo}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Foreground="{ThemeResource PaneText2Brush}"/>
+                       Foreground="{ThemeResource UiText2Brush}"/>
             <Grid Grid.Row="4" Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBox x:Name="Destination" AutomationProperties.AutomationId="DownloadDestination"
@@ -53,7 +53,7 @@
                 <Button Grid.Column="1" Content="{loc:Localize Key=Common.Browse}" Click="PickFolder" AutomationProperties.Name="{loc:Localize Key=Common.ChooseFolder}"/>
             </Grid>
             <StackPanel x:Name="ManualActions" Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="0,14,0,0">
-                <Button x:Name="AdvancedButton" Style="{StaticResource PaneSubtleButton}"
+                <Button x:Name="AdvancedButton" Style="{StaticResource UiSubtleButton}"
                         Click="ToggleOptions" AutomationProperties.AutomationId="ToggleDownloadOptions"
                         AutomationProperties.Name="{loc:Localize Key=Download.OptionsTitle}" ToolTipService.ToolTip="{loc:Localize Key=Download.OptionsTitle}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
@@ -61,8 +61,8 @@
                         <controls:Icon x:Name="OptionsArrow" Glyph="chev-d" Width="12" Height="12"/>
                     </StackPanel>
                 </Button>
-                <Button x:Name="TorrentPickerButton" Content="{loc:Localize Key=Download.ChooseTorrent}" Click="PickTorrent" Style="{StaticResource PaneSubtleButton}"/>
-                <Button x:Name="RecentLinksButton" Content="{loc:Localize Key=Download.RecentLinks}" Click="ShowRecent" Style="{StaticResource PaneSubtleButton}"/>
+                <Button x:Name="TorrentPickerButton" Content="{loc:Localize Key=Download.ChooseTorrent}" Click="PickTorrent" Style="{StaticResource UiSubtleButton}"/>
+                <Button x:Name="RecentLinksButton" Content="{loc:Localize Key=Download.RecentLinks}" Click="ShowRecent" Style="{StaticResource UiSubtleButton}"/>
             </StackPanel>
             <StackPanel x:Name="FilesSurface" Grid.Row="7" Grid.Column="1" Spacing="8" Margin="0,14,0,0" Visibility="Collapsed">
                 <StackPanel x:Name="FileSelectionActions" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">

@@ -11,7 +11,7 @@ using System.Text.Json.Nodes;
 namespace Harbor.Views;
 
 /// <summary>
-/// Pane's settings window: a sidebar of sections (the selection slides behind them) beside one section's cards;
+/// Harbor's settings window: a sidebar of sections (the selection slides behind them) beside one section's cards;
 /// Reload on the left of the footer, Cancel and Save on the right.
 /// </summary>
 public sealed partial class SettingsPage : Page
@@ -84,7 +84,7 @@ public sealed partial class SettingsPage : Page
         surface.Children.Add(content);
 
         var footer = new Grid { Padding = new Thickness(20, 12, 20, 12), BorderThickness = new Thickness(0, 1, 0, 0) };
-        Motion.Themed(footer, Grid.BorderBrushProperty, "PaneStrokeBrush");
+        Motion.Themed(footer, Grid.BorderBrushProperty, "UiStrokeBrush");
         var reload = NativeButtons.Create(Strings.Get("Settings.Reload"));
         reload.Click += (_, _) => Load(this, new RoutedEventArgs());
         footer.Children.Add(reload);
@@ -112,7 +112,7 @@ public sealed partial class SettingsPage : Page
         var label = new TextBlock { Text = title, VerticalAlignment = VerticalAlignment.Center };
         var item = new Button
         {
-            Style = (Style)Application.Current.Resources["PaneNavItem"],
+            Style = (Style)Application.Current.Resources["UiNavItem"],
             Content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Children = { new Icon { Glyph = icon, Width = 16, Height = 16 }, label } }
         };
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(item, title);
@@ -148,7 +148,7 @@ public sealed partial class SettingsPage : Page
         for (int i = 0; i < sections.Count; i++)
         {
             var item = sections[i].Item;
-            item.Foreground = Motion.Resource(item, i == selected ? "PaneText1Brush" : "PaneText2Brush");
+            item.Foreground = Motion.Resource(item, i == selected ? "UiText1Brush" : "UiText2Brush");
             item.FontWeight = i == selected ? FontWeights.SemiBold : FontWeights.Normal;
         }
     }

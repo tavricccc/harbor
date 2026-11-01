@@ -97,7 +97,7 @@ public sealed class TaskDetailsDialog : ContentDialog
                 <Grid Padding="4,8" ColumnSpacing="16">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="1" Text="{Binding SizeText}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding SizeText}" FontSize="12" Foreground="{ThemeResource UiText2Brush}" VerticalAlignment="Center"/>
                 </Grid>
             </DataTemplate>
             """);

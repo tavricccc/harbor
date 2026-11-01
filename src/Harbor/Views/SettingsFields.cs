@@ -9,7 +9,7 @@ using Harbor.Services;
 namespace Harbor.Views;
 
 /// <summary>
-/// Settings bound to core config paths, each added as a Pane row (label left, control right; multi-line text under
+/// Settings bound to core config paths, each added as a settings row (label left, control right; multi-line text under
 /// its label) to a <see cref="SettingCard"/> made by <see cref="Group"/>.
 /// </summary>
 internal sealed class SettingsFields
@@ -78,7 +78,7 @@ internal sealed class SettingsFields
     public static SettingCard Group(Panel page, string? title = null, string? note = null)
     {
         if (title is not null)
-            page.Children.Add(new TextBlock { Text = title, Style = (Style)Application.Current.Resources["PaneGroupTitle"] });
+            page.Children.Add(new TextBlock { Text = title, Style = (Style)Application.Current.Resources["UiGroupTitle"] });
         var card = new SettingCard();
         page.Children.Add(card);
         if (note is not null)
@@ -112,7 +112,7 @@ internal sealed class SettingsFields
         Update();
     }
 
-    public static TextBlock Note(string text) => new() { Text = text, Style = (Style)Application.Current.Resources["PaneNote"] };
+    public static TextBlock Note(string text) => new() { Text = text, Style = (Style)Application.Current.Resources["UiNote"] };
 
     public static TextBlock Description(string text) => new()
     {

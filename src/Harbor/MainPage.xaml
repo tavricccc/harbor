@@ -34,7 +34,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel x:Name="Brand" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                 <Image Source="ms-appx:///Assets/Square44x44Logo.scale-200.png" Width="20" Height="20"/>
-                <TextBlock Text="Harbor" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource PaneText1Brush}" VerticalAlignment="Center"/>
+                <TextBlock Text="Harbor" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource UiText1Brush}" VerticalAlignment="Center"/>
             </StackPanel>
             <Button x:Name="BackToDownloads" Click="ShowDownloads" Visibility="Collapsed" Padding="8,0,12,0"
                     AutomationProperties.Name="{loc:Localize Key=Downloads.List}">
@@ -44,7 +44,7 @@
                 </StackPanel>
             </Button>
             <StackPanel x:Name="DownloadsCommands" Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                <Button Style="{StaticResource PaneAccentButton}" Click="AddDownload" Height="28" Margin="0,0,6,0" Padding="10,0,12,0"
+                <Button Style="{StaticResource UiAccentButton}" Click="AddDownload" Height="28" Margin="0,0,6,0" Padding="10,0,12,0"
                         IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}" AutomationProperties.AutomationId="AddDownload"
                         AutomationProperties.Name="{loc:Localize Key=Downloads.Add}" ToolTipService.ToolTip="Ctrl+N">
                     <StackPanel Orientation="Horizontal" Spacing="6">
@@ -52,11 +52,11 @@
                         <TextBlock Text="{loc:Localize Key=Downloads.Add}"/>
                     </StackPanel>
                 </Button>
-                <Button Style="{StaticResource PaneIconButton}" Click="PasteDownload" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"
+                <Button Style="{StaticResource UiIconButton}" Click="PasteDownload" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"
                         AutomationProperties.Name="{loc:Localize Key=Downloads.Paste}" ToolTipService.ToolTip="{loc:Localize Key=Downloads.Paste}">
                     <controls:Icon Glyph="clipboard" Width="16" Height="16"/>
                 </Button>
-                <Button Style="{StaticResource PaneIconButton}" AutomationProperties.Name="{loc:Localize Key=Common.MoreOptions}"
+                <Button Style="{StaticResource UiIconButton}" AutomationProperties.Name="{loc:Localize Key=Common.MoreOptions}"
                         ToolTipService.ToolTip="{loc:Localize Key=Common.MoreOptions}">
                     <controls:Icon Glyph="more" Width="16" Height="16"/>
                     <Button.Flyout>
@@ -72,39 +72,39 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <Button Style="{StaticResource PaneIconButton}" Click="ShowSettings" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"
+                <Button Style="{StaticResource UiIconButton}" Click="ShowSettings" IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"
                         AutomationProperties.AutomationId="SettingsItem" AutomationProperties.Name="{loc:Localize Key=Common.Settings}"
                         ToolTipService.ToolTip="{loc:Localize Key=Common.Settings}">
                     <controls:Icon Glyph="gear" Width="16" Height="16"/>
                 </Button>
             </StackPanel>
             <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Padding="10,0,0,0"
-                        BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1,0,0,0">
-                <Button Style="{StaticResource PaneIconButton}" Click="MinimizeClicked" AutomationProperties.Name="{loc:Localize Key=Common.Minimize}">
+                        BorderBrush="{ThemeResource UiStrokeBrush}" BorderThickness="1,0,0,0">
+                <Button Style="{StaticResource UiIconButton}" Click="MinimizeClicked" AutomationProperties.Name="{loc:Localize Key=Common.Minimize}">
                     <controls:Icon Glyph="minus" Width="16" Height="16"/>
                 </Button>
-                <Button Style="{StaticResource PaneIconButton}" Click="CloseClicked" AutomationProperties.Name="{loc:Localize Key=Common.Close}">
+                <Button Style="{StaticResource UiIconButton}" Click="CloseClicked" AutomationProperties.Name="{loc:Localize Key=Common.Close}">
                     <controls:Icon Glyph="close" Width="16" Height="16"/>
                 </Button>
             </StackPanel>
         </Grid>
 
         <StackPanel Grid.Row="1" Padding="20,0,20,0" Spacing="10">
-            <!-- A Pane hint card rather than an InfoBar: its action and close button stay centered on the text. -->
+            <!-- A hint card rather than an InfoBar: its action and close button stay centered on the text. -->
             <Border x:Name="BrowserSetupHint" Visibility="Collapsed" CornerRadius="12" Padding="16,10,8,10"
-                    Background="{ThemeResource PaneFillControlBrush}" BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1">
+                    Background="{ThemeResource UiFillControlBrush}" BorderBrush="{ThemeResource UiStrokeBrush}" BorderThickness="1">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <controls:Icon Glyph="globe" Width="16" Height="16" VerticalAlignment="Center" Foreground="{ThemeResource PaneAccentBrush}"/>
+                    <controls:Icon Glyph="globe" Width="16" Height="16" VerticalAlignment="Center" Foreground="{ThemeResource UiAccentBrush}"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                        <TextBlock Text="{loc:Localize Key=Browser.HintTitle}" FontWeight="SemiBold" Foreground="{ThemeResource PaneText1Brush}" TextWrapping="Wrap"/>
-                        <TextBlock Text="{loc:Localize Key=Browser.HintMessage}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Localize Key=Browser.HintTitle}" FontWeight="SemiBold" Foreground="{ThemeResource UiText1Brush}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Localize Key=Browser.HintMessage}" FontSize="12" Foreground="{ThemeResource UiText2Brush}" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <Button Grid.Column="2" Style="{StaticResource PaneAccentButton}" Height="28" VerticalAlignment="Center"
+                    <Button Grid.Column="2" Style="{StaticResource UiAccentButton}" Height="28" VerticalAlignment="Center"
                             Content="{loc:Localize Key=Browser.Setup}" Click="OpenBrowserSetup"/>
-                    <Button Grid.Column="3" Style="{StaticResource PaneIconButton}" VerticalAlignment="Center" Click="BrowserSetupHintClosed"
+                    <Button Grid.Column="3" Style="{StaticResource UiIconButton}" VerticalAlignment="Center" Click="BrowserSetupHintClosed"
                             AutomationProperties.Name="{loc:Localize Key=Common.Close}" ToolTipService.ToolTip="{loc:Localize Key=Common.Close}">
                         <controls:Icon Glyph="close" Width="14" Height="14"/>
                     </Button>
@@ -124,11 +124,11 @@
                              TextChanged="SearchChanged" AutomationProperties.AutomationId="DownloadSearch"
                              AutomationProperties.Name="{loc:Localize Key=Downloads.SearchName}"/>
                     <controls:Icon Glyph="search" Width="14" Height="14" Margin="11,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                   IsHitTestVisible="False" Foreground="{ThemeResource PaneText3Brush}"/>
+                                   IsHitTestVisible="False" Foreground="{ThemeResource UiText3Brush}"/>
                 </Grid>
                 <Button Grid.Column="3" Height="32" Width="32" Padding="0" AutomationProperties.AutomationId="DownloadSort"
                         AutomationProperties.Name="{loc:Localize Key=Downloads.SortName}" ToolTipService.ToolTip="{loc:Localize Key=Downloads.SortName}">
-                    <controls:Icon Glyph="sort" Width="14" Height="14" Foreground="{ThemeResource PaneText2Brush}"/>
+                    <controls:Icon Glyph="sort" Width="14" Height="14" Foreground="{ThemeResource UiText2Brush}"/>
                     <Button.Flyout>
                         <MenuFlyout x:Name="SortMenu" Placement="BottomEdgeAlignedRight">
                             <RadioMenuFlyoutItem Text="{loc:Localize Key=Downloads.Newest}" Tag="newest" GroupName="Sort" IsChecked="True" Click="SortClicked"/>
@@ -145,7 +145,7 @@
         <Grid x:Name="DownloadsSurface" Grid.Row="2">
             <ListView x:Name="DownloadList" ItemsSource="{x:Bind ViewModel.VisibleItems, Mode=OneWay}"
                       SelectionMode="Extended" SelectionChanged="DownloadSelectionChanged" DoubleTapped="ListDoubleTapped"
-                      Padding="12,0,12,8" ItemContainerStyle="{StaticResource PaneListItem}"
+                      Padding="12,0,12,8" ItemContainerStyle="{StaticResource UiListItem}"
                       ScrollViewer.HorizontalScrollMode="Disabled" AutomationProperties.AutomationId="DownloadList">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:DownloadItem">
@@ -158,32 +158,32 @@
                                 <ColumnDefinition Width="64"/>
                             </Grid.ColumnDefinitions>
                             <Border Width="32" Height="32" CornerRadius="8" VerticalAlignment="Center"
-                                    Background="{ThemeResource PaneFillControlBrush}" BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1">
-                                <controls:Icon Glyph="{x:Bind FileGlyph, Mode=OneWay}" Width="16" Height="16" Foreground="{ThemeResource PaneText2Brush}"/>
+                                    Background="{ThemeResource UiFillControlBrush}" BorderBrush="{ThemeResource UiStrokeBrush}" BorderThickness="1">
+                                <controls:Icon Glyph="{x:Bind FileGlyph, Mode=OneWay}" Width="16" Height="16" Foreground="{ThemeResource UiText2Brush}"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                                 <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" MaxLines="1"
-                                           Foreground="{ThemeResource PaneText1Brush}"/>
+                                           Foreground="{ThemeResource UiText1Brush}"/>
                                 <TextBlock Text="{x:Bind SubText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" MaxLines="1"
-                                           Foreground="{ThemeResource PaneText3Brush}"/>
+                                           Foreground="{ThemeResource UiText3Brush}"/>
                             </StackPanel>
                             <Grid Grid.Column="2" ColumnSpacing="10" VerticalAlignment="Center">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <ProgressBar Value="{x:Bind Percent, Mode=OneWay}" Maximum="100" CornerRadius="2" MinHeight="4"
                                              Visibility="{x:Bind ProgressVisibility, Mode=OneWay}" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="{x:Bind RowProgressText, Mode=OneWay}" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"
-                                           Foreground="{ThemeResource PaneText2Brush}"/>
+                                           Foreground="{ThemeResource UiText2Brush}"/>
                             </Grid>
                             <TextBlock Grid.Column="3" Text="{x:Bind RowSpeedText, Mode=OneWay}" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                       Foreground="{ThemeResource PaneText2Brush}"/>
+                                       Foreground="{ThemeResource UiText2Brush}"/>
                             <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <Button Tag="{x:Bind Id}" Click="RowPrimary" Style="{StaticResource PaneIconButton}"
+                                <Button Tag="{x:Bind Id}" Click="RowPrimary" Style="{StaticResource UiIconButton}"
                                         Visibility="{x:Bind ActionVisibility, Mode=OneWay}" IsEnabled="{x:Bind CanAct, Mode=OneWay}"
                                         AutomationProperties.Name="{x:Bind PrimaryActionLabel, Mode=OneWay}"
                                         ToolTipService.ToolTip="{x:Bind PrimaryActionLabel, Mode=OneWay}">
                                     <controls:Icon Glyph="{x:Bind PrimaryActionGlyph, Mode=OneWay}" Width="15" Height="15"/>
                                 </Button>
-                                <Button Tag="{x:Bind Id}" Click="RowFolder" Style="{StaticResource PaneIconButton}"
+                                <Button Tag="{x:Bind Id}" Click="RowFolder" Style="{StaticResource UiIconButton}"
                                         Visibility="{x:Bind FolderVisibility, Mode=OneWay}"
                                         AutomationProperties.Name="{loc:Localize Key=Common.RevealFile}" ToolTipService.ToolTip="{loc:Localize Key=Common.RevealFile}">
                                     <controls:Icon Glyph="folder" Width="15" Height="15"/>
@@ -213,16 +213,16 @@
             <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Padding="24" MaxWidth="420" Margin="0,0,0,40">
                 <Image Source="ms-appx:///Assets/Square44x44Logo.scale-200.png" Width="48" Height="48" HorizontalAlignment="Center" Margin="0,0,0,6"/>
                 <TextBlock Text="{x:Bind ViewModel.EmptyTitle, Mode=OneWay}" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"
-                           Foreground="{ThemeResource PaneText1Brush}"/>
+                           Foreground="{ThemeResource UiText1Brush}"/>
                 <TextBlock Text="{x:Bind ViewModel.EmptyHint, Mode=OneWay}" TextWrapping="Wrap" TextAlignment="Center" FontSize="12"
-                           Foreground="{ThemeResource PaneText2Brush}"/>
+                           Foreground="{ThemeResource UiText2Brush}"/>
             </StackPanel>
         </Grid>
         <Frame x:Name="SettingsFrame" Grid.Row="1" Grid.RowSpan="2" Margin="20,0,20,12" Visibility="Collapsed"/>
 
         <!-- Status bar: the summary, and actions for the selection while there is one. -->
-        <Grid x:Name="StatusBar" Grid.Row="3" Height="44" Padding="20,0,14,0" BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="0,1,0,0">
-            <TextBlock Text="{x:Bind ViewModel.Summary, Mode=OneWay}" FontSize="12" VerticalAlignment="Center" Foreground="{ThemeResource PaneText2Brush}"
+        <Grid x:Name="StatusBar" Grid.Row="3" Height="44" Padding="20,0,14,0" BorderBrush="{ThemeResource UiStrokeBrush}" BorderThickness="0,1,0,0">
+            <TextBlock Text="{x:Bind ViewModel.Summary, Mode=OneWay}" FontSize="12" VerticalAlignment="Center" Foreground="{ThemeResource UiText2Brush}"
                        TextTrimming="CharacterEllipsis"/>
             <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center"
                         Visibility="{x:Bind ViewModel.HasSelection, Mode=OneWay}">

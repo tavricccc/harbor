@@ -23,7 +23,7 @@ internal sealed partial class WindowHeader : Grid
         Padding = new Thickness(20, 0, 8, 0);
         ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        Motion.Themed(title, TextBlock.ForegroundProperty, "PaneText1Brush");
+        Motion.Themed(title, TextBlock.ForegroundProperty, "UiText1Brush");
         Children.Add(title);
         var close = IconButton("close", "Common.Close");
         minimize.Click += (_, _) => MinimizeRequested?.Invoke();
@@ -35,7 +35,7 @@ internal sealed partial class WindowHeader : Grid
 
     internal static Button IconButton(string glyph, string label)
     {
-        var button = new Button { Style = (Style)Application.Current.Resources["PaneIconButton"], Content = new Icon { Glyph = glyph, Width = 16, Height = 16 } };
+        var button = new Button { Style = (Style)Application.Current.Resources["UiIconButton"], Content = new Icon { Glyph = glyph, Width = 16, Height = 16 } };
         AutomationProperties.SetName(button, Strings.Get(label));
         ToolTipService.SetToolTip(button, Strings.Get(label));
         return button;

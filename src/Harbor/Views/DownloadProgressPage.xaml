@@ -13,33 +13,33 @@
                     <TextBlock x:Name="FileName" FontSize="15" FontWeight="SemiBold" MaxLines="1"
                                TextTrimming="CharacterEllipsis" DragStarting="DragFile"/>
                     <HyperlinkButton x:Name="SourceLink" Click="OpenSource" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                     Foreground="{ThemeResource PaneText3Brush}" AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}">
+                                     Foreground="{ThemeResource UiText3Brush}" AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}">
                         <TextBlock x:Name="Source" FontSize="12" MaxLines="1" TextTrimming="CharacterEllipsis"/>
                         <HyperlinkButton.ContextFlyout>
                             <MenuFlyout><MenuFlyoutItem Text="{loc:Localize Key=Common.CopyUrl}" Click="CopySource"/></MenuFlyout>
                         </HyperlinkButton.ContextFlyout>
                     </HyperlinkButton>
-                    <TextBlock x:Name="Folder" FontSize="12" Foreground="{ThemeResource PaneText3Brush}"
+                    <TextBlock x:Name="Folder" FontSize="12" Foreground="{ThemeResource UiText3Brush}"
                                TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
                 </StackPanel>
                 <StackPanel x:Name="ProgressSection" Spacing="8" Margin="0,8,0,0">
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <TextBlock x:Name="Transfer" FontSize="13" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="Percent" Grid.Column="1" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource PaneAccentBrush}"/>
+                        <TextBlock x:Name="Percent" Grid.Column="1" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource UiAccentBrush}"/>
                     </Grid>
                     <ProgressBar x:Name="Progress" Maximum="100" IsIndeterminate="False" AutomationProperties.Name="{loc:Localize Key=Downloads.Progress}"/>
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <TextBlock x:Name="Status" FontSize="12" TextWrapping="Wrap" Foreground="{ThemeResource PaneText2Brush}"/>
+                        <TextBlock x:Name="Status" FontSize="12" TextWrapping="Wrap" Foreground="{ThemeResource UiText2Brush}"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                            <TextBlock x:Name="Speed" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.SpeedName}"/>
-                            <TextBlock x:Name="Remaining" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.RemainingName}"/>
+                            <TextBlock x:Name="Speed" FontSize="12" Foreground="{ThemeResource UiText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.SpeedName}"/>
+                            <TextBlock x:Name="Remaining" FontSize="12" Foreground="{ThemeResource UiText2Brush}" AutomationProperties.Name="{loc:Localize Key=Progress.RemainingName}"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
                 <Border x:Name="ConnectionsSurface" Visibility="Collapsed" BorderThickness="0,1,0,0"
-                        BorderBrush="{ThemeResource PaneStrokeBrush}" Padding="0,16,0,0">
+                        BorderBrush="{ThemeResource UiStrokeBrush}" Padding="0,16,0,0">
                     <ContentPresenter x:Name="ConnectionsHost"/>
                 </Border>
             </StackPanel>
@@ -47,7 +47,7 @@
         <Border x:Name="Footer" Grid.Row="1" Style="{StaticResource DownloadFooterStyle}">
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <Button x:Name="ConnectionsToggle" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource PaneSubtleButton}"
+                <Button x:Name="ConnectionsToggle" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource UiSubtleButton}"
                         Click="ToggleConnections" AutomationProperties.AutomationId="ToggleConnectionProgress"
                         AutomationProperties.Name="{loc:Localize Key=Progress.ConnectionsTitle}" ToolTipService.ToolTip="{loc:Localize Key=Progress.ConnectionsTitle}">
                     <StackPanel Orientation="Horizontal" Spacing="6">

@@ -34,9 +34,9 @@ public sealed class App : Application, IXamlMetadataProvider
         }
 
         Resources.MergedDictionaries.Add(new XamlControlsResources());
-        // Harbor's own Pane styles, parsed at run time because the single-file setup carries no compiled XAML.
-        using (var pane = new StreamReader(typeof(App).Assembly.GetManifestResourceStream("Pane.xaml")!))
-            Resources.MergedDictionaries.Add((ResourceDictionary)XamlReader.Load(pane.ReadToEnd()));
+        // Harbor's own theme styles, parsed at run time because the single-file setup carries no compiled XAML.
+        using (var theme = new StreamReader(typeof(App).Assembly.GetManifestResourceStream("Theme.xaml")!))
+            Resources.MergedDictionaries.Add((ResourceDictionary)XamlReader.Load(theme.ReadToEnd()));
         Strings.Initialize(SavedLanguage(), Windows.System.UserProfile.GlobalizationPreferences.Languages);
         Resources["ContentControlThemeFontFamily"] = Harbor.Services.UiFont.For(Strings.Language);
         window = new SetupWindow(uninstall, arguments.Contains("--auto-update"));

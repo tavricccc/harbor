@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using Path = Microsoft.UI.Xaml.Shapes.Path;
 namespace Harbor.Controls;
 
-/// <summary>A Lucide stroke icon (24 × 24, line width 1.75, scaled with the control) like Pane's.</summary>
+/// <summary>A Lucide stroke icon (24 × 24, line width 1.75, scaled with the control).</summary>
 public sealed partial class Icon : UserControl
 {
     // Lucide (ISC License, see Assets/LICENSE-Lucide.txt), 24 × 24 stroke paths.

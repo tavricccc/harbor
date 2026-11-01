@@ -7,7 +7,7 @@ using Windows.System;
 namespace Harbor.Controls;
 
 /// <summary>
-/// Pane's segmented choice: neutral fill with a thin stroke and 2 px inset, equal segments 28 high; the selected segment's
+/// Harbor's segmented choice: neutral fill with a thin stroke and 2 px inset, equal segments 28 high; the selected segment's
 /// text turns bold and primary, and the selected fill glides over.
 /// </summary>
 public sealed partial class Segmented : UserControl
@@ -31,8 +31,8 @@ public sealed partial class Segmented : UserControl
         grid.Children.Add(layer); grid.Children.Add(row);
         var shell = new Grid();
         var track = new Border { Padding = new Thickness(2), CornerRadius = new CornerRadius(Radius), BorderThickness = new Thickness(1), Child = grid };
-        Motion.Themed(track, Border.BackgroundProperty, "PaneFillControlBrush");
-        Motion.Themed(track, Border.BorderBrushProperty, "PaneStrokeBrush");
+        Motion.Themed(track, Border.BackgroundProperty, "UiFillControlBrush");
+        Motion.Themed(track, Border.BorderBrushProperty, "UiStrokeBrush");
         shell.Children.Add(track);
         Content = shell;
         FocusRing.Attach(this, shell, Radius);
@@ -76,7 +76,7 @@ public sealed partial class Segmented : UserControl
         for (int i = 0; i < items.Count; i++)
         {
             var t = (TextBlock)items[i].Child;
-            t.Foreground = Motion.Resource(t, i == SelectedIndex ? "PaneText1Brush" : "PaneText2Brush");
+            t.Foreground = Motion.Resource(t, i == SelectedIndex ? "UiText1Brush" : "UiText2Brush");
             t.FontWeight = i == SelectedIndex ? FontWeights.SemiBold : FontWeights.Normal;
         }
     }

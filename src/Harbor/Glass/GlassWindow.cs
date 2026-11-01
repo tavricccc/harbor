@@ -12,7 +12,7 @@ using Windows.UI.ViewManagement;
 namespace Harbor.Glass;
 
 /// <summary>
-/// A Pane-style glass window. Two top-level windows: the content window (no redirection surface, so transparent
+/// A glass window. Two top-level windows: the content window (no redirection surface, so transparent
 /// XAML really is transparent, clipped to a rounded rectangle) hosts the XAML through <see cref="DesktopWindowXamlSource"/>;
 /// the glass window right behind it (<see cref="GlassSurface"/>) draws blur, saturation, tint, highlight edge and shadows.
 /// Opening scales the glass up with a slight spring while the content fades in; closing and minimizing shrink and fade out.
@@ -322,7 +322,7 @@ internal sealed partial class GlassWindow : IDisposable
                 {
                     case 0xF020 when !IsMinimizable: return 0;
                     case 0xF020 when revealed && Speed > 0 && !IsIconic(Handle): AnimatedMinimize(); return 0;
-                    case 0xF030: return 0; // Pane's windows do not maximize
+                    case 0xF030: return 0; // these windows do not maximize
                     case 0xF060: if (!closing && CanClose()) Close(); return 0;
                 }
                 break;

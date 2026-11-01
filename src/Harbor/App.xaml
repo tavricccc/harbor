@@ -8,21 +8,21 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <ResourceDictionary Source="ms-appx:///Themes/Pane.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Themes/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <!-- Replaced at launch by the language's Noto Sans fallback list (Services/UiFont). -->
             <FontFamily x:Key="ContentControlThemeFontFamily">Segoe UI Variable Text, Microsoft JhengHei UI</FontFamily>
-            <!-- Older view keys, drawn in Pane's type scale and colors. -->
-            <Style x:Key="CompactPageTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource PaneSectionTitle}"/>
+            <!-- Older view keys, drawn in Harbor's type scale and colors. -->
+            <Style x:Key="CompactPageTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource UiSectionTitle}"/>
             <Style x:Key="CompactSectionTitleStyle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="Foreground" Value="{ThemeResource PaneText1Brush}"/>
+                <Setter Property="Foreground" Value="{ThemeResource UiText1Brush}"/>
             </Style>
             <Style x:Key="SecondaryTextBlockStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12"/><Setter Property="Foreground" Value="{ThemeResource PaneText2Brush}"/>
+                <Setter Property="FontSize" Value="12"/><Setter Property="Foreground" Value="{ThemeResource UiText2Brush}"/>
             </Style>
             <Style x:Key="DownloadFooterStyle" TargetType="Border">
-                <Setter Property="BorderThickness" Value="0,1,0,0"/><Setter Property="BorderBrush" Value="{ThemeResource PaneStrokeBrush}"/>
+                <Setter Property="BorderThickness" Value="0,1,0,0"/><Setter Property="BorderBrush" Value="{ThemeResource UiStrokeBrush}"/>
                 <Setter Property="Padding" Value="20,12"/>
             </Style>
         </ResourceDictionary>

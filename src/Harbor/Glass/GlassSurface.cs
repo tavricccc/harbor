@@ -14,7 +14,7 @@ namespace Harbor.Glass;
 /// </summary>
 internal sealed class GlassSurface : IDisposable
 {
-    /// <summary>Pane's glass tokens.</summary>
+    /// <summary>Harbor's glass tokens.</summary>
     internal const float Radius = 20, TintOpacity = 0.42f, LuminosityOpacity = 0.38f, Saturation = 1.6f,
         Highlight = 0.7f, Shadow = 0.7f, EnterScale = 0.94f;
     internal const int FastMs = 120, NormalMs = 220, SlowMs = 360;

@@ -8,7 +8,7 @@ using Harbor.Services;
 namespace Harbor.Views;
 
 /// <summary>
-/// One download's options: a segmented tab bar over one Pane settings card per topic (general, request, proxy,
+/// One download's options: a segmented tab bar over one settings card per topic (general, request, proxy,
 /// BitTorrent, extraction), label on the left and its control on the right.
 /// </summary>
 internal sealed class DownloadOptionsPanel : StackPanel

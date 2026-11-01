@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 namespace Harbor.Controls;
 
-/// <summary>A settings row with Pane's switch; the state text (開啟／關閉 or a pair like 中文／英文) sits left of it.</summary>
+/// <summary>A settings row with Harbor's switch; the state text (開啟／關閉 or a pair like 中文／英文) sits left of it.</summary>
 public sealed partial class SettingToggle : SettingRow
 {
     public static readonly DependencyProperty IsOnProperty = DependencyProperty.Register(nameof(IsOn), typeof(bool), typeof(SettingToggle), new PropertyMetadata(false, (d, _) => ((SettingToggle)d).Sync()));
@@ -17,7 +17,7 @@ public sealed partial class SettingToggle : SettingRow
 
     public SettingToggle()
     {
-        Motion.Themed(state, TextBlock.ForegroundProperty, "PaneText2Brush");
+        Motion.Themed(state, TextBlock.ForegroundProperty, "UiText2Brush");
         var pair = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         pair.Children.Add(state); pair.Children.Add(toggle);
         Control = pair;

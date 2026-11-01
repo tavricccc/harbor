@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.UI.ViewManagement;
 namespace Harbor.Controls;
 
-/// <summary>Pane's motion tokens: durations in ms and cubic Bézier curves. Durations drop to 1 ms when Windows animations are off.</summary>
+/// <summary>Harbor's motion tokens: durations in ms and cubic Bézier curves. Durations drop to 1 ms when Windows animations are off.</summary>
 internal static class Motion
 {
     static readonly UISettings settings = new();
@@ -14,11 +14,11 @@ internal static class Motion
     internal static readonly (float, float, float, float) Smooth = (0.2f, 0, 0, 1), Spring = (0.34f, 1.36f, 0.64f, 1), Glide = (0.25f, 1.05f, 0.35f, 1);
     internal static TimeSpan Duration(double ms) => TimeSpan.FromMilliseconds(settings.AnimationsEnabled ? ms : 1);
     internal static CubicBezierEasingFunction Ease(Compositor c, (float, float, float, float) p) => c.CreateCubicBezierEasingFunction(new Vector2(p.Item1, p.Item2), new Vector2(p.Item3, p.Item4));
-    /// <summary>Pane's default accent (霧藍); only control states and focus use it.</summary>
-    internal static SolidColorBrush Accent => (SolidColorBrush)Application.Current.Resources["PaneAccentBrush"];
+    /// <summary>The default accent (霧藍); only control states and focus use it.</summary>
+    internal static SolidColorBrush Accent => (SolidColorBrush)Application.Current.Resources["UiAccentBrush"];
     static readonly AccessibilitySettings accessibility = new();
     /// <summary>
-    /// A Pane brush for the element's own theme: Harbor sets RequestedTheme per window, while the application dictionary
+    /// A theme brush for the element's own theme: Harbor sets RequestedTheme per window, while the application dictionary
     /// always answers for the startup theme. Kept current when the element's theme changes.
     /// </summary>
     internal static void Themed(FrameworkElement element, DependencyProperty property, string key)
@@ -42,7 +42,7 @@ internal static class Motion
     }
 }
 
-/// <summary>Keyboard focus ring like Pane's: 2 px accent at 45 % outside the control, only for Tab / arrow focus.</summary>
+/// <summary>Keyboard focus ring: 2 px accent at 45 % outside the control, only for Tab / arrow focus.</summary>
 internal static class FocusRing
 {
     internal static void Attach(Control owner, Grid host, double radius)

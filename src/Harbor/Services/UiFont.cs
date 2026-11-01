@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Media;
 namespace Harbor.Services;
 
 /// <summary>
-/// Pane's font: Noto Sans when it is installed, otherwise the Windows UI font for the language. XAML skips the
+/// Harbor's font: Noto Sans when it is installed, otherwise the Windows UI font for the language. XAML skips the
 /// families in a list that are not installed, so the list itself is the lookup.
 /// </summary>
 internal static class UiFont
