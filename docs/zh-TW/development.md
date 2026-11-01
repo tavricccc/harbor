@@ -31,7 +31,7 @@ pwsh -File scripts/source.ps1
 
 發布版本使用共用 .NET 與 Windows App Runtime，停用 NativeAOT、裁剪與 ReadyToRun。語系、偏好設定及統計資料使用產生的 JSON 序列化程式碼。註冊／解除註冊整合會先於 Windows App Runtime 初始化執行，不需要 WinUI。安裝器本身是依賴共用 runtime 的 WinUI 程式：缺少 .NET 時由 .NET host 顯示下載提示，缺少 Windows App Runtime 時由 SDK 顯示，兩者都在修改任何檔案之前。安裝器介面以程式碼建立，因為單一檔案發布會把編譯後的 XAML 解壓到執行檔以外的位置，WinUI 不會去那裡找。
 
-製作本機測試安裝器可用 `pwsh -File scripts/package.ps1 -SkipBuild -OutputDirectory artifacts/shared-runtime`，避免覆寫已發布版本的本機檔案。安裝器以 zip 嵌入發布的 app 與 `installed-files.txt`，移除新版本不再包含的檔案，並把自己複製為 `Uninstall.exe`；不包含 PDB 除錯符號。從 Inno Setup 安裝器（0.11 以前）升級時沿用原安裝位置，並移除舊的解除安裝程式與登錄項。`Harbor.exe --check-dotnet` 檢查 .NET host，`Harbor.exe --check-runtime` 另檢查所需的 Windows App Runtime；兩者都不開啟介面或修改整合。
+製作本機測試安裝器可用 `pwsh -File scripts/package.ps1 -SkipBuild -OutputDirectory artifacts/shared-runtime`，避免覆寫已發布版本的本機檔案。安裝器以 zip 嵌入發布的 app 與 `installed-files.txt`，移除新版本不再包含的檔案，並把自己複製為 `Uninstall.exe`；不包含 PDB 除錯符號。打包時另會產生 `Harbor-Setup-<version>-x64.exe.sha256`，發布時要與安裝器一起附上：Harbor 內建更新只會提供附有它的版本。從 Inno Setup 安裝器（0.11 以前）升級時沿用原安裝位置，並移除舊的解除安裝程式與登錄項。`Harbor.exe --check-dotnet` 檢查 .NET host，`Harbor.exe --check-runtime` 另檢查所需的 Windows App Runtime；兩者都不開啟介面或修改整合。
 
 ## 更新上游
 

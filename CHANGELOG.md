@@ -2,11 +2,16 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
-## 0.12.0 — 2026-10-25
+## 0.13.0 — 2026-11-01
 
+- Redesign every window in the Pane style on a glass window: a new main page with filters, search and sort, Settings with a sidebar and setting cards, tabbed options when adding a download, a quieter progress window, and a matching installer and uninstaller.
+- Download and install updates inside Harbor from Settings > About. The setup is checked against the release's SHA-256 before it runs, then installs and reopens Harbor.
+- Closing the download window after opening a file or folder is now one setting in Settings.
+- Accept FTP links, which the core now downloads.
+- Update Gopeed to main `fc0a1e0`.
 - Replace the Inno Setup installer with a WinUI setup on the shared .NET and Windows App Runtime. A missing runtime shows its download prompt before anything is installed. Upgrades keep the install location and replace the old uninstaller.
 - Expire abandoned link checks after ten minutes and release the rest on shutdown, so `gopeed-prefetch-*` temporary files no longer pile up in `%TEMP%`.
-- Update Gopeed to main `b8ff5ff` and keep serving the text proxy it removed, which update checks, the extension store and tracker lists use.
+- Keep serving the text proxy Gopeed removed, which update checks, the extension store and tracker lists use.
 
 ## 0.11.1 — 2026-10-11
 
