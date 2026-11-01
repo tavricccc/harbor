@@ -187,10 +187,13 @@ public sealed class DownloadWindow
             var current = Glass.Bounds;
             if (w == lastBounds.Width && h == lastBounds.Height && current.X == lastBounds.X && current.Y == lastBounds.Y)
                 return;
-            // Grow and shrink around the current center, kept inside the work area.
+            // The first fit centers the window; later ones keep the top edge and expand or collapse downward,
+            // pushed up only as far as the work area needs, and glide there.
+            var first = lastBounds.Width == 0;
             var x = Math.Clamp((int)Math.Round(current.X + current.Width / 2.0 - w / 2.0), area.X, area.X + area.Width - w);
-            var y = Math.Clamp((int)Math.Round(current.Y + current.Height / 2.0 - h / 2.0), area.Y, area.Y + area.Height - h);
-            Glass.Bounds = lastBounds = new Windows.Graphics.RectInt32(x, y, w, h);
+            var y = Math.Clamp(first ? (int)Math.Round(current.Y + current.Height / 2.0 - h / 2.0) : current.Y, area.Y, area.Y + area.Height - h);
+            lastBounds = new Windows.Graphics.RectInt32(x, y, w, h);
+            if (first) Glass.Bounds = lastBounds; else Glass.AnimateBounds(lastBounds);
             confirmationTopmost.Refresh();
         });
     }
