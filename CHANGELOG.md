@@ -2,9 +2,9 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
-## 0.13.0 — 2026-11-01
+## 0.12.0 — 2026-11-01
 
-- Redesign every window in the Pane style on a glass window: a new main page with filters, search and sort, Settings with a sidebar and setting cards, tabbed options when adding a download, a quieter progress window, and a matching installer and uninstaller.
+- Redesign every window with a frosted-glass look: a new main page with filters, search and sort, Settings with a sidebar and setting cards, tabbed options when adding a download, a quieter progress window, and a matching installer and uninstaller.
 - Download and install updates inside Harbor from Settings > About. The setup is checked against the release's SHA-256 before it runs, then installs and reopens Harbor.
 - Closing the download window after opening a file or folder is now one setting in Settings.
 - Accept FTP links, which the core now downloads.

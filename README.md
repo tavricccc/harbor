@@ -8,11 +8,11 @@ A native Windows download manager built with WinUI 3 and the official [Gopeed](h
 
 ## Download
 
-[Harbor 0.13.0 for Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.13.0) — preview release.
+[Harbor 0.12.0 for Windows x64](https://github.com/tavricccc/harbor/releases/tag/v0.12.0) — preview release.
 
-- [Installer](https://github.com/tavricccc/harbor/releases/download/v0.13.0/Harbor-Setup-0.13.0-x64.exe)
-- [Complete source](https://github.com/tavricccc/harbor/releases/download/v0.13.0/Harbor-Source-0.13.0.zip)
-- [SHA-256 checksums](https://github.com/tavricccc/harbor/releases/download/v0.13.0/SHA256SUMS.txt)
+- [Installer](https://github.com/tavricccc/harbor/releases/download/v0.12.0/Harbor-Setup-0.12.0-x64.exe)
+- [Complete source](https://github.com/tavricccc/harbor/releases/download/v0.12.0/Harbor-Source-0.12.0.zip)
+- [SHA-256 checksums](https://github.com/tavricccc/harbor/releases/download/v0.12.0/SHA256SUMS.txt)
 
 Windows 10 1809 or later; Windows 11 recommended. Requires shared [.NET 10 Runtime (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0/runtime?os=windows&arch=x64) and Windows App Runtime 2.5.1 or later. If either runtime is missing, the installer shows its download prompt before installing. The per-user installer preserves downloads and settings during upgrades.
 
