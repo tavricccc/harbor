@@ -92,7 +92,7 @@
             </StackPanel>
         </Grid>
 
-        <StackPanel Grid.Row="1" Padding="20,0,20,0" Spacing="10">
+        <StackPanel x:Name="DownloadsTop" Grid.Row="1" Padding="20,0,20,0" Spacing="10">
             <!-- A hint card rather than an InfoBar: its action and close button stay centered on the text. -->
             <Border x:Name="BrowserSetupHint" Visibility="Collapsed" CornerRadius="12" Padding="16,10,8,10"
                     Background="{ThemeResource UiFillControlBrush}" BorderBrush="{ThemeResource UiStrokeBrush}" BorderThickness="1">

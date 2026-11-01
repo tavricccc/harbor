@@ -46,7 +46,7 @@ public sealed partial class ExtensionsPage : Page
         Grid.SetColumn(other, 1); title.Children.Add(other);
         toolbar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { search, sort } };
 
-        var panel = new StackPanel { Spacing = 16, MaxWidth = 800, HorizontalAlignment = HorizontalAlignment.Stretch, Children = { title, message, tabs, toolbar, status, store, installed, more } };
+        var panel = new StackPanel { Spacing = 16, MaxWidth = 800, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(4, 8, 0, 0), Children = { title, message, tabs, toolbar, status, store, installed, more } };
         Content = new ScrollViewer { Content = panel, Padding = new Thickness(0, 0, 16, 24), HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, HorizontalScrollMode = ScrollMode.Disabled, HorizontalContentAlignment = HorizontalAlignment.Left };
         tabs.SelectionChanged += (_, _) => ShowTab();
         search.KeyDown += async (_, e) => { if (e.Key == Windows.System.VirtualKey.Enter) { e.Handled = true; await LoadStore(true); } };

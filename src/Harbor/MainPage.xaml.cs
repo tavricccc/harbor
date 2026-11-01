@@ -269,6 +269,9 @@ public sealed partial class MainPage : Page
     }
     private void OpenSection(Page page)
     {
+        // A section covers the list's toolbar and the brand; the back button takes the brand's place.
+        DownloadsTop.Visibility = Visibility.Collapsed;
+        Brand.Visibility = Visibility.Collapsed;
         DownloadsSurface.Visibility = Visibility.Collapsed;
         DownloadsCommands.Visibility = Visibility.Collapsed;
         SettingsFrame.Content = page;
@@ -280,6 +283,8 @@ public sealed partial class MainPage : Page
     {
         SettingsFrame.Content = null;
         SettingsFrame.Visibility = Visibility.Collapsed;
+        DownloadsTop.Visibility = Visibility.Visible;
+        Brand.Visibility = Visibility.Visible;
         DownloadsSurface.Visibility = Visibility.Visible;
         DownloadsCommands.Visibility = Visibility.Visible;
         BackToDownloads.Visibility = Visibility.Collapsed;
