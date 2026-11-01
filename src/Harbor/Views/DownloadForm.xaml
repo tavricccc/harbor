@@ -24,17 +24,8 @@
             </Grid.RowDefinitions>
             <TextBlock Text="{loc:Localize Key=Common.FileName}" VerticalAlignment="Center" Margin="0,0,0,14"
                        Foreground="{ThemeResource PaneText2Brush}"/>
-            <Grid Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Border VerticalAlignment="Center" CornerRadius="4" Padding="6,2"
-                        Background="{ThemeResource PaneFillControlBrush}"
-                        BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1">
-                    <TextBlock x:Name="KindLabel" Text="{loc:Localize Key=Common.File}" FontSize="11"
-                               Foreground="{ThemeResource PaneText2Brush}"/>
-                </Border>
-                <TextBox x:Name="FileName" Grid.Column="1" PlaceholderText="{loc:Localize Key=Download.FileNamePlaceholder}"
+            <TextBox x:Name="FileName" Grid.Column="1" Margin="0,0,0,14" PlaceholderText="{loc:Localize Key=Download.FileNamePlaceholder}"
                          AutomationProperties.Name="{loc:Localize Key=Common.FileName}"/>
-            </Grid>
             <TextBlock Grid.Row="1" Text="{loc:Localize Key=Common.Source}" VerticalAlignment="Top" Margin="0,8,0,14"
                        Foreground="{ThemeResource PaneText2Brush}"/>
             <TextBox x:Name="Links" Grid.Row="1" Grid.Column="1" PlaceholderText="{loc:Localize Key=Download.LinksPlaceholder}"

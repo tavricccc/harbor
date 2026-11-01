@@ -8,16 +8,8 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
             <StackPanel x:Name="Body" Padding="24,20,24,16" Spacing="12">
                 <InfoBar x:Name="Error" Severity="Error" Visibility="Collapsed" Closed="HideError"/>
-                <Grid ColumnSpacing="10">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <Border VerticalAlignment="Center" CornerRadius="4" Padding="6,2"
-                            Background="{ThemeResource PaneFillControlBrush}"
-                            BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1">
-                        <TextBlock x:Name="KindLabel" FontSize="11" Foreground="{ThemeResource PaneText2Brush}"/>
-                    </Border>
-                    <TextBlock x:Name="FileName" Grid.Column="1" FontSize="14" VerticalAlignment="Center" MaxLines="1"
+                <TextBlock x:Name="FileName" FontSize="14" VerticalAlignment="Center" MaxLines="1"
                                TextTrimming="CharacterEllipsis" DragStarting="DragFile"/>
-                </Grid>
                 <HyperlinkButton x:Name="SourceLink" Click="OpenSource" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                  AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}">
                     <TextBlock x:Name="Source" FontSize="12" MaxLines="1" TextTrimming="CharacterEllipsis"/>

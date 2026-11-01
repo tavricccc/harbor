@@ -13,7 +13,6 @@ public sealed partial class DownloadProgressPage
         Primary.IsEnabled = task.CanAct && !cancelling;
         FileName.Text = task.Name;
         FileName.CanDrag = task.IsComplete && !task.IsProcessing;
-        KindLabel.Text = task.Protocol == "BT" ? "BT" : Strings.Get("Common.File");
         ToolTipService.SetToolTip(FileName, task.Name);
         Folder.Text = Strings.Format("Progress.SaveLocation", task.Folder);
         ToolTipService.SetToolTip(Folder, task.Folder);

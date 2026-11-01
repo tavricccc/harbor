@@ -83,7 +83,6 @@ public sealed partial class DownloadForm : UserControl
         resolved = null;
         var links = ConfigJson.Lines(Links.Text);
         SetAction(links.Length > 1 ? Strings.Format("Download.StartBatch", links.Length) : DirectDownload.IsOn ? Strings.Get("Download.Start") : Strings.Get("Download.CheckLink"));
-        KindLabel.Text = links.Length > 1 ? Strings.Get("Download.Batch") : links.FirstOrDefault() is { } link && DownloadSources.IsTorrent(link) ? "BT" : Strings.Get("Common.File");
         Files.Visibility = Visibility.Collapsed;
         FileSelectionActions.Visibility = Visibility.Collapsed;
         FilesSurface.Visibility = Visibility.Collapsed;
