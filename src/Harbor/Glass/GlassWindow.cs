@@ -20,7 +20,11 @@ namespace Harbor.Glass;
 /// </summary>
 internal sealed partial class GlassWindow : IDisposable
 {
-    const double EdgeDip = 8;
+    /// <summary>Resize grips: a band along each edge and a larger square at each corner, where the rounded region
+    /// leaves little edge to aim at.</summary>
+    const double EdgeDip = 8, CornerDip = 24;
+    /// <summary>A resize from code glides there in this long, like a panel that changes size.</summary>
+    const double GlideMs = 180;
     static readonly System.Numerics.Vector2 Smooth1 = new(0.2f, 0), Smooth2 = new(0, 1);
     static readonly List<GlassWindow> open = [];
     /// <summary>The windows open now.</summary>
@@ -35,6 +39,13 @@ internal sealed partial class GlassWindow : IDisposable
     readonly double minWidth, minHeight;
     bool ready, shown, closing, minimizing, iconic, disposed, revealed;
     int lastWidth, lastHeight;
+    /// <summary>A resize from code in flight: the window covers <c>Host</c> (both rectangles), the content already sits
+    /// at <c>To</c>, and the region and glass glide from <c>From</c>.</summary>
+    sealed record Glide(RectInt32 From, RectInt32 To, RectInt32 Host, long Start) { internal RectInt32 Drawn = From; }
+    Glide? glide;
+    PointInt32 islandOffset;
+    /// <summary>Where a maximized window goes back to; null when not maximized.</summary>
+    RectInt32? restore;
 
     internal nint Handle { get; }
     internal AppWindow AppWindow { get; }
@@ -53,6 +64,10 @@ internal sealed partial class GlassWindow : IDisposable
     internal bool IsMinimizable { get; set; } = true;
     internal string Title { get => AppWindow.Title; set => AppWindow.Title = value; }
     float Speed => system.AnimationsEnabled ? 1 : 0;
+    /// <summary>Whether the window fills the work area; only resizable windows maximize.</summary>
+    internal bool IsMaximized => restore is not null;
+    /// <summary>Raised when the window is maximized or restored.</summary>
+    internal event EventHandler? MaximizedChanged;
     float Dpi => GetDpiForWindow(Handle) / 96f;
 
     internal GlassWindow(FrameworkElement content, string title, double width, double height, bool resizable, double minWidth = 0, double minHeight = 0)
@@ -118,11 +133,80 @@ internal sealed partial class GlassWindow : IDisposable
         }
     }
 
-    /// <summary>The window's bounds in physical pixels.</summary>
+    /// <summary>The window's bounds in physical pixels; while a resize glides, where it is headed. Setting it jumps there.</summary>
     internal RectInt32 Bounds
     {
-        get { GetWindowRect(Handle, out var r); return new(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top); }
-        set => SetWindowPos(Handle, 0, value.X, value.Y, value.Width, value.Height, 0x14); // NOZORDER | NOACTIVATE
+        get { if (glide is { } g) return g.To; GetWindowRect(Handle, out var r); return new(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top); }
+        set { EndGlide(); SetWindowPos(Handle, 0, value.X, value.Y, value.Width, value.Height, 0x14); } // NOZORDER | NOACTIVATE
+    }
+
+    /// <summary>Moves and resizes the window from code, gliding there (180 ms) the way a panel changes size: the content
+    /// takes its final layout at once, clipped to the rounded rectangle while it and the glass glide from where they
+    /// are drawn now. Jumps instead before the window opens, with Windows animations off, or onto a monitor with
+    /// another DPI. A resize the user drags never glides.</summary>
+    internal void AnimateBounds(RectInt32 to)
+    {
+        if (disposed || glide?.To == to) return;
+        var from = glide?.Drawn ?? Bounds;
+        if (from == to) return;
+        if (!revealed || Speed == 0 || IsIconic(Handle) || MonitorDpi(to) != GetDpiForWindow(Handle)) { Bounds = to; return; }
+        int left = Math.Min(from.X, to.X), top = Math.Min(from.Y, to.Y);
+        var host = new RectInt32(left, top, Math.Max(from.X + from.Width, to.X + to.Width) - left, Math.Max(from.Y + from.Height, to.Y + to.Height) - top);
+        if (glide is null) CompositionTarget.Rendering += GlideFrame;
+        glide = new Glide(from, to, host, System.Diagnostics.Stopwatch.GetTimestamp());
+        SetWindowPos(Handle, 0, host.X, host.Y, host.Width, host.Height, 0x14);
+        islandOffset = new(to.X - host.X, to.Y - host.Y);
+        island.SiteBridge.MoveAndResize(new RectInt32(islandOffset.X, islandOffset.Y, to.Width, to.Height));
+        UpdateCaption();
+        DrawGlide(from);
+    }
+
+    void GlideFrame(object? sender, object e)
+    {
+        if (glide is not { } g) return;
+        double t = System.Diagnostics.Stopwatch.GetElapsedTime(g.Start).TotalMilliseconds / GlideMs;
+        if (t >= 1) { Bounds = g.To; return; }
+        double p = Controls.Motion.Progress(Controls.Motion.Glide, t);
+        static int Lerp(int a, int b, double p) => (int)Math.Round(a + (b - a) * p);
+        DrawGlide(new(Lerp(g.From.X, g.To.X, p), Lerp(g.From.Y, g.To.Y, p), Lerp(g.From.Width, g.To.Width, p), Lerp(g.From.Height, g.To.Height, p)));
+    }
+
+    /// <summary>Clips the window to <paramref name="r"/> (screen pixels) and puts the glass there.</summary>
+    void DrawGlide(RectInt32 r)
+    {
+        var g = glide!;
+        g.Drawn = r;
+        int d = (int)Math.Round(2 * GlassSurface.Radius * Dpi), x = r.X - g.Host.X, y = r.Y - g.Host.Y;
+        var region = CreateRoundRectRgn(x, y, x + r.Width + 1, y + r.Height + 1, d, d);
+        if (SetWindowRgn(Handle, region, true) == 0) DeleteObject(region);
+        if (shown) glass.Place(r.X, r.Y, r.Width, r.Height, Dpi, Handle);
+    }
+
+    /// <summary>Stops a glide where it is; the caller puts the window where it belongs, and the next
+    /// <see cref="Follow"/> puts the island and region back over the whole window.</summary>
+    void EndGlide()
+    {
+        if (glide is null) return;
+        glide = null;
+        CompositionTarget.Rendering -= GlideFrame;
+        islandOffset = default;
+        lastWidth = lastHeight = -1;
+    }
+
+    uint MonitorDpi(RectInt32 r)
+    {
+        var rect = new Rect { Left = r.X, Top = r.Y, Right = r.X + r.Width, Bottom = r.Y + r.Height };
+        GetDpiForMonitor(MonitorFromRect(ref rect, 2), 0, out uint dpi, out _);
+        return dpi;
+    }
+
+    /// <summary>Maximizes to the work area, or restores to where the window was, gliding like any resize from code.</summary>
+    internal void ToggleMaximize()
+    {
+        if (!resizable || disposed) return;
+        if (restore is { } back) { restore = null; AnimateBounds(back); }
+        else { restore = Bounds; AnimateBounds(WorkArea); }
+        MaximizedChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>Starts the user-facing window: hidden (cloaked) until content and glass have drawn a frame, then opens.</summary>
@@ -246,7 +330,7 @@ internal sealed partial class GlassWindow : IDisposable
         RectInt32 Rect(FrameworkElement e)
         {
             var p = e.TransformToVisual(null).TransformPoint(default);
-            return new((int)Math.Round(p.X * scale), (int)Math.Round(p.Y * scale), (int)Math.Round(e.ActualWidth * scale), (int)Math.Round(e.ActualHeight * scale));
+            return new((int)Math.Round(p.X * scale) + islandOffset.X, (int)Math.Round(p.Y * scale) + islandOffset.Y, (int)Math.Round(e.ActualWidth * scale), (int)Math.Round(e.ActualHeight * scale));
         }
         static bool Shown(FrameworkElement e)
         {
@@ -262,6 +346,15 @@ internal sealed partial class GlassWindow : IDisposable
             var source = InputNonClientPointerSource.GetForWindowId(AppWindow.Id);
             source.SetRegionRects(NonClientRegionKind.Caption, captionRects);
             source.SetRegionRects(NonClientRegionKind.Passthrough, passRects);
+            // The island covers the whole window and answers every point as client area, so the resize grips only
+            // reach HitTest where they are registered here too. Corners go with the top and bottom bands.
+            GetWindowRect(Handle, out var r);
+            bool grips = resizable && glide is null;
+            int w = r.Right - r.Left, h = r.Bottom - r.Top, edge = (int)(EdgeDip * Dpi), corner = (int)(CornerDip * Dpi);
+            source.SetRegionRects(NonClientRegionKind.TopBorder, grips ? [new(0, 0, w, edge), new(0, 0, corner, corner), new(w - corner, 0, corner, corner)] : []);
+            source.SetRegionRects(NonClientRegionKind.BottomBorder, grips ? [new(0, h - edge, w, edge), new(0, h - corner, corner, corner), new(w - corner, h - corner, corner, corner)] : []);
+            source.SetRegionRects(NonClientRegionKind.LeftBorder, grips ? [new(0, 0, edge, h), new(0, 0, corner, corner), new(0, h - corner, corner, corner)] : []);
+            source.SetRegionRects(NonClientRegionKind.RightBorder, grips ? [new(w - edge, 0, edge, h), new(w - corner, 0, corner, corner), new(w - corner, h - corner, corner, corner)] : []);
         }
         catch (Exception) { } // without caption regions the window still drags from its own hit test
     }
@@ -274,7 +367,7 @@ internal sealed partial class GlassWindow : IDisposable
     /// <summary>Keeps the glass right behind the window, the island filling it, and the window clipped to the rounded rectangle.</summary>
     void Follow()
     {
-        if (disposed || !GetWindowRect(Handle, out var r)) return;
+        if (disposed || glide is not null || !GetWindowRect(Handle, out var r)) return;
         int w = r.Right - r.Left, h = r.Bottom - r.Top;
         if (shown) glass.Place(r.Left, r.Top, w, h, Dpi, Handle);
         if (w == lastWidth && h == lastHeight) return;
@@ -290,8 +383,13 @@ internal sealed partial class GlassWindow : IDisposable
     {
         int x = (short)(l & 0xffff), y = (short)((l >> 16) & 0xffff);
         GetWindowRect(Handle, out var r);
-        if (!resizable) return Caption(x - r.Left, y - r.Top) ? 2 : 1; // HTCAPTION
-        int edge = (int)(EdgeDip * Dpi);
+        if (!resizable || glide is not null) return Caption(x - r.Left, y - r.Top) ? 2 : 1; // HTCAPTION
+        int edge = (int)(EdgeDip * Dpi), corner = (int)(CornerDip * Dpi);
+        bool nearLeft = x < r.Left + corner, nearRight = x >= r.Right - corner, nearTop = y < r.Top + corner, nearBottom = y >= r.Bottom - corner;
+        if (nearTop && nearLeft) return 13; // HTTOPLEFT
+        if (nearTop && nearRight) return 14;
+        if (nearBottom && nearLeft) return 16;
+        if (nearBottom && nearRight) return 17;
         bool left = x < r.Left + edge, right = x >= r.Right - edge, top = y < r.Top + edge, bottom = y >= r.Bottom - edge;
         if (top) return left ? 13 : right ? 14 : 12;
         if (bottom) return left ? 16 : right ? 17 : 15;
@@ -322,12 +420,16 @@ internal sealed partial class GlassWindow : IDisposable
                 {
                     case 0xF020 when !IsMinimizable: return 0;
                     case 0xF020 when revealed && Speed > 0 && !IsIconic(Handle): AnimatedMinimize(); return 0;
-                    case 0xF030: return 0; // these windows do not maximize
+                    case 0xF030: if (!IsMaximized) ToggleMaximize(); return 0; // SC_MAXIMIZE: glide to the work area
+                    case 0xF120 when IsMaximized && !IsIconic(Handle): ToggleMaximize(); return 0; // SC_RESTORE
                     case 0xF060: if (!closing && CanClose()) Close(); return 0;
                 }
                 break;
+            case 0xA3 when w == 2: ToggleMaximize(); return 0; // WM_NCLBUTTONDBLCLK on the caption
+            case 0x231 when glide is { } g: Bounds = g.To; break; // WM_ENTERSIZEMOVE: the user takes over; a glide jumps to its end
+            case 0x232 when IsMaximized && Bounds != WorkArea: restore = null; MaximizedChanged?.Invoke(this, EventArgs.Empty); break; // WM_EXITSIZEMOVE
             case 0x10: if (!closing && CanClose()) Close(); return 0; // WM_CLOSE
-            case 0x46 when shown && l != 0: // WM_WINDOWPOSCHANGING: a move takes the glass along in the same frame
+            case 0x46 when shown && glide is null && l != 0: // WM_WINDOWPOSCHANGING: a move takes the glass along in the same frame
             {
                 var p = Marshal.PtrToStructure<WindowPos>(l);
                 if ((p.Flags & 0x3) == 0x1 && !IsIconic(Handle) && GetWindowRect(Handle, out var r)) // SWP_NOSIZE without SWP_NOMOVE
@@ -351,6 +453,7 @@ internal sealed partial class GlassWindow : IDisposable
     {
         if (disposed) return;
         disposed = true;
+        EndGlide();
         open.Remove(this);
         ShowWindow(Handle, 0);
         glass.Dispose();
@@ -386,6 +489,7 @@ internal sealed partial class GlassWindow : IDisposable
     [DllImport("user32.dll")] static extern bool GetCursorPos(out Point p);
     [DllImport("user32.dll")] static extern nint MonitorFromPoint(Point p, uint flags);
     [DllImport("user32.dll")] static extern nint MonitorFromWindow(nint h, uint flags);
+    [DllImport("user32.dll")] static extern nint MonitorFromRect(ref Rect r, uint flags);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern bool GetMonitorInfoW(nint monitor, ref MonitorInfo info);
     [DllImport("shcore.dll")] static extern int GetDpiForMonitor(nint monitor, int type, out uint x, out uint y);
     [DllImport("gdi32.dll")] static extern nint CreateRoundRectRgn(int l, int t, int r, int b, int w, int h);

@@ -13,6 +13,16 @@ internal static class Motion
     internal const double Fast = 120, Normal = 220, Slow = 360;
     internal static readonly (float, float, float, float) Smooth = (0.2f, 0, 0, 1), Spring = (0.34f, 1.36f, 0.64f, 1), Glide = (0.25f, 1.05f, 0.35f, 1);
     internal static TimeSpan Duration(double ms) => TimeSpan.FromMilliseconds(settings.AnimationsEnabled ? ms : 1);
+    /// <summary>Where a cubic Bézier curve is at time <paramref name="t"/> (0 to 1), for motion driven frame by frame.</summary>
+    internal static double Progress((float, float, float, float) p, double t)
+    {
+        if (t <= 0) return 0;
+        if (t >= 1) return 1;
+        static double At(double a, double b, double s) => 3 * a * s * (1 - s) * (1 - s) + 3 * b * s * s * (1 - s) + s * s * s;
+        double lo = 0, hi = 1, s = t;
+        for (int i = 0; i < 24; i++) { s = (lo + hi) / 2; if (At(p.Item1, p.Item3, s) < t) lo = s; else hi = s; }
+        return At(p.Item2, p.Item4, s);
+    }
     internal static CubicBezierEasingFunction Ease(Compositor c, (float, float, float, float) p) => c.CreateCubicBezierEasingFunction(new Vector2(p.Item1, p.Item2), new Vector2(p.Item3, p.Item4));
     /// <summary>The default accent (霧藍); only control states and focus use it.</summary>
     internal static SolidColorBrush Accent => (SolidColorBrush)Application.Current.Resources["UiAccentBrush"];
