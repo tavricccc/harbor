@@ -218,7 +218,7 @@
   "Errors.SourceMissing": "找不到下载来源或记录，请检查链接后重试。",
   "Errors.SourceUrl": "请输入有效的 HTTP 或 HTTPS 来源网址。",
   "Errors.TrackerUrl": "请输入有效的 Tracker 订阅网址。",
-  "Errors.UnsupportedLink": "请粘贴 HTTP、HTTPS、磁力、eD2k 下载链接或 Torrent 文件路径。",
+  "Errors.UnsupportedLink": "请粘贴 HTTP、HTTPS、FTP、磁力、eD2k 下载链接或 Torrent 文件路径。",
   "Errors.WebhookRequired": "请先输入 Webhook 网址。",
   "Errors.WebhookUrl": "请输入有效的 Webhook 网址。",
   "Extensions.ChooseFolder": "选择本地文件夹…",

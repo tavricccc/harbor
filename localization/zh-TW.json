@@ -218,7 +218,7 @@
   "Errors.SourceMissing": "找不到下載來源或紀錄，請檢查連結後重試。",
   "Errors.SourceUrl": "請輸入有效的 HTTP 或 HTTPS 來源網址。",
   "Errors.TrackerUrl": "請輸入有效的 Tracker 訂閱網址。",
-  "Errors.UnsupportedLink": "請貼上 HTTP、HTTPS、磁力、eD2k 下載連結或 Torrent 檔案路徑。",
+  "Errors.UnsupportedLink": "請貼上 HTTP、HTTPS、FTP、磁力、eD2k 下載連結或 Torrent 檔案路徑。",
   "Errors.WebhookRequired": "請先輸入 Webhook 網址。",
   "Errors.WebhookUrl": "請輸入有效的 Webhook 網址。",
   "Extensions.ChooseFolder": "選擇本機資料夾…",

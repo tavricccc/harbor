@@ -218,7 +218,7 @@
   "Errors.SourceMissing": "The download source or record could not be found. Check the link and try again.",
   "Errors.SourceUrl": "Enter a valid HTTP or HTTPS source URL.",
   "Errors.TrackerUrl": "Enter a valid Tracker subscription URL.",
-  "Errors.UnsupportedLink": "Paste an HTTP, HTTPS, magnet or eD2k link, or a Torrent file path.",
+  "Errors.UnsupportedLink": "Paste an HTTP, HTTPS, FTP, magnet or eD2k link, or a Torrent file path.",
   "Errors.WebhookRequired": "Enter a Webhook URL first.",
   "Errors.WebhookUrl": "Enter a valid Webhook URL.",
   "Extensions.ChooseFolder": "Choose local folder…",
