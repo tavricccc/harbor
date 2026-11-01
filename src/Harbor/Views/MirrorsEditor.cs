@@ -10,7 +10,8 @@ namespace Harbor.Views;
 
 internal sealed class MirrorsEditor : StackPanel
 {
-    private readonly CheckBox enabled = new() { Content = Strings.Get("Mirrors.Enable") };
+    // Shown by the settings page as the card's first row, above this editor.
+    public Controls.SettingToggle Enabled { get; } = new() { Label = Strings.Get("Mirrors.Enable") };
     private readonly ListView list = new() { MaxHeight = 184, SelectionMode = ListViewSelectionMode.Single, Visibility = Visibility.Collapsed };
     private readonly ComboBox type = new() { HorizontalAlignment = HorizontalAlignment.Stretch, Items = { "GitHub Proxy", "jsDelivr" }, SelectedIndex = 0 };
     private readonly TextBox url = new() { PlaceholderText = "https://…" };
@@ -38,7 +39,6 @@ internal sealed class MirrorsEditor : StackPanel
                 </Grid>
             </DataTemplate>
             """);
-        Children.Add(enabled);
         Children.Add(list);
         Children.Add(message);
         var form = new NativeFormGrid();
@@ -84,7 +84,7 @@ internal sealed class MirrorsEditor : StackPanel
 
     public void Load(JsonObject config)
     {
-        enabled.IsChecked = config["extra"]?["githubMirror"]?["enabled"]?.GetValue<bool>() == true;
+        Enabled.IsOn = config["extra"]?["githubMirror"]?["enabled"]?.GetValue<bool>() == true;
         list.Items.Clear();
         foreach (var mirror in config["extra"]?["githubMirror"]?["mirrors"]?.AsArray() ?? [])
             if (mirror?["isDeleted"]?.GetValue<bool>() != true)
@@ -93,11 +93,11 @@ internal sealed class MirrorsEditor : StackPanel
 
     public void Save(JsonObject config)
     {
-        if (enabled.IsChecked == true && list.Items.Count == 0)
+        if (Enabled.IsOn && list.Items.Count == 0)
             throw new FormatException(Strings.Get("Errors.MirrorRequired"));
         ConfigJson.Set(config, "extra.githubMirror", new JsonObject
         {
-            ["enabled"] = enabled.IsChecked == true,
+            ["enabled"] = Enabled.IsOn,
             ["mirrors"] = new JsonArray(list.Items.Cast<Mirror>().Select(x => (JsonNode?)new JsonObject { ["type"] = x.Type, ["url"] = x.Url, ["isBuiltIn"] = false, ["isDeleted"] = false }).ToArray())
         });
     }

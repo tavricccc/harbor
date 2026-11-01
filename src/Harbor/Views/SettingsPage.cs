@@ -1,4 +1,6 @@
+using Harbor.Controls;
 using Harbor.Localization;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Harbor.ViewModels;
@@ -8,25 +10,35 @@ using System.Text.Json.Nodes;
 
 namespace Harbor.Views;
 
+/// <summary>
+/// Pane's settings window: a sidebar of sections (the selection slides behind them) beside one section's cards;
+/// Reload on the left of the footer, Cancel and Save on the right.
+/// </summary>
 public sealed partial class SettingsPage : Page
 {
     private readonly DownloadsViewModel vm;
     private readonly nint windowHandle;
     private readonly SettingsFields fields = new();
-    private readonly InfoBar message = new() { IsClosable = true, Visibility = Visibility.Collapsed };
-    private readonly Pivot sections = new();
+    private readonly InfoBar message = new() { IsClosable = true, Visibility = Visibility.Collapsed, Margin = new Thickness(0, 0, 0, 12) };
+    private readonly StackPanel navigation = new() { Spacing = 2 };
+    private readonly Canvas highlightLayer = new() { IsHitTestVisible = false };
+    private readonly SlidingHighlight highlight;
+    private readonly ScrollViewer content = new() { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, HorizontalScrollMode = ScrollMode.Disabled };
+    private readonly StackPanel contentHost = new() { Padding = new Thickness(8, 0, 24, 24) };
+    private readonly List<(Button Item, StackPanel Panel)> sections = [];
+    private int selected = -1;
     private Button saveButton = null!;
-    private readonly ComboBox theme = new() { Header = Strings.Get("Settings.Theme"), HorizontalAlignment = HorizontalAlignment.Stretch, Items = { Strings.Get("Common.FollowWindows"), Strings.Get("Settings.Light"), Strings.Get("Settings.Dark") }, SelectedIndex = 0 };
-    private readonly CheckBox remember = new() { Content = Strings.Get("Settings.RememberFolder") };
-    private readonly CheckBox closeProgress = new() { Content = Strings.Get("Settings.CloseProgress") };
-    private readonly CheckBox startup = new() { Content = Strings.Get("Settings.Startup") };
-    private readonly CheckBox checkUpdates = new() { Content = Strings.Get("Settings.CheckUpdates") };
-    private readonly NumberBox apiPort = new() { Header = Strings.Get("Settings.ApiPort"), Minimum = 1024, Maximum = 65535, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact };
+    private readonly Segmented theme = new() { Options = string.Join("|", Strings.Get("Common.FollowWindows"), Strings.Get("Settings.Light"), Strings.Get("Settings.Dark")) };
+    private readonly SettingToggle remember = new() { Label = Strings.Get("Settings.RememberFolder") };
+    private readonly SettingToggle closeProgress = new() { Label = Strings.Get("Settings.CloseProgress") };
+    private readonly SettingToggle startup = new() { Label = Strings.Get("Settings.Startup") };
+    private readonly SettingToggle checkUpdates = new() { Label = Strings.Get("Settings.CheckUpdates") };
+    private readonly NumberBox apiPort = new() { Width = 140, MinWidth = 0, Minimum = 1024, Maximum = 65535, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact };
     private TextBox folder = null!;
     private TextBox customTrackers = null!;
     private readonly CategoriesEditor categories;
     private readonly MirrorsEditor mirrors = new();
-    private readonly ComboBox proxyMode = new() { Header = Strings.Get("Proxy.Mode"), HorizontalAlignment = HorizontalAlignment.Stretch, Items = { Strings.Get("Common.FollowSystem"), Strings.Get("Request.Direct"), Strings.Get("Common.Custom") }, SelectedIndex = 0 };
+    private readonly Segmented proxyMode = new() { Options = string.Join("|", Strings.Get("Common.FollowSystem"), Strings.Get("Request.DirectShort"), Strings.Get("Common.Custom")) };
 
     public event Action? CloseRequested;
     public event Action? MinimizeRequested;
@@ -37,6 +49,7 @@ public sealed partial class SettingsPage : Page
         vm = viewModel;
         windowHandle = ownerHandle;
         categories = new CategoriesEditor(ownerHandle);
+        highlight = new SlidingHighlight(highlightLayer, 10);
         BuildDownloads();
         BuildBehavior();
         BuildCategories();
@@ -44,52 +57,97 @@ public sealed partial class SettingsPage : Page
         BuildAutomation();
         BuildAbout();
 
-        var surface = new Grid { Padding = new Thickness(24, 16, 24, 20), RowSpacing = 16 };
+        var surface = new Grid();
         surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         surface.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        var header = new StackPanel { Spacing = 16 };
-        var title = new WindowHeader { Title = Strings.Get("Common.Settings"), Margin = new Thickness(-24, -16, -24, 0) };
+        surface.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(200) });
+        surface.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        var title = new WindowHeader { Title = Strings.Get("Common.Settings") };
         title.MinimizeRequested += () => MinimizeRequested?.Invoke();
         title.CloseRequested += () => CloseRequested?.Invoke();
         TitleBar = title;
-        header.Children.Add(title);
-        header.Children.Add(message);
-        surface.Children.Add(header);
-        NativeInfoBars.CollapseWhenClosed(message);
-        Grid.SetRow(sections, 1);
-        surface.Children.Add(sections);
+        Grid.SetColumnSpan(title, 2);
+        surface.Children.Add(title);
 
+        var sidebar = new Grid { Padding = new Thickness(12, 4, 12, 12) };
+        sidebar.Children.Add(highlightLayer);
+        sidebar.Children.Add(new StackPanel { Children = { navigation } });
+        Grid.SetRow(sidebar, 1);
+        surface.Children.Add(sidebar);
+
+        NativeInfoBars.CollapseWhenClosed(message);
+        content.Content = contentHost;
+        Grid.SetRow(content, 1);
+        Grid.SetColumn(content, 1);
+        surface.Children.Add(content);
+
+        var footer = new Grid { Padding = new Thickness(20, 12, 20, 12), BorderThickness = new Thickness(0, 1, 0, 0) };
+        Motion.Themed(footer, Grid.BorderBrushProperty, "PaneStrokeBrush");
+        var reload = NativeButtons.Create(Strings.Get("Settings.Reload"));
+        reload.Click += (_, _) => Load(this, new RoutedEventArgs());
+        footer.Children.Add(reload);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };
         var cancel = NativeButtons.Create(Strings.Get("Common.Cancel"));
         cancel.Click += (_, _) => CloseRequested?.Invoke();
         saveButton = NativeButtons.Create(Strings.Get("Common.Save"), true);
         saveButton.Click += Save;
-        sections.IsEnabled = saveButton.IsEnabled = false;
+        content.IsEnabled = saveButton.IsEnabled = false;
         actions.Children.Add(cancel);
         actions.Children.Add(saveButton);
-        Grid.SetRow(actions, 2);
-        surface.Children.Add(actions);
+        footer.Children.Add(actions);
+        Grid.SetRow(footer, 2);
+        Grid.SetColumnSpan(footer, 2);
+        surface.Children.Add(footer);
         Content = surface;
+        Select(0, false);
+        ActualThemeChanged += (_, _) => PaintNavigation();
         Loaded += Load;
     }
 
-    private StackPanel Section(string title)
+    private StackPanel Section(string title, string icon)
     {
-        var panel = new StackPanel { Spacing = 20, Padding = new Thickness(0, 12, 12, 16) };
-        sections.Items.Add(new PivotItem
+        var panel = new StackPanel();
+        var label = new TextBlock { Text = title, VerticalAlignment = VerticalAlignment.Center };
+        var item = new Button
         {
-            Header = title,
-            Content = new ScrollViewer
-            {
-                Content = panel,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                HorizontalScrollMode = ScrollMode.Disabled,
-                HorizontalContentAlignment = HorizontalAlignment.Stretch
-            }
-        });
+            Style = (Style)Application.Current.Resources["PaneNavItem"],
+            Content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Children = { new Icon { Glyph = icon, Width = 16, Height = 16 }, label } }
+        };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(item, title);
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(item, "SettingsSection-" + icon);
+        int index = sections.Count;
+        item.Click += (_, _) => Select(index, true);
+        item.SizeChanged += (_, _) => { if (index == selected) highlight.MoveTo(item, false); };
+        navigation.Children.Add(item);
+        sections.Add((item, panel));
         return panel;
+    }
+
+    private void Select(int index, bool animate)
+    {
+        if (index == selected)
+            return;
+        selected = index;
+        PaintNavigation();
+        contentHost.Children.Clear();
+        contentHost.Children.Add(message);
+        contentHost.Children.Add(sections[index].Panel);
+        content.ChangeView(null, 0, null, true);
+        if (sections[index].Item.ActualWidth > 0)
+            highlight.MoveTo(sections[index].Item, animate);
+    }
+
+    // The selected section reads primary and semibold, the rest secondary.
+    private void PaintNavigation()
+    {
+        for (int i = 0; i < sections.Count; i++)
+        {
+            var item = sections[i].Item;
+            item.Foreground = Motion.Resource(item, i == selected ? "PaneText1Brush" : "PaneText2Brush");
+            item.FontWeight = i == selected ? FontWeights.SemiBold : FontWeights.Normal;
+        }
     }
 
     private async void Load(object sender, RoutedEventArgs args)
@@ -102,12 +160,12 @@ public sealed partial class SettingsPage : Page
             categories.Load(config);
             mirrors.Load(config);
             var prefs = UiPreferences.Load();
-            remember.IsChecked = prefs.RememberDownloadDirectory;
-            closeProgress.IsChecked = prefs.CloseProgressAfterOpen;
+            remember.IsOn = prefs.RememberDownloadDirectory;
+            closeProgress.IsOn = prefs.CloseProgressAfterOpen;
             language.SelectedValue = prefs.Language;
             apiPort.Value = prefs.ApiPort;
-            checkUpdates.IsChecked = prefs.CheckForUpdates;
-            startup.IsChecked = WindowsIntegration.StartsWithWindows;
+            checkUpdates.IsOn = prefs.CheckForUpdates;
+            startup.IsOn = WindowsIntegration.StartsWithWindows;
             proxyMode.SelectedIndex = config["proxy"]?["enable"]?.GetValue<bool>() == true ? config["proxy"]?["system"]?.GetValue<bool>() == true ? 0 : 2 : 1;
             theme.SelectedIndex = WindowAppearance.Theme switch
             {
@@ -115,7 +173,7 @@ public sealed partial class SettingsPage : Page
                 ElementTheme.Dark => 2,
                 _ => 0
             };
-            sections.IsEnabled = saveButton.IsEnabled = true;
+            content.IsEnabled = saveButton.IsEnabled = true;
         }
         catch (Exception error) { Report(error); }
     }
@@ -157,12 +215,12 @@ public sealed partial class SettingsPage : Page
             var selectedLanguage = (string)language.SelectedValue;
             var languageChanged = prefs.Language != selectedLanguage;
             prefs.Language = selectedLanguage;
-            prefs.RememberDownloadDirectory = remember.IsChecked == true;
-            prefs.CloseProgressAfterOpen = closeProgress.IsChecked == true;
+            prefs.RememberDownloadDirectory = remember.IsOn;
+            prefs.CloseProgressAfterOpen = closeProgress.IsOn;
             prefs.ApiPort = (int)apiPort.Value;
-            prefs.CheckForUpdates = checkUpdates.IsChecked == true;
+            prefs.CheckForUpdates = checkUpdates.IsOn;
             prefs.Save();
-            WindowsIntegration.SetStartup(startup.IsChecked == true);
+            WindowsIntegration.SetStartup(startup.IsOn);
             var selectedTheme = theme.SelectedIndex switch
             {
                 1 => ElementTheme.Light,

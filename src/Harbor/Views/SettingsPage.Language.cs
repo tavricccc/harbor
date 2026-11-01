@@ -13,8 +13,8 @@ public sealed partial class SettingsPage
     {
         var selector = new ComboBox
         {
-            Header = Strings.Get("Settings.Language"),
-            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Width = 220,
+            MinWidth = 0,
             SelectedValuePath = "Tag"
         };
         selector.Items.Add(new ComboBoxItem { Content = Strings.Get("Common.FollowWindows"), Tag = "" });

@@ -356,6 +356,29 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!-- Sidebar item: icon and label on the left, neutral fill on hover; the selection is a SlidingHighlight behind it. -->
+    <Style x:Key="PaneNavItem" TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="Height" Value="36"/><Setter Property="Padding" Value="12,0,12,0"/>
+        <Setter Property="CornerRadius" Value="10"/><Setter Property="FontSize" Value="13"/><Setter Property="Foreground" Value="{ThemeResource PaneText2Brush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" Background="Transparent" CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Padding="{TemplateBinding Padding}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="{TemplateBinding FontSize}"
+                                          FontWeight="{TemplateBinding FontWeight}" Foreground="{TemplateBinding Foreground}"/>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Bg.Background" Value="{ThemeResource PaneFillHoverBrush}"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Pressed"><VisualState.Setters><Setter Target="Bg.Background" Value="{ThemeResource PaneFillHoverBrush}"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Bg.Opacity" Value="0.4"/></VisualState.Setters></VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <!-- Subtle text button: the icon button's look with room for a label (secondary links, toggles). -->
     <Style x:Key="PaneSubtleButton" TargetType="Button" BasedOn="{StaticResource PaneIconButton}">
         <Setter Property="Width" Value="NaN"/><Setter Property="Padding" Value="10,0,10,0"/><Setter Property="FontSize" Value="12"/>

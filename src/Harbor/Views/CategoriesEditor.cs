@@ -19,12 +19,12 @@ internal sealed class CategoriesEditor : StackPanel
     private readonly TextBox name = new();
     private readonly TextBox path = new();
     private readonly InfoBar message = new() { Severity = InfoBarSeverity.Error, IsClosable = true };
-    private readonly CheckBox enabled = new() { Content = Strings.Get("Categories.SaveByCategory") };
+    // Shown by the settings page as the card's first row, above this editor.
+    public Controls.SettingToggle Enabled { get; } = new() { Label = Strings.Get("Categories.SaveByCategory") };
 
     public CategoriesEditor(nint windowHandle)
     {
         Spacing = 20;
-        Children.Add(enabled);
         NativeInfoBars.CollapseWhenClosed(message);
         AutomationProperties.SetName(name, Strings.Get("Categories.Name"));
         AutomationProperties.SetName(path, Strings.Get("Common.SaveLocation"));
@@ -128,14 +128,14 @@ internal sealed class CategoriesEditor : StackPanel
 
     public void Load(JsonObject config)
     {
-        enabled.IsChecked = UsesCategories(config);
+        Enabled.IsOn = UsesCategories(config);
         list.Items.Clear();
         foreach (var item in Read(config))
             list.Items.Add(item);
     }
     public void Save(JsonObject config)
     {
-        ConfigJson.Set(config, "extra.harborCategorizedDownloads", JsonValue.Create(enabled.IsChecked == true));
+        ConfigJson.Set(config, "extra.harborCategorizedDownloads", JsonValue.Create(Enabled.IsOn));
         ConfigJson.Set(config, "extra.downloadCategories", new JsonArray(list.Items.Cast<DownloadCategory>().Select(x => (JsonNode?)new JsonObject { ["name"] = x.Name, ["path"] = x.Path, ["isBuiltIn"] = false, ["isDeleted"] = false }).ToArray()));
     }
     public static bool UsesCategories(JsonNode config) => ConfigJson.Get(config, "extra.harborCategorizedDownloads")?.GetValue<bool>() == true;

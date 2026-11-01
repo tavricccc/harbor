@@ -11,42 +11,48 @@ public sealed partial class SettingsPage
 {
     private void BuildNetwork()
     {
-        var panel = Section(Strings.Get("Settings.Network"));
-        panel.Children.Add(proxyMode);
-        var customProxy = new StackPanel { Spacing = 16 };
-        panel.Children.Add(customProxy);
-        void ShowProxy() => customProxy.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
+        var page = Section(Strings.Get("Settings.Network"), "globe");
+        var proxy = SettingsFields.Group(page, Strings.Get("Proxy.Title"));
+        SettingsFields.Row(proxy, Strings.Get("Proxy.Mode"), proxyMode);
+        var before = proxy.Children.Count;
+        fields.Text(proxy, Strings.Get("Common.Protocol"), "proxy.scheme", initial: "http");
+        fields.Text(proxy, Strings.Get("Proxy.Host"), "proxy.host");
+        fields.Text(proxy, Strings.Get("Common.Username"), "proxy.usr");
+        fields.Password(proxy, Strings.Get("Common.Password"), "proxy.pwd");
+        var custom = proxy.Children.Skip(before).ToArray();
+        void ShowProxy()
+        {
+            foreach (var row in custom)
+                row.Visibility = proxyMode.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
+        }
         proxyMode.SelectionChanged += (_, _) => ShowProxy();
         ShowProxy();
-        var (scheme, host) = SettingsFields.Columns(customProxy);
-        fields.Text(scheme, Strings.Get("Common.Protocol"), "proxy.scheme", initial: "http");
-        fields.Text(host, Strings.Get("Proxy.Host"), "proxy.host");
-        var (user, password) = SettingsFields.Columns(customProxy);
-        fields.Text(user, Strings.Get("Common.Username"), "proxy.usr");
-        fields.Password(password, Strings.Get("Common.Password"), "proxy.pwd");
 
-        var github = SettingsFields.Advanced(panel, Strings.Get("Settings.Mirrors"));
-        github.Children.Add(mirrors);
-        var browser = SettingsFields.Group(panel, Strings.Get("Settings.Browser"));
-        browser.Children.Add(new BrowserIntegrationGuide());
-        var remote = SettingsFields.Advanced(panel, Strings.Get("Settings.LocalApi"));
-        remote.Children.Add(new TextBox { Header = Strings.Get("Settings.ServerAddress"), IsReadOnly = true, Text = new Uri(vm.Core.ApiAddress).Authority });
-        remote.Children.Add(new PasswordBox { Header = "API Token", Password = vm.Core.Token, PasswordRevealMode = PasswordRevealMode.Peek });
-        var copy = NativeButtons.Create(Strings.Get("Settings.CopyToken"));
+        var github = SettingsFields.Group(page, Strings.Get("Settings.Mirrors"));
+        github.Children.Add(mirrors.Enabled);
+        SettingsFields.Reveal(mirrors.Enabled, SettingsFields.Block(github, mirrors));
+
+        var browser = SettingsFields.Group(page, Strings.Get("Settings.Browser"));
+        SettingsFields.Block(browser, new BrowserIntegrationGuide());
+
+        var remote = SettingsFields.Group(page, Strings.Get("Settings.LocalApi"));
+        SettingsFields.Row(remote, Strings.Get("Settings.ServerAddress"), new TextBox { Width = 280, IsReadOnly = true, Text = new Uri(vm.Core.ApiAddress).Authority });
+        var token = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        token.Children.Add(new PasswordBox { Width = 200, Password = vm.Core.Token, PasswordRevealMode = PasswordRevealMode.Peek });
+        var copy = NativeButtons.Create(Strings.Get("Action.Copy"));
         copy.Click += (_, _) => { FileActions.Copy(vm.Core.Token); Success(Strings.Get("Settings.TokenCopied")); };
-        remote.Children.Add(copy);
-        remote.Children.Add(apiPort);
+        token.Children.Add(copy);
+        SettingsFields.Row(remote, "API Token", token);
+        SettingsFields.Row(remote, Strings.Get("Settings.ApiPort"), apiPort);
     }
 
     private void BuildAutomation()
     {
-        var panel = Section(Strings.Get("Settings.Automation"));
-        var webhookEnabled = fields.Toggle(panel, Strings.Get("Settings.Webhook"), "webhook.enable");
-        var webhook = new StackPanel { Spacing = 16 };
-        panel.Children.Add(webhook);
-        SettingsFields.Reveal(webhookEnabled, webhook);
+        var page = Section(Strings.Get("Settings.Automation"), "link");
+        var webhook = SettingsFields.Group(page, "Webhook");
+        var webhookEnabled = fields.Toggle(webhook, Strings.Get("Settings.Webhook"), "webhook.enable");
         var urls = fields.Text(webhook, Strings.Get("Settings.WebhookUrls"), "webhook.urls", true);
-        var test = NativeButtons.Create(Strings.Get("Settings.TestWebhook"));
+        var test = NativeButtons.Create(Strings.Get("Action.SendTest"));
         test.Click += async (_, _) =>
         {
             test.IsEnabled = false;
@@ -66,24 +72,20 @@ public sealed partial class SettingsPage
             catch (Exception error) { Report(error); }
             finally { test.IsEnabled = true; }
         };
-        webhook.Children.Add(test);
-        var script = SettingsFields.Group(panel, Strings.Get("Settings.Scripts"));
+        var testRow = SettingsFields.Row(webhook, Strings.Get("Settings.TestWebhook"), test);
+        SettingsFields.Reveal(webhookEnabled, webhook.Children[1], testRow);
+
+        var script = SettingsFields.Group(page, Strings.Get("Settings.Scripts"));
         var scriptEnabled = fields.Toggle(script, Strings.Get("Settings.RunScript"), "script.enable");
-        var scriptPaths = new StackPanel { Spacing = 16 };
-        script.Children.Add(scriptPaths);
-        SettingsFields.Reveal(scriptEnabled, scriptPaths);
-        fields.Text(scriptPaths, Strings.Get("Settings.ScriptPaths"), "script.paths", true);
+        fields.Text(script, Strings.Get("Settings.ScriptPaths"), "script.paths", true);
+        SettingsFields.Reveal(scriptEnabled, script.Children[1]);
     }
 
     private void BuildAbout()
     {
-        var panel = Section(Strings.Get("Settings.About"));
-        panel.Children.Add(new TextBlock { Text = $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", Style = (Style)Application.Current.Resources["CompactSectionTitleStyle"] });
-        panel.Children.Add(SettingsFields.Description(Strings.Format("Settings.CoreVersion", vm.Core.Version)));
-        var credits = SettingsFields.Group(panel, Strings.Get("Settings.Credits"));
-        credits.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
-        panel.Children.Add(checkUpdates);
-        var update = NativeButtons.Create(Strings.Get("Update.Check"));
+        var page = Section(Strings.Get("Settings.About"), "info");
+        var product = SettingsFields.Group(page);
+        var update = NativeButtons.Create(Strings.Get("Action.Check"));
         update.Click += async (_, _) =>
         {
             update.IsEnabled = false;
@@ -98,15 +100,22 @@ public sealed partial class SettingsPage
             catch (Exception error) { Report(error); }
             finally { update.IsEnabled = true; }
         };
-        panel.Children.Add(update);
-        var links = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 20 };
-        links.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.Project"), NavigateUri = new Uri("https://github.com/tavricccc/harbor"), Padding = new Thickness(0) });
-        links.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.License"), NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
-        panel.Children.Add(links);
-        var logs = NativeButtons.Create(Strings.Get("Settings.OpenLogs"));
+        SettingsFields.Row(product, $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", update, Strings.Format("Settings.CoreVersion", vm.Core.Version));
+        product.Children.Add(checkUpdates);
+
+        var links = SettingsFields.Group(page, Strings.Get("Settings.Credits"));
+        var list = new StackPanel { Spacing = 4 };
+        list.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.Project"), NavigateUri = new Uri("https://github.com/tavricccc/harbor"), Padding = new Thickness(0) });
+        list.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.License"), NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
+        list.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
+        list.Children.Add(new HyperlinkButton { Content = "Lucide icons · ISC", NavigateUri = new Uri("https://lucide.dev/license"), Padding = new Thickness(0) });
+        SettingsFields.Block(links, list);
+
+        var maintenance = SettingsFields.Group(page, Strings.Get("Settings.Maintenance"));
+        var logs = NativeButtons.Create(Strings.Get("Action.Open"));
         logs.Click += (_, _) => FileActions.Open(Path.Combine(CoreClient.DataDirectory, "logs"));
-        panel.Children.Add(logs);
-        var stop = NativeButtons.Create(Strings.Get("Settings.Quit"));
+        SettingsFields.Row(maintenance, Strings.Get("Settings.OpenLogs"), logs);
+        var stop = NativeButtons.Create(Strings.Get("Action.Quit"));
         stop.Click += async (_, _) =>
         {
             var dialog = new ContentDialog { Title = Strings.Get("Settings.QuitConfirm"), Content = Strings.Get("Settings.QuitDescription"), PrimaryButtonText = Strings.Get("Settings.QuitAction"), CloseButtonText = Strings.Get("Common.Cancel") };
@@ -120,6 +129,6 @@ public sealed partial class SettingsPage
                 catch (Exception error) { Report(error); }
             }
         };
-        panel.Children.Add(stop);
+        SettingsFields.Row(maintenance, Strings.Get("Settings.Quit"), stop, Strings.Get("Settings.QuitDescription"));
     }
 }
