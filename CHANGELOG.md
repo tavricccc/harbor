@@ -7,6 +7,7 @@
 - The main window can be maximized from a new title bar button or by double-clicking the title bar.
 - Window edges and corners are easier to grab for resizing; corners have a larger grip.
 - The add-download window expands and collapses downward with a short glide instead of jumping around its center.
+- Harbor now requires Windows 11 21H2 (build 22000) or later; the installer stops on older Windows. The glass window relies on Windows 11 backdrop and corner APIs.
 
 ## 0.12.0 — 2026-11-01
 

@@ -31,7 +31,7 @@ internal sealed class GlassSurface : IDisposable
     readonly SpriteVisual[] shadows = new SpriteVisual[2];
     readonly ShapeVisual mask, edges;
     readonly CompositionRoundedRectangleGeometry maskGeometry, clip, outer, inner;
-    readonly CompositionVisualSurface? maskSurface;
+    readonly CompositionVisualSurface maskSurface;
     readonly SpriteVisual material, luminosity, tint;
     readonly CompositionColorBrush outerStroke;
     readonly CompositionColorGradientStop[] innerStops = new CompositionColorGradientStop[4];
@@ -66,14 +66,10 @@ internal sealed class GlassSurface : IDisposable
         var maskShape = c.CreateSpriteShape(maskGeometry);
         maskShape.FillBrush = c.CreateColorBrush(Colors(1, 255, 255, 255));
         mask.Shapes.Add(maskShape);
-        // The rounded shadow needs a visual surface (Windows 10 1903); on 1809 the glass simply casts none.
-        CompositionSurfaceBrush? maskBrush = null;
-        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 18362))
-        {
-            maskSurface = c.CreateVisualSurface();
-            maskSurface.SourceVisual = mask;
-            maskBrush = c.CreateSurfaceBrush(maskSurface);
-        }
+        // The rounded shadow takes its shape from the mask through a visual surface.
+        maskSurface = c.CreateVisualSurface();
+        maskSurface.SourceVisual = mask;
+        var maskBrush = c.CreateSurfaceBrush(maskSurface);
         var shadowLayer = c.CreateContainerVisual();
         root.Children.InsertAtTop(shadowLayer);
         for (int i = 0; i < 2; i++)
@@ -82,7 +78,6 @@ internal sealed class GlassSurface : IDisposable
             v.Offset = offset;
             shadowLayer.Children.InsertAtTop(v);
             shadows[i] = v;
-            if (maskBrush is null) continue;
             var s = c.CreateDropShadow();
             s.Mask = maskBrush;
             s.Color = Colors(1, 0, 0, 0);
@@ -206,7 +201,7 @@ internal sealed class GlassSurface : IDisposable
         root.Size = new Vector2(width + 2 * Margin, height + Margin + MarginBottom);
         foreach (var g in new[] { maskGeometry, clip }) { g.Size = next; g.CornerRadius = radius; }
         mask.Size = next;
-        if (maskSurface is not null && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 18362)) maskSurface.SourceSize = next;
+        maskSurface.SourceSize = next;
         foreach (var v in shadows.Concat([material, luminosity, tint])) v.Size = next;
         edges.Size = new Vector2(width + 2, height + 2);
         outer.Size = new Vector2(width + 1, height + 1);
