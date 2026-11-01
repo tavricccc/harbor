@@ -2,7 +2,7 @@
 
 [English](../development.md) · [首頁](../../README.zh-TW.md)
 
-使用 Windows、PowerShell 7、.NET 10 SDK 與 Go 1.27，在 `winui-native` 分支工作。
+使用 Windows、PowerShell 7、.NET 10 SDK 與 Go 1.27，在 `harbor` 分支工作。
 
 ## 維護範圍
 

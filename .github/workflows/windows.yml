@@ -1,9 +1,9 @@
 name: Windows native build
 on:
   push:
-    branches: [winui-native]
+    branches: [harbor]
   pull_request:
-    branches: [winui-native]
+    branches: [harbor]
   workflow_dispatch:
     inputs:
       core-channel:

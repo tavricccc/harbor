@@ -166,7 +166,7 @@ public sealed partial class SettingsPage
         var links = SettingsFields.Group(page, Strings.Get("Settings.Credits"));
         var list = new StackPanel { Spacing = 4 };
         list.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.Project"), NavigateUri = new Uri("https://github.com/tavricccc/harbor"), Padding = new Thickness(0) });
-        list.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.License"), NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/winui-native/LICENSE"), Padding = new Thickness(0) });
+        list.Children.Add(new HyperlinkButton { Content = Strings.Get("Settings.License"), NavigateUri = new Uri("https://github.com/tavricccc/harbor/blob/harbor/LICENSE"), Padding = new Thickness(0) });
         list.Children.Add(new HyperlinkButton { Content = "Gopeed · GopeedLab", NavigateUri = new Uri("https://github.com/GopeedLab/gopeed"), Padding = new Thickness(0) });
         list.Children.Add(new HyperlinkButton { Content = "Lucide icons · ISC", NavigateUri = new Uri("https://lucide.dev/license"), Padding = new Thickness(0) });
         SettingsFields.Block(links, list);

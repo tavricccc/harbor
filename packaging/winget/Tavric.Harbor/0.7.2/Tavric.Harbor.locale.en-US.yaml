@@ -8,7 +8,7 @@ PublisherSupportUrl: https://github.com/tavricccc/harbor/issues
 PackageName: Harbor
 PackageUrl: https://github.com/tavricccc/harbor
 License: GPL-3.0
-LicenseUrl: https://github.com/tavricccc/harbor/blob/winui-native/LICENSE
+LicenseUrl: https://github.com/tavricccc/harbor/blob/harbor/LICENSE
 ShortDescription: A native Windows download manager powered by Gopeed.
 Description: Harbor is an independently maintained community fork of Gopeed with a WinUI 3 interface in Traditional Chinese. This preview release supports HTTP, BitTorrent, browser integration, and scheduled downloads.
 Tags:

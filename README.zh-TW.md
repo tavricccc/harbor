@@ -42,4 +42,4 @@ pwsh -File scripts/build.ps1 -Test
 pwsh -File scripts/package.ps1 -SkipBuild
 ```
 
-輸出位於 `artifacts/`，原始碼維護於 `winui-native` 分支。使用 [GPL-3.0](LICENSE) 授權。
+輸出位於 `artifacts/`，原始碼維護於 `harbor` 分支。使用 [GPL-3.0](LICENSE) 授權。

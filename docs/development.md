@@ -2,7 +2,7 @@
 
 [繁體中文](zh-TW/development.md) · [Home](../README.md)
 
-Use Windows, PowerShell 7, .NET 10 SDK, and Go 1.27. Work on `winui-native`.
+Use Windows, PowerShell 7, .NET 10 SDK, and Go 1.27. Work on `harbor`.
 
 ## Ownership
 
