@@ -41,6 +41,9 @@
     <Compile Include="..\Harbor\Localization\Strings.cs" Link="Localization\Strings.cs" />
     <Compile Include="..\Harbor\Localization\LanguageOption.cs" Link="Localization\LanguageOption.cs" />
     <Compile Include="..\Harbor\Localization\LocalizationJsonContext.cs" Link="Localization\LocalizationJsonContext.cs" />
+    <Compile Include="..\Harbor\Controls\Icon.cs" Link="Controls\Icon.cs" />
+    <Compile Include="..\Harbor\Services\UiFont.cs" Link="Services\UiFont.cs" />
+    <EmbeddedResource Include="..\Harbor\Themes\Pane.xaml" LogicalName="Pane.xaml" />
     <EmbeddedResource Include="..\..\localization\*.json" LogicalName="Harbor.Localization.%(Filename)%(Extension)" />
     <EmbeddedResource Include="$(PayloadZip)" LogicalName="payload.zip" Condition="Exists('$(PayloadZip)')" />
     <Content Include="..\Harbor\Assets\AppIcon.ico" Link="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

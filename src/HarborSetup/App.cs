@@ -34,9 +34,12 @@ public sealed class App : Application, IXamlMetadataProvider
         }
 
         Resources.MergedDictionaries.Add(new XamlControlsResources());
-        Resources["ContentControlThemeFontFamily"] = new FontFamily("Segoe UI Variable Text, Microsoft JhengHei UI");
+        // Harbor's own Pane styles, parsed at run time because the single-file setup carries no compiled XAML.
+        using (var pane = new StreamReader(typeof(App).Assembly.GetManifestResourceStream("Pane.xaml")!))
+            Resources.MergedDictionaries.Add((ResourceDictionary)XamlReader.Load(pane.ReadToEnd()));
         Strings.Initialize(SavedLanguage(), Windows.System.UserProfile.GlobalizationPreferences.Languages);
-        window = new SetupWindow(uninstall);
+        Resources["ContentControlThemeFontFamily"] = Harbor.Services.UiFont.For(Strings.Language);
+        window = new SetupWindow(uninstall, arguments.Contains("--auto-update"));
         window.Activate();
     }
 
