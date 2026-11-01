@@ -39,7 +39,7 @@ public sealed partial class DownloadForm
                 if (links.Length > 1 && FileName.Text.Length > 0)
                     throw new FormatException(Strings.Get("Errors.BatchFileName"));
                 var requests = new JsonArray(links.Select(link => (JsonNode?)BuildRequest(link)).ToArray());
-                if (links.Length == 1 && resolved is not null && DirectDownload.IsChecked != true)
+                if (links.Length == 1 && resolved is not null && !DirectDownload.IsOn)
                 {
                     if (Files.Items.Count > 1 && Files.SelectedItems.Count == 0)
                         throw new FormatException(Strings.Get("Errors.SelectFile"));
@@ -56,7 +56,7 @@ public sealed partial class DownloadForm
                 await core.SendAsync(HttpMethod.Post, "tasks/batch", new JsonObject { ["reqs"] = requests });
                 complete = true;
             }
-            else if (resolved is null && DirectDownload.IsChecked != true)
+            else if (resolved is null && !DirectDownload.IsOn)
             {
                 await InspectAsync(links[0]);
             }
@@ -64,7 +64,7 @@ public sealed partial class DownloadForm
             {
                 // Update resolution options if destination, file name or file selection changed after probing.
                 var request = BuildRequest(links[0]);
-                if (DirectDownload.IsChecked != true)
+                if (!DirectDownload.IsOn)
                 {
                     request["opts"]!["selectFiles"] = new JsonArray(Files.SelectedItems.Cast<ResolvedFile>().Select(file => JsonValue.Create(file.Index) as JsonNode).ToArray());
                     if (Files.Items.Count > 1 && Files.SelectedItems.Count == 0)

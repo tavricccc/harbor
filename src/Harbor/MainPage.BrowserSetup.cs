@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Harbor.Services;
 using Harbor.Views;
 
@@ -9,18 +8,21 @@ public sealed partial class MainPage
 {
     private void InitializeBrowserSetupHint()
     {
-        NativeInfoBars.CollapseWhenClosed(BrowserSetupHint);
-        Loaded += (_, _) => BrowserSetupHint.IsOpen = !UiPreferences.Load().BrowserSetupHintDismissed;
+        Loaded += (_, _) => BrowserSetupHint.Visibility = UiPreferences.Load().BrowserSetupHintDismissed ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void OpenBrowserSetup(object sender, RoutedEventArgs args)
     {
-        BrowserSetupHint.IsOpen = false;
+        DismissBrowserSetupHint();
         OpenSection(new BrowserSetupPage());
     }
 
-    private void BrowserSetupHintClosed(InfoBar sender, InfoBarClosedEventArgs args)
+    private void BrowserSetupHintClosed(object sender, RoutedEventArgs args) => DismissBrowserSetupHint();
+
+    // Setting up or closing the hint both retire it for good.
+    private void DismissBrowserSetupHint()
     {
+        BrowserSetupHint.Visibility = Visibility.Collapsed;
         var preferences = UiPreferences.Load();
         preferences.BrowserSetupHintDismissed = true;
         preferences.Save();

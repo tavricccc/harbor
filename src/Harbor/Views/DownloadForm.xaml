@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:loc="using:Harbor.Localization"
+             xmlns:controls="using:Harbor.Controls"
              FontFamily="{StaticResource ContentControlThemeFontFamily}" FontSize="14">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
         <StackPanel x:Name="FormContent" Spacing="14">
@@ -22,38 +23,38 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="{loc:Localize Key=Common.FileName}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Foreground="{ThemeResource PaneText2Brush}"/>
             <Grid Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Border VerticalAlignment="Center" CornerRadius="4" Padding="6,2"
-                        Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
-                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1">
+                        Background="{ThemeResource PaneFillControlBrush}"
+                        BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1">
                     <TextBlock x:Name="KindLabel" Text="{loc:Localize Key=Common.File}" FontSize="11"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                               Foreground="{ThemeResource PaneText2Brush}"/>
                 </Border>
                 <TextBox x:Name="FileName" Grid.Column="1" PlaceholderText="{loc:Localize Key=Download.FileNamePlaceholder}"
                          AutomationProperties.Name="{loc:Localize Key=Common.FileName}"/>
             </Grid>
             <TextBlock Grid.Row="1" Text="{loc:Localize Key=Common.Source}" VerticalAlignment="Top" Margin="0,8,0,14"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Foreground="{ThemeResource PaneText2Brush}"/>
             <TextBox x:Name="Links" Grid.Row="1" Grid.Column="1" PlaceholderText="{loc:Localize Key=Download.LinksPlaceholder}"
                      AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" MaxHeight="120" Margin="0,0,0,14"
                      AutomationProperties.AutomationId="DownloadLinks" AutomationProperties.Name="{loc:Localize Key=Common.SourceUrl}" TextChanged="InputChanged"/>
             <TextBlock Grid.Row="2" Text="{loc:Localize Key=Common.Size}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Foreground="{ThemeResource PaneText2Brush}"/>
             <Grid Grid.Row="2" Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBlock x:Name="Preview" Text="{loc:Localize Key=Download.SizeAfterCheck}" TextWrapping="Wrap" VerticalAlignment="Center"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                           Foreground="{ThemeResource PaneText2Brush}"/>
                 <ProgressRing x:Name="Busy" Grid.Column="1" IsActive="False" Width="16" Height="16"
                               Visibility="Collapsed" AutomationProperties.Name="{loc:Localize Key=Download.CheckingLink}"/>
             </Grid>
             <TextBlock x:Name="CategoryLabel" Grid.Row="3" Text="{loc:Localize Key=Common.Category}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Visibility="Collapsed" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Visibility="Collapsed" Foreground="{ThemeResource PaneText2Brush}"/>
             <ComboBox x:Name="Category" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,14"
                       Visibility="Collapsed" SelectionChanged="CategoryChanged" AutomationProperties.Name="{loc:Localize Key=Download.Category}"/>
             <TextBlock Grid.Row="4" Text="{loc:Localize Key=Common.SaveTo}" VerticalAlignment="Center" Margin="0,0,0,14"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Foreground="{ThemeResource PaneText2Brush}"/>
             <Grid Grid.Row="4" Grid.Column="1" ColumnSpacing="10" Margin="0,0,0,14">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBox x:Name="Destination" AutomationProperties.AutomationId="DownloadDestination"
@@ -61,14 +62,16 @@
                 <Button Grid.Column="1" Content="{loc:Localize Key=Common.Browse}" Click="PickFolder" AutomationProperties.Name="{loc:Localize Key=Common.ChooseFolder}"/>
             </Grid>
             <StackPanel x:Name="ManualActions" Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="0,14,0,0">
-                <Button x:Name="AdvancedButton" Style="{ThemeResource SubtleButtonStyle}"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                <Button x:Name="AdvancedButton" Style="{StaticResource PaneSubtleButton}"
                         Click="ToggleOptions" AutomationProperties.AutomationId="ToggleDownloadOptions"
                         AutomationProperties.Name="{loc:Localize Key=Download.OptionsTitle}" ToolTipService.ToolTip="{loc:Localize Key=Download.OptionsTitle}">
-                    <FontIcon x:Name="OptionsArrow" Glyph="&#xE70D;" FontSize="12"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{loc:Localize Key=Download.Options}"/>
+                        <controls:Icon x:Name="OptionsArrow" Glyph="chev-d" Width="12" Height="12"/>
+                    </StackPanel>
                 </Button>
-                <Button x:Name="TorrentPickerButton" Content="{loc:Localize Key=Download.ChooseTorrent}" Click="PickTorrent" Style="{ThemeResource SubtleButtonStyle}"/>
-                <Button x:Name="RecentLinksButton" Content="{loc:Localize Key=Download.RecentLinks}" Click="ShowRecent" Style="{ThemeResource SubtleButtonStyle}"/>
+                <Button x:Name="TorrentPickerButton" Content="{loc:Localize Key=Download.ChooseTorrent}" Click="PickTorrent" Style="{StaticResource PaneSubtleButton}"/>
+                <Button x:Name="RecentLinksButton" Content="{loc:Localize Key=Download.RecentLinks}" Click="ShowRecent" Style="{StaticResource PaneSubtleButton}"/>
             </StackPanel>
             <StackPanel x:Name="FilesSurface" Grid.Row="7" Grid.Column="1" Spacing="8" Margin="0,14,0,0" Visibility="Collapsed">
                 <StackPanel x:Name="FileSelectionActions" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
@@ -78,24 +81,7 @@
                 <ListView x:Name="Files" SelectionMode="Multiple" MaxHeight="180" Visibility="Collapsed"/>
             </StackPanel>
             </Grid>
-            <Border x:Name="OptionsSurface" Visibility="Collapsed" BorderThickness="0,1,0,0"
-                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="0,16,0,0">
-                <ScrollViewer MaxHeight="240" VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel x:Name="OptionsContent" Spacing="16">
-                    <TextBlock Text="{loc:Localize Key=Download.OptionsTitle}" FontSize="16" FontWeight="SemiBold"/>
-                    <CheckBox x:Name="DirectDownload" Content="{loc:Localize Key=Download.SkipCheck}"
-                              ToolTipService.ToolTip="{loc:Localize Key=Download.SkipCheckHint}"
-                              Checked="DirectChanged" Unchecked="DirectChanged"/>
-                    <NumberBox x:Name="Connections" Header="{loc:Localize Key=Download.Connections}" Value="8" Minimum="1" Maximum="256" SpinButtonPlacementMode="Compact"/>
-                    <Expander Header="{loc:Localize Key=Common.HttpHeaders}" HorizontalAlignment="Stretch"
-                              IsExpanded="False" Expanding="OptionsExpanding" Collapsed="OptionsCollapsed">
-                        <TextBox x:Name="Headers" PlaceholderText="{loc:Localize Key=Download.HeadersPlaceholder}"
-                                 AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxHeight="160"/>
-                    </Expander>
-                </StackPanel>
-                </ScrollViewer>
-            </Border>
+            <StackPanel x:Name="OptionsContent" Visibility="Collapsed" Margin="0,4,0,0"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

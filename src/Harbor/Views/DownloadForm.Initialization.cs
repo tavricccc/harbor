@@ -20,7 +20,7 @@ public sealed partial class DownloadForm
             Destination.Text = config["downloadDir"]?.GetValue<string>() ?? "";
             requestOptions.Load(initial, config);
             Connections.Value = config["protocolConfig"]?["http"]?["connections"]?.GetValue<int>() ?? 8;
-            DirectDownload.IsChecked = config["extra"]?["defaultDirectDownload"]?.GetValue<bool>() == true;
+            DirectDownload.IsOn = config["extra"]?["defaultDirectDownload"]?.GetValue<bool>() == true;
             if (CategoriesEditor.UsesCategories(config))
                 foreach (var category in CategoriesEditor.Read(config))
                     Category.Items.Add(new ComboBoxItem { Content = category.Name, Tag = category.Path });
@@ -32,7 +32,7 @@ public sealed partial class DownloadForm
                 Destination.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
             ApplyInitial();
             var links = Links.Text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            if (initial is not null && links.Length == 1 && DirectDownload.IsChecked != true)
+            if (initial is not null && links.Length == 1 && !DirectDownload.IsOn)
                 await InspectAsync(links[0]);
             else if (links.Length > 1)
                 SetAction(Strings.Format("Download.StartBatch", links.Length));

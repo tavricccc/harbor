@@ -90,10 +90,26 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Padding="20,0,20,0" Spacing="10">
-            <InfoBar x:Name="BrowserSetupHint" IsOpen="False" Severity="Informational" IsClosable="True" Visibility="Collapsed"
-                     Title="{loc:Localize Key=Browser.HintTitle}" Message="{loc:Localize Key=Browser.HintMessage}" Closed="BrowserSetupHintClosed">
-                <InfoBar.ActionButton><Button Style="{StaticResource PaneAccentButton}" Height="28" Content="{loc:Localize Key=Browser.Setup}" Click="OpenBrowserSetup"/></InfoBar.ActionButton>
-            </InfoBar>
+            <!-- A Pane hint card rather than an InfoBar: its action and close button stay centered on the text. -->
+            <Border x:Name="BrowserSetupHint" Visibility="Collapsed" CornerRadius="12" Padding="16,10,8,10"
+                    Background="{ThemeResource PaneFillControlBrush}" BorderBrush="{ThemeResource PaneStrokeBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <controls:Icon Glyph="globe" Width="16" Height="16" VerticalAlignment="Center" Foreground="{ThemeResource PaneAccentBrush}"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="{loc:Localize Key=Browser.HintTitle}" FontWeight="SemiBold" Foreground="{ThemeResource PaneText1Brush}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{loc:Localize Key=Browser.HintMessage}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Button Grid.Column="2" Style="{StaticResource PaneAccentButton}" Height="28" VerticalAlignment="Center"
+                            Content="{loc:Localize Key=Browser.Setup}" Click="OpenBrowserSetup"/>
+                    <Button Grid.Column="3" Style="{StaticResource PaneIconButton}" VerticalAlignment="Center" Click="BrowserSetupHintClosed"
+                            AutomationProperties.Name="{loc:Localize Key=Common.Close}" ToolTipService.ToolTip="{loc:Localize Key=Common.Close}">
+                        <controls:Icon Glyph="close" Width="14" Height="14"/>
+                    </Button>
+                </Grid>
+            </Border>
             <InfoBar x:Name="ErrorBar" IsOpen="False" Severity="Error" IsClosable="True" Visibility="Collapsed"/>
             <Grid x:Name="Toolbar" ColumnSpacing="8" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>

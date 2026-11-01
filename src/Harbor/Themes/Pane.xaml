@@ -342,7 +342,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="Transparent" CornerRadius="{TemplateBinding CornerRadius}">
-                        <ContentPresenter x:Name="Content" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
+                        <ContentPresenter x:Name="Content" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="{TemplateBinding FontSize}" Foreground="{TemplateBinding Foreground}"/>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal"/>
@@ -355,6 +355,10 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <!-- Subtle text button: the icon button's look with room for a label (secondary links, toggles). -->
+    <Style x:Key="PaneSubtleButton" TargetType="Button" BasedOn="{StaticResource PaneIconButton}">
+        <Setter Property="Width" Value="NaN"/><Setter Property="Padding" Value="10,0,10,0"/><Setter Property="FontSize" Value="12"/>
     </Style>
 
     <!-- Text button: neutral fill and thin stroke, darker on hover; the implicit style for every Button -->

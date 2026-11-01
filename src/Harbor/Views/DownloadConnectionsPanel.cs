@@ -45,7 +45,7 @@ internal sealed class DownloadConnectionsPanel : Grid
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding TransferText}" FontSize="12" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" MaxWidth="104" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" MaxWidth="104" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                         <ProgressBar Value="{Binding Percent}" Maximum="100" IsIndeterminate="{Binding IsIndeterminate}" Height="4" AutomationProperties.Name="{Binding Label}"/>
                     </StackPanel>

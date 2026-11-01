@@ -16,6 +16,10 @@ public sealed partial class DownloadForm : UserControl
     private readonly nint owner;
     private string lastInput = "";
     private readonly DownloadOptionsPanel requestOptions = new();
+    // The general options live in the options panel's first card.
+    private Controls.SettingToggle DirectDownload => requestOptions.SkipCheck;
+    private NumberBox Connections => requestOptions.Connections;
+    private TextBox Headers => requestOptions.Headers;
     public string? CreatedTaskId
     {
         get; private set;
@@ -42,6 +46,7 @@ public sealed partial class DownloadForm : UserControl
         requestOptions.RequestChanged += InvalidateResolution;
         requestOptions.LayoutChanged += () => LayoutChanged?.Invoke();
         Headers.TextChanged += (_, _) => InvalidateResolution();
+        DirectDownload.RegisterPropertyChangedCallback(Controls.SettingToggle.IsOnProperty, (_, _) => DirectChanged());
         FormContent.SizeChanged += (_, _) => LayoutChanged?.Invoke();
         if (compact)
         {
@@ -60,14 +65,12 @@ public sealed partial class DownloadForm : UserControl
     }
     private void ToggleOptions(object sender, RoutedEventArgs e)
     {
-        var expanded = OptionsSurface.Visibility != Visibility.Visible;
-        OptionsSurface.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
-        OptionsArrow.Glyph = expanded ? "\uE70E" : "\uE70D";
+        var expanded = OptionsContent.Visibility != Visibility.Visible;
+        OptionsContent.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+        OptionsArrow.Glyph = expanded ? "chev-u" : "chev-d";
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(AdvancedButton, Strings.Get(expanded ? "Common.Collapse" : "Common.Expand"));
         LayoutChanged?.Invoke();
     }
-    private void OptionsExpanding(Expander sender, ExpanderExpandingEventArgs args) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
-    private void OptionsCollapsed(Expander sender, ExpanderCollapsedEventArgs args) => DispatcherQueue.TryEnqueue(() => LayoutChanged?.Invoke());
     private void InputChanged(object s, TextChangedEventArgs e)
     {
         if (Files is null || lastInput == Links.Text)
@@ -79,14 +82,14 @@ public sealed partial class DownloadForm : UserControl
     {
         resolved = null;
         var links = ConfigJson.Lines(Links.Text);
-        SetAction(links.Length > 1 ? Strings.Format("Download.StartBatch", links.Length) : DirectDownload.IsChecked == true ? Strings.Get("Download.Start") : Strings.Get("Download.CheckLink"));
+        SetAction(links.Length > 1 ? Strings.Format("Download.StartBatch", links.Length) : DirectDownload.IsOn ? Strings.Get("Download.Start") : Strings.Get("Download.CheckLink"));
         KindLabel.Text = links.Length > 1 ? Strings.Get("Download.Batch") : links.FirstOrDefault() is { } link && DownloadSources.IsTorrent(link) ? "BT" : Strings.Get("Common.File");
         Files.Visibility = Visibility.Collapsed;
         FileSelectionActions.Visibility = Visibility.Collapsed;
         FilesSurface.Visibility = Visibility.Collapsed;
-        Preview.Text = DirectDownload.IsChecked == true ? Strings.Get("Download.SizeAfterStart") : Strings.Get("Download.SizeAfterCheck");
+        Preview.Text = DirectDownload.IsOn ? Strings.Get("Download.SizeAfterStart") : Strings.Get("Download.SizeAfterCheck");
     }
-    private void DirectChanged(object sender, RoutedEventArgs e)
+    private void DirectChanged()
     {
         if (Files is not null)
             InvalidateResolution();

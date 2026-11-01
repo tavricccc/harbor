@@ -34,7 +34,7 @@ internal sealed class MirrorsEditor : StackPanel
                 <Grid Padding="4,8" ColumnSpacing="16">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="104"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding DisplayType}" FontSize="14" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Url}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Url}" FontSize="12" Foreground="{ThemeResource PaneText2Brush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 </Grid>
             </DataTemplate>
             """);
