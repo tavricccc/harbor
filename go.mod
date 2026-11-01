@@ -3,7 +3,7 @@ module harbor
 go 1.25.4
 
 require (
-	github.com/GopeedLab/gopeed v1.9.4-0.20261024033810-b8ff5ff97fef
+	github.com/GopeedLab/gopeed v1.9.4-0.20261031095156-fc0a1e0ef97f
 	github.com/anacrolix/torrent v1.60.1-0.20251217073903-486bcbe758e0
 	github.com/getlantern/systray v1.2.2
 	golang.org/x/sys v0.44.0
@@ -88,6 +88,7 @@ require (
 	github.com/icholy/digest v1.1.0 // indirect
 	github.com/imroc/req/v3 v3.52.2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
+	github.com/jlaffaye/ftp v0.2.4 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
