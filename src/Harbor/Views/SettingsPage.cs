@@ -125,6 +125,9 @@ public sealed partial class SettingsPage : Page
         return panel;
     }
 
+    /// <summary>Opens the last section, About, where updates are checked and installed.</summary>
+    public void ShowAbout() => Select(sections.Count - 1, false);
+
     private void Select(int index, bool animate)
     {
         if (index == selected)

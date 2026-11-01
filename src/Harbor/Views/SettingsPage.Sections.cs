@@ -1,3 +1,4 @@
+using Harbor.Models;
 using Harbor.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -85,23 +86,82 @@ public sealed partial class SettingsPage
     {
         var page = Section(Strings.Get("Settings.About"), "info");
         var product = SettingsFields.Group(page);
-        var update = NativeButtons.Create(Strings.Get("Action.Check"));
-        update.Click += async (_, _) =>
-        {
-            update.IsEnabled = false;
-            try
-            {
-                var release = await UpdateService.CheckAsync(vm.Core);
-                if (release is null)
-                    Success(Strings.Get("Update.UpToDate"));
-                else
-                    await UpdateService.PromptAsync(vm.Core, release, XamlRoot);
-            }
-            catch (Exception error) { Report(error); }
-            finally { update.IsEnabled = true; }
-        };
-        SettingsFields.Row(product, $"Harbor {typeof(App).Assembly.GetName().Version?.ToString(3)}", update, Strings.Format("Settings.CoreVersion", vm.Core.Version));
+        var updates = UpdateService.Shared;
+        var action = NativeButtons.Create(Strings.Get("Update.Check"));
+        var other = new Button { Style = (Style)Application.Current.Resources["PaneTextButton"], Visibility = Visibility.Collapsed };
+        var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { other, action } };
+        var row = SettingsFields.Row(product, $"Harbor {updates.CurrentVersion}", buttons, Strings.Format("Settings.CoreVersion", vm.Core.Version));
+        var notes = new TextBlock { TextWrapping = TextWrapping.Wrap, MaxLines = 12, TextTrimming = TextTrimming.CharacterEllipsis, Style = (Style)Application.Current.Resources["SecondaryTextBlockStyle"] };
+        var releaseLink = new HyperlinkButton { Content = Strings.Get("Update.ReleaseNotes"), Padding = new Thickness(0) };
+        releaseLink.Click += (_, _) => { if (updates.Latest?.PageUrl is { } url) System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true })?.Dispose(); };
+        var details = SettingsFields.Block(product, new StackPanel { Spacing = 6, Children = { notes, releaseLink } });
         product.Children.Add(checkUpdates);
+
+        static string Name(UpdateRelease release) => release.Prerelease ? Strings.Format("Update.Preview", release.Version) : release.Version;
+        void Render()
+        {
+            var latest = updates.Latest;
+            row.Description = updates.State switch
+            {
+                UpdateState.Checking => Strings.Get("Update.Checking"),
+                UpdateState.UpToDate => Strings.Get("Update.UpToDate"),
+                UpdateState.Available when latest is not null => Strings.Format("Update.AvailableDetail", Name(latest), DownloadItem.FormatBytes(latest.SizeBytes), latest.PublishedAt.LocalDateTime.ToString("d")),
+                UpdateState.Downloading when latest is not null => Strings.Format("Update.DownloadingDetail", Name(latest), $"{updates.DownloadProgress:P0}"),
+                UpdateState.Ready when latest is not null => Strings.Format("Update.ReadyDetail", Name(latest)),
+                UpdateState.Failed => updates.Error ?? "",
+                _ => Strings.Format("Settings.CoreVersion", vm.Core.Version),
+            };
+            NativeButtons.SetContent(action, Strings.Get(updates.State switch
+            {
+                UpdateState.Checking => "Update.CheckingButton",
+                UpdateState.Available => "Update.Download",
+                UpdateState.Downloading => "Update.DownloadingButton",
+                UpdateState.Ready => "Update.Install",
+                UpdateState.Failed when latest is not null => "Update.Retry",
+                _ => "Update.Check",
+            }));
+            var accent = updates.State is UpdateState.Available or UpdateState.Ready;
+            action.Style = (Style)Application.Current.Resources[accent ? "PaneAccentButton" : "PaneTextButton"];
+            action.IsEnabled = updates.State is not (UpdateState.Checking or UpdateState.Downloading);
+            // With both a stable and a pre-release, the other one can be picked instead.
+            var alternative = updates.Choices.FirstOrDefault(choice => choice != latest);
+            other.Visibility = alternative is not null && updates.State is UpdateState.Available or UpdateState.Ready or UpdateState.Failed ? Visibility.Visible : Visibility.Collapsed;
+            if (alternative is not null)
+                NativeButtons.SetContent(other, Strings.Format("Update.SwitchTo", Name(alternative)));
+            notes.Text = latest?.Notes ?? "";
+            notes.Visibility = notes.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+            details.Visibility = latest is not null ? Visibility.Visible : Visibility.Collapsed;
+        }
+        void Changed(object? sender, EventArgs args) => DispatcherQueue.TryEnqueue(Render);
+        updates.Changed += Changed;
+        Unloaded += (_, _) => updates.Changed -= Changed;
+        Render();
+        action.Click += async (_, _) =>
+        {
+            switch (updates.State)
+            {
+                case UpdateState.Available:
+                case UpdateState.Failed when updates.Latest is not null:
+                    await updates.DownloadAsync();
+                    break;
+                case UpdateState.Ready:
+                    if (updates.Install())
+                    {
+                        try { await vm.Core.StopAsync(); }
+                        catch (Exception) { /* The setup stops the core too. */ }
+                        Application.Current.Exit();
+                    }
+                    break;
+                default:
+                    await updates.CheckAsync();
+                    break;
+            }
+        };
+        other.Click += (_, _) =>
+        {
+            if (updates.Choices.FirstOrDefault(choice => choice != updates.Latest) is { } alternative)
+                updates.Choose(alternative);
+        };
 
         var links = SettingsFields.Group(page, Strings.Get("Settings.Credits"));
         var list = new StackPanel { Spacing = 4 };

@@ -37,20 +37,17 @@ public sealed partial class MainPage : Page
         UpdatePollingVisibility();
         if (ViewModel.IsConnected && UiPreferences.Load().CheckForUpdates)
         {
-            try
+            var updates = UpdateService.Shared;
+            await updates.CheckAsync();
+            if (updates is { State: UpdateState.Available, Latest: { } latest })
             {
-                var update = await UpdateService.CheckAsync(ViewModel.Core);
-                if (update is not null)
-                {
-                    ErrorBar.Severity = InfoBarSeverity.Informational;
-                    ErrorBar.Message = Strings.Format("Update.Available", update.Version);
-                    var button = new Button { Content = Strings.Get("Update.Download") };
-                    button.Click += async (_, _) => await UpdateService.PromptAsync(ViewModel.Core, update, XamlRoot);
-                    ErrorBar.ActionButton = button;
-                    ErrorBar.IsOpen = true;
-                }
+                ErrorBar.Severity = InfoBarSeverity.Informational;
+                ErrorBar.Message = Strings.Format("Update.Available", latest.Version);
+                var button = new Button { Content = Strings.Get("Update.View") };
+                button.Click += (_, _) => { ErrorBar.IsOpen = false; ShowSettingsAbout(); };
+                ErrorBar.ActionButton = button;
+                ErrorBar.IsOpen = true;
             }
-            catch (Exception) { /* A background update check must not interrupt downloads. Manual checks report errors. */ }
         }
     }
     private async void AddDownload(object sender, RoutedEventArgs e)
@@ -287,6 +284,11 @@ public sealed partial class MainPage : Page
         DownloadsCommands.Visibility = Visibility.Visible;
         BackToDownloads.Visibility = Visibility.Collapsed;
         UpdatePollingVisibility();
+    }
+    private void ShowSettingsAbout()
+    {
+        ShowSettings(this, new RoutedEventArgs());
+        settingsWindow?.ShowAbout();
     }
     private void ShowSettings(object sender, RoutedEventArgs args)
     {

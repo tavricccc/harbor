@@ -10,12 +10,13 @@ public sealed class SettingsWindow
 {
     internal GlassWindow Glass { get; }
     public event EventHandler? Closed;
+    private readonly SettingsPage page;
 
     public SettingsWindow(DownloadsViewModel viewModel)
     {
         var root = new UserControl { RequestedTheme = WindowAppearance.Theme, IsTabStop = false };
         Glass = new GlassWindow(root, Strings.Get("Settings.WindowTitle"), 860, 680, resizable: true, minWidth: 720, minHeight: 520);
-        var page = new SettingsPage(viewModel, Glass.Handle);
+        page = new SettingsPage(viewModel, Glass.Handle);
         page.CloseRequested += Glass.Close;
         page.MinimizeRequested += Glass.Minimize;
         root.Content = page;
@@ -24,5 +25,6 @@ public sealed class SettingsWindow
     }
 
     public void Activate() => Glass.Activate();
+    public void ShowAbout() => page.ShowAbout();
     public void Close() => Glass.Close();
 }

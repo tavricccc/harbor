@@ -44,5 +44,6 @@ jobs:
           name: Harbor-windows-x64
           path: |
             artifacts/Harbor-Setup-*-x64.exe
+            artifacts/Harbor-Setup-*-x64.exe.sha256
             artifacts/Harbor-Source-*.zip
           compression-level: 0

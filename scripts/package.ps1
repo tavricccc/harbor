@@ -33,4 +33,7 @@ New-Item -ItemType Directory -Force $output | Out-Null
 $installer = Join-Path $output "Harbor-Setup-$version-x64.exe"
 Move-Item -LiteralPath (Join-Path $setup 'HarborSetup.exe') -Destination $installer -Force
 Remove-Item -LiteralPath $setup, $zip -Recurse -Force
+# Harbor's updater downloads the setup only with this checksum beside it on the release.
+$hash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
+[IO.File]::WriteAllText("$installer.sha256", "$hash  $(Split-Path $installer -Leaf)`n", [Text.UTF8Encoding]::new($false))
 Get-Item -LiteralPath $installer | Select-Object Name, @{ n = 'MB'; e = { [math]::Round($_.Length / 1MB, 1) } }
