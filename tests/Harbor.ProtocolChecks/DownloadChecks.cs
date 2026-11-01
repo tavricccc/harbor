@@ -35,7 +35,7 @@ internal static class DownloadChecks
         if (lane.Percent != 37.5 || lane.IsIndeterminate || lane.TransferText != Harbor.Localization.Strings.Format("Progress.ConnectionShare", $"{37.5:0.0}%"))
             throw new Exception("Connection contribution must use the whole file rather than the average lane quota");
         lane.UpdateHttp(new(384, 128, true, false, 0), 0, now, false, 1024);
-        if (lane.Percent != 37.5 || lane.SpeedText != "0 B/s")
+        if (lane.Percent != 37.5 || lane.SpeedText != Harbor.Localization.Strings.Get("Status.Completed"))
             throw new Exception("Completed connections must retain their contribution instead of displaying 100%");
         lane.UpdateHttp(new(384, 256, false, false, 0), 0, now, true, 0);
         if (lane.Percent != 0 || !lane.IsIndeterminate || lane.TransferText != DownloadItem.FormatBytes(384))
@@ -101,8 +101,8 @@ internal static class DownloadChecks
                     nameof(row.TransferSizeText) => row.TransferSizeText,
                     nameof(row.RowProgressText) => row.RowProgressText,
                     nameof(row.SpeedText) => row.SpeedText,
-                    nameof(row.DetailsText) => row.DetailsText,
-                    "" or null => row.DetailsText + row.PrimaryActionLabel + row.CanAct,
+                    nameof(row.SubText) => row.SubText,
+                    "" or null => row.SubText + row.PrimaryActionLabel + row.CanAct,
                     _ => ""
                 };
             };
