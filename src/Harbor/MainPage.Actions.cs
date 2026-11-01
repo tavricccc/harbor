@@ -12,16 +12,11 @@ namespace Harbor;
 public sealed partial class MainPage
 {
     private void DownloadSelectionChanged(object sender, SelectionChangedEventArgs args) => ViewModel.SetSelection(DownloadList.SelectedItems.Cast<DownloadItem>());
-    private void SortChanged(object sender, SelectionChangedEventArgs args)
+    private void SortClicked(object sender, RoutedEventArgs args)
     {
-        if (((ComboBox)sender).SelectedItem is ComboBoxItem item)
-        {
-            ViewModel.Sort = item.Tag.ToString()!;
-            ViewModel.ApplyFilter();
-        }
+        ViewModel.Sort = ((FrameworkElement)sender).Tag.ToString()!;
+        ViewModel.ApplyFilter();
     }
-    private void SelectAll(object sender, RoutedEventArgs args) => DownloadList.SelectAll();
-    private void OpenDeferredDownloads(object sender, RoutedEventArgs args) => ShowDeferredDownloads();
     private bool ListHasFocus()
     {
         var current = Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
@@ -78,17 +73,12 @@ public sealed partial class MainPage
         if (await NativeDialogs.ShowAsync(dialog, XamlRoot) == ContentDialogResult.Primary)
             await ViewModel.ActAsync("delete", targets);
     }
-    private async void Redownload(object sender, RoutedEventArgs args)
+    private async void ContextRedownload(object sender, RoutedEventArgs args)
     {
-        if (ViewModel.Selected is not { } item)
+        if (ContextItem(sender) is not { } item)
             return;
         var meta = item.Data["meta"]!;
         await AddDownloadAsync(new JsonObject { ["req"] = meta["req"]!.DeepClone(), ["opts"] = meta["opts"]!.DeepClone() });
-    }
-    private async void EditSelectedSource(object sender, RoutedEventArgs args)
-    {
-        if (ViewModel.Selected is { CanEditSource: true } item)
-            await EditSource(item);
     }
     private async void ContextEditSource(object sender, RoutedEventArgs args)
     {

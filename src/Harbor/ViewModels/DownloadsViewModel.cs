@@ -38,13 +38,6 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
     public bool HasSingleSelection => Selected is not null;
     public bool HasActivity => items.Values.Any(i => i.CanPause || i.IsProcessing);
     public TimeSpan RefreshInterval => TimeSpan.FromSeconds(HasActivity ? 1 : 5);
-    public bool CanOpenSelected => Selected?.IsComplete == true;
-    public string PrimaryActionKey => Selected is not null ? Selected.PrimaryAction.Key : Selection.Count == 0 ? "none" : CanPauseSelected ? "pause" : CanResumeSelected ? "continue" : "folder";
-    public string PrimaryActionLabel => Selected?.PrimaryActionLabel ?? PrimaryActionKey switch { "pause" => Strings.Get("Downloads.PauseSelected"), "continue" => Strings.Get("Downloads.ResumeSelected"), "folder" => Strings.Get("Downloads.OpenSaveFolder"), _ => Strings.Get("Downloads.Select") };
-    public string PrimaryActionGlyph => Selected?.PrimaryActionGlyph ?? PrimaryActionKey switch { "pause" => "\uE769", "continue" => "\uE768", "folder" => "\uE8B7", _ => "\uE896" };
-    public bool CanActSelected => PrimaryActionKey != "none";
-    public bool CanEditSource => Selected?.CanEditSource == true;
-    public bool CanShowProgress => Selected?.IsDeferred == false;
     public string EmptyTitle => items.Count == 0 ? Strings.Get("Downloads.EmptyTitle") : Strings.Get("Downloads.NoMatches");
     public string EmptyHint => items.Count == 0 ? Strings.Get("Downloads.EmptyHint") : Strings.Get("Downloads.NoMatchesHint");
     partial void OnSelectedChanged(DownloadItem? oldValue, DownloadItem? newValue)
@@ -56,7 +49,6 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
         SelectionUpdated(this, new System.ComponentModel.PropertyChangedEventArgs(null));
         OnPropertyChanged(nameof(HasSelection));
         OnPropertyChanged(nameof(HasSingleSelection));
-        OnPropertyChanged(nameof(CanEditSource));
     }
     public void SetSelection(IEnumerable<DownloadItem> values)
     {
@@ -73,12 +65,6 @@ public sealed partial class DownloadsViewModel : ObservableObject, IDisposable
             return;
         OnPropertyChanged(nameof(CanPauseSelected));
         OnPropertyChanged(nameof(CanResumeSelected));
-        OnPropertyChanged(nameof(CanOpenSelected));
-        OnPropertyChanged(nameof(CanEditSource));
-        OnPropertyChanged(nameof(CanShowProgress));
-        OnPropertyChanged(nameof(PrimaryActionLabel));
-        OnPropertyChanged(nameof(PrimaryActionGlyph));
-        OnPropertyChanged(nameof(CanActSelected));
     }
 
     public async Task InitializeAsync()

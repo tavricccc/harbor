@@ -23,6 +23,7 @@ public sealed partial class MainPage : Page
         Loaded += Start;
         NativeInfoBars.CollapseWhenClosed(ErrorBar);
         InitializeBrowserSetupHint();
+        InitializeFilter();
         Unloaded += (_, _) => { polling = false; timer.Stop(); searchTimer.Stop(); settingsWindow?.Close(); ViewModel.Dispose(); };
         ViewModel.VisibleItems.CollectionChanged += (_, _) => EmptyState.Visibility = ViewModel.VisibleItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         ViewModel.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(ViewModel.Error) && ViewModel.Error.Length > 0) { ErrorBar.Message = ViewModel.Error; ErrorBar.IsOpen = true; } };
@@ -82,17 +83,19 @@ public sealed partial class MainPage : Page
         }
         catch (Exception error) { ViewModel.Error = Strings.Format("Errors.OpenGopeedLink", error.Message); }
     }
-    private void FilterChanged(object s, SelectionChangedEventArgs e)
+    private static readonly string[] Filters = ["all", "active", "deferred", "pause", "done", "error"];
+    private void InitializeFilter()
     {
-        if (FilterBox?.SelectedItem is ComboBoxItem item)
+        FilterSegment.Options = string.Join("|", new[] { "Filter.All", "Filter.Active", "Filter.Later", "Filter.Paused", "Filter.Done", "Filter.Failed" }.Select(Strings.Get));
+        FilterSegment.SelectionChanged += (_, _) =>
         {
-            ViewModel.Filter = item.Tag.ToString()!;
+            ViewModel.Filter = Filters[FilterSegment.SelectedIndex];
             ViewModel.ApplyFilter();
-        }
+        };
     }
-    private void SearchChanged(AutoSuggestBox s, AutoSuggestBoxTextChangedEventArgs e)
+    private void SearchChanged(object s, TextChangedEventArgs e)
     {
-        ViewModel.Search = s.Text;
+        ViewModel.Search = SearchBox.Text;
         searchTimer.Stop();
         searchTimer.Start();
     }
@@ -100,7 +103,6 @@ public sealed partial class MainPage : Page
     private async void ResumeSelected(object s, RoutedEventArgs e) => await ViewModel.ActAsync("continue", ViewModel.Selection.Where(x => x.CanResume));
     private async void PauseAll(object s, RoutedEventArgs e) => await ViewModel.ActAsync("pause", ViewModel.AllItems.Where(i => i.CanPause));
     private async void ResumeAll(object s, RoutedEventArgs e) => await ViewModel.ActAsync("continue", ViewModel.AllItems.Where(i => i.CanResume && (!i.IsDeferred || i.ScheduledAt is null)));
-    private async void RefreshClicked(object s, RoutedEventArgs e) => await ViewModel.RefreshAsync();
     private void OpenSelected(object s, RoutedEventArgs e)
     {
         try
@@ -110,7 +112,6 @@ public sealed partial class MainPage : Page
         }
         catch (Exception ex) { ViewModel.Error = UserError.Message(ex); }
     }
-    private void CopySelected(object s, RoutedEventArgs e) => FileActions.Copy(string.Join("\n", ViewModel.Selection.Select(x => x.Url)));
     private async void PasteDownload(object s, RoutedEventArgs e)
     {
         try
@@ -213,11 +214,6 @@ public sealed partial class MainPage : Page
         if (ContextItem(s) is { IsDeferred: false } item)
             ((App)Application.Current).OpenProgressWindow(item.Id);
     }
-    private void ShowProgress(object s, RoutedEventArgs e)
-    {
-        if (ViewModel.Selected is { IsDeferred: false } item)
-            ((App)Application.Current).OpenProgressWindow(item.Id);
-    }
     private DownloadItem? ContextItem(object s) => ViewModel.VisibleItems.FirstOrDefault(i => i.Id == (s as MenuFlyoutItem)?.Tag?.ToString());
     private async void ContextPrimary(object s, RoutedEventArgs e)
     {
@@ -234,6 +230,11 @@ public sealed partial class MainPage : Page
         }
         else if (action.Key != "none")
             await ViewModel.ActAsync(action.Key, [item]);
+    }
+    private void ContextCopy(object s, RoutedEventArgs e)
+    {
+        if (ContextItem(s) is { } item)
+            FileActions.Copy(item.Url);
     }
     private async void ContextPause(object s, RoutedEventArgs e)
     {

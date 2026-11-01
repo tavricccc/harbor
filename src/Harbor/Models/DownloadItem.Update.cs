@@ -13,7 +13,7 @@ public sealed partial class DownloadItem
     [Flags]
     private enum Metrics
     {
-        None = 0, Downloaded = 1, Uploaded = 2, Speed = 4, Transfer = 8, Status = 16, Remaining = 32, Details = 64
+        None = 0, Downloaded = 1, Uploaded = 2, Speed = 4, Transfer = 8, Status = 16, Remaining = 32
     }
 
     public DownloadChanges Update(JsonObject data)
@@ -42,15 +42,15 @@ public sealed partial class DownloadItem
         // Every changed row raises these each tick, so skip metrics whose inputs stayed the same.
         var changed = Metrics.None;
         if (Downloaded != downloaded)
-            changed |= Metrics.Downloaded | Metrics.Transfer | Metrics.Status | Metrics.Remaining | Metrics.Details;
+            changed |= Metrics.Downloaded | Metrics.Transfer | Metrics.Status | Metrics.Remaining;
         if (Speed != speed)
-            changed |= Metrics.Speed | Metrics.Remaining | Metrics.Details;
+            changed |= Metrics.Speed | Metrics.Remaining;
         if (Uploaded != uploaded)
             changed |= Metrics.Uploaded;
         if (UploadSpeed != uploadSpeed)
-            changed |= Metrics.Speed | Metrics.Details;
+            changed |= Metrics.Speed;
         if (IsProcessing && !JsonNode.DeepEquals(extractProgress, progress?["extractProgress"]))
-            changed |= Metrics.Transfer | Metrics.Status | Metrics.Details;
+            changed |= Metrics.Transfer | Metrics.Status;
         if ((changed & Metrics.Downloaded) != 0)
         {
             OnPropertyChanged(nameof(Downloaded));
@@ -80,8 +80,8 @@ public sealed partial class DownloadItem
         }
         if ((changed & Metrics.Remaining) != 0)
             OnPropertyChanged(nameof(RemainingText));
-        if ((changed & Metrics.Details) != 0)
-            OnPropertyChanged(nameof(DetailsText));
+        if ((changed & (Metrics.Transfer | Metrics.Remaining)) != 0)
+            OnPropertyChanged(nameof(SubText));
         return DownloadChanges.Progress;
     }
 

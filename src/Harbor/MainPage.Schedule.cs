@@ -15,7 +15,7 @@ public sealed partial class MainPage
         await ready.Task;
         ShowDownloads(this, new RoutedEventArgs());
         SearchBox.Text = "";
-        FilterBox.SelectedIndex = 2;
+        FilterSegment.SelectedIndex = 2;
         await ViewModel.RefreshAsync();
     }
     private async void EditSchedule(object sender, RoutedEventArgs args)

@@ -7,13 +7,6 @@ namespace Harbor;
 
 public sealed partial class MainPage
 {
-    private void TableSizeChanged(object sender, SizeChangedEventArgs args)
-    {
-        var grid = (Grid)sender;
-        var showSize = args.NewSize.Width >= 860;
-        grid.ColumnDefinitions[1].Width = new GridLength(showSize ? 140 : 0);
-        grid.Children[1].Visibility = showSize ? Visibility.Visible : Visibility.Collapsed;
-    }
     private DownloadItem? RowItem(object sender) => ViewModel.VisibleItems.FirstOrDefault(x => x.Id == (sender as Button)?.Tag?.ToString());
     private async void RowPrimary(object sender, RoutedEventArgs args)
     {

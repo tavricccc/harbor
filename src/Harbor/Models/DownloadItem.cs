@@ -44,7 +44,7 @@ public sealed partial class DownloadItem : ObservableObject
         FilePath = !string.IsNullOrEmpty(resourceName)
             ? Path.Combine(Folder, string.IsNullOrEmpty(custom) ? resourceName : custom)
             : Path.Combine(Folder, file?["path"]?.GetValue<string>() ?? "", string.IsNullOrEmpty(custom) ? file?["name"]?.GetValue<string>() ?? Name : custom);
-        FileGlyph = !string.IsNullOrEmpty(resourceName) ? "" : DownloadPresentation.FileGlyph(Name);
+        FileGlyph = !string.IsNullOrEmpty(resourceName) ? "folder" : DownloadPresentation.FileGlyph(Name);
         primaryAction = null;
     }
     // Progress ticks keep the metadata, so only the live metrics are read again.
@@ -83,7 +83,8 @@ public sealed partial class DownloadItem : ObservableObject
     public string TransferText => $"{FormatBytes(Downloaded)} / {SizeText}" + (ExtractionText.Length > 0 ? $" · {ExtractionText}" : "");
     public string TransferSizeText => IsComplete ? SizeText : $"{FormatBytes(Downloaded)} / {SizeText}";
     public string RowProgressText => Status == "running" && Size > 0 ? $"{Percent:0}%" : StatusText;
-    public string DetailsText => Strings.Format("Downloads.DetailsText", Name, StatusText, TransferText, SpeedText, RemainingText, FilePath, Url) + (DeferredError.Length > 0 ? "\n" + DeferredError : "");
+    // The row's second line: what has arrived, and while running how long is left; a deferred task shows its link or why it failed.
+    public string SubText => IsDeferred ? DeferredError.Length > 0 ? DeferredError : Url : Status == "running" && RemainingText != "—" ? $"{TransferSizeText} · {RemainingText}" : TransferSizeText;
     public long Uploaded { get; private set; }
     public long UploadSpeed { get; private set; }
     public string SpeedText => Status == "running" ? FormatBytes(Speed) + "/s" : Uploading ? "↑ " + FormatBytes(UploadSpeed) + "/s" : "—";
@@ -91,10 +92,10 @@ public sealed partial class DownloadItem : ObservableObject
     // Opening checks the disk each time; the row action keeps its check until the next snapshot.
     public string OpenPath => ExtractionStatus == "done" && !File.Exists(FilePath) && !Directory.Exists(FilePath) ? Folder : FilePath;
     private DownloadAction? primaryAction;
-    public DownloadAction PrimaryAction => primaryAction ??= IsDeferred ? new("continue", Strings.Get("Downloads.StartNow"), "") : IsProcessing ? new("none", Strings.Get("Status.Extracting"), "") : IsComplete && OpenPath == Folder ? new("open", Strings.Get("Downloads.OpenExtracted"), "") : DownloadPresentation.ForStatus(Status);
+    public DownloadAction PrimaryAction => primaryAction ??= IsDeferred ? new("continue", Strings.Get("Downloads.StartNow"), "play") : IsProcessing ? new("none", Strings.Get("Status.Extracting"), "archive") : IsComplete && OpenPath == Folder ? new("open", Strings.Get("Downloads.OpenExtracted"), "folder") : DownloadPresentation.ForStatus(Status);
     public string PrimaryActionLabel => PrimaryAction.Label;
     public string PrimaryActionGlyph => PrimaryAction.Glyph;
-    public string FileGlyph { get; private set; } = "";
+    public string FileGlyph { get; private set; } = "file";
     public bool CanEditSource => Protocol == "HTTP" && (Status is "pause" or "error");
     public bool CanReveal => !IsDeferred;
     public bool CanAct => PrimaryAction.Key != "none";
