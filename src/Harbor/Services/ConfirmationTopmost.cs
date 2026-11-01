@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+using Harbor.Glass;
 using System.Runtime.InteropServices;
 
 namespace Harbor.Services;
@@ -8,16 +8,16 @@ namespace Harbor.Services;
 // suspend this policy so their owner cannot compete with the modal dialog.
 internal sealed partial class ConfirmationTopmost : IDisposable
 {
-    private readonly Window window;
+    private readonly GlassWindow window;
     private readonly nint hwnd;
     private readonly Subclass callback;
     private bool active = true;
     private const nuint SubclassId = 0x48415242;
 
-    internal ConfirmationTopmost(Window window)
+    internal ConfirmationTopmost(GlassWindow window)
     {
         this.window = window;
-        hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+        hwnd = window.Handle;
         callback = WindowProcedure;
         if (!SetWindowSubclass(hwnd, callback, SubclassId, 0))
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
@@ -27,9 +27,9 @@ internal sealed partial class ConfirmationTopmost : IDisposable
             SetTopmost(false);
     }
 
-    private void OnActivated(object sender, WindowActivatedEventArgs args)
+    private void OnActivated(object? sender, EventArgs args)
     {
-        if (IsEnforced && window.AppWindow.IsVisible)
+        if (IsEnforced && window.IsVisible)
             WindowActivation.KeepAbove(window);
     }
 

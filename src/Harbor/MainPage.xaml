@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:loc="using:Harbor.Localization"
       xmlns:models="using:Harbor.Models"
+      xmlns:controls="using:Harbor.Controls"
       FontFamily="{StaticResource ContentControlThemeFontFamily}" FontSize="14"
       AllowDrop="True" DragOver="DownloadDragOver" Drop="DownloadDrop">
     <Page.KeyboardAccelerators>
@@ -23,7 +24,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Spacing="12">
-        <Grid Margin="12,8,12,0">
+        <Grid x:Name="TitleBarArea" Margin="12,8,8,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Spacing="2">
+                <Button Style="{StaticResource PaneIconButton}" Click="MinimizeClicked"><controls:Icon Glyph="minus" Width="16" Height="16"/></Button>
+                <Button Style="{StaticResource PaneIconButton}" Click="CloseClicked"><controls:Icon Glyph="close" Width="16" Height="16"/></Button>
+            </StackPanel>
             <Button x:Name="BackToDownloads" Click="ShowDownloads" Visibility="Collapsed"
                     Style="{StaticResource SubtleButtonStyle}" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal" Spacing="10">

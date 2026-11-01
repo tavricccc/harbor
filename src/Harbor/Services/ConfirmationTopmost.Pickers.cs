@@ -1,5 +1,3 @@
-using Microsoft.UI.Windowing;
-
 namespace Harbor.Services;
 
 internal sealed partial class ConfirmationTopmost
@@ -18,12 +16,7 @@ internal sealed partial class ConfirmationTopmost
         return new PickerScope(owner);
     }
 
-    private void SetTopmost(bool topmost)
-    {
-        if (window.AppWindow.Presenter is OverlappedPresenter presenter)
-            presenter.IsAlwaysOnTop = topmost;
-        WindowActivation.SetTopmost(window, topmost);
-    }
+    private void SetTopmost(bool topmost) => WindowActivation.SetTopmost(window, topmost);
 
     private sealed class PickerScope(nint owner) : IDisposable
     {

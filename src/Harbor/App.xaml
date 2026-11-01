@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="ms-appx:///Themes/Pane.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <FontFamily x:Key="ContentControlThemeFontFamily">Segoe UI Variable Text, Microsoft JhengHei UI</FontFamily>
             <FontFamily x:Key="HeadingFontFamily">Segoe UI Variable Display, Microsoft JhengHei UI</FontFamily>

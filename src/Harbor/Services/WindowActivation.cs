@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+using Harbor.Glass;
 using System.Runtime.InteropServices;
 
 namespace Harbor.Services;
@@ -8,17 +8,16 @@ internal static class WindowActivation
     // Transfer the launcher's foreground permission before redirecting activation.
     internal static void AllowRedirect(uint processId) => AllowSetForegroundWindow(processId);
 
-    internal static void ShowConfirmation(Window window)
+    internal static void ShowConfirmation(GlassWindow window)
     {
         if (ConfirmationTopmost.HasOpenPicker)
         {
-            window.AppWindow.Show(false);
+            window.Show(activate: false);
             return;
         }
-        window.AppWindow.Show(true);
+        window.Show();
         KeepAbove(window);
-        window.Activate();
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+        var hwnd = window.Handle;
         // Activation and Z-order are separate operations. A refused foreground
         // activation must not prevent the confirmation from becoming topmost.
         var activated = SetForegroundWindow(hwnd);
@@ -31,10 +30,10 @@ internal static class WindowActivation
         }
     }
 
-    internal static void KeepAbove(Window window) => SetTopmost(window, true);
+    internal static void KeepAbove(GlassWindow window) => SetTopmost(window, true);
 
-    internal static void SetTopmost(Window window, bool topmost) => SetWindowPos(
-        WinRT.Interop.WindowNative.GetWindowHandle(window), new nint(topmost ? -1 : -2), 0, 0, 0, 0,
+    internal static void SetTopmost(GlassWindow window, bool topmost) => SetWindowPos(
+        window.Handle, new nint(topmost ? -1 : -2), 0, 0, 0, 0,
         0x0001 | 0x0002 | 0x0010); // NOSIZE | NOMOVE | NOACTIVATE
 
     [DllImport("user32.dll")]

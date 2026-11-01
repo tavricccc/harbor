@@ -1,4 +1,5 @@
 using Harbor.Localization;
+using Harbor.Glass;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Harbor.Services;
@@ -6,10 +7,11 @@ using System.Text.Json.Nodes;
 
 namespace Harbor.Views;
 
-public sealed class DownloadWindow : Window
+public sealed class DownloadWindow
 {
     private readonly Grid surface = new();
     private readonly Grid pageHost = new();
+    private readonly WindowHeader header = new();
     private readonly CoreClient core = new();
     private readonly JsonObject request;
     private readonly bool compact;
@@ -22,36 +24,36 @@ public sealed class DownloadWindow : Window
     }
     private Func<double, double>? preferredHeight;
     private const double ContentWidth = 660;
-    private const double MaximumContentHeight = 600;
+    private const double MaximumContentHeight = 640;
     private bool fitQueued;
-    private Windows.Graphics.SizeInt32 lastClientSize;
+    private Windows.Graphics.RectInt32 lastBounds;
+    internal GlassWindow Glass { get; }
+    public event EventHandler? Closed;
+    private string Title
+    {
+        set { Glass.Title = value; header.Title = value; }
+    }
 
     public DownloadWindow(JsonObject request, bool compact = true)
     {
         this.request = request;
         this.compact = compact;
-        Title = Strings.Get("Downloads.Add");
-        surface.RequestedTheme = WindowAppearance.Theme;
-        surface.Style = (Style)Application.Current.Resources["DownloadSurfaceStyle"];
+        surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        surface.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        Grid.SetRow(pageHost, 1);
+        surface.Children.Add(header);
         surface.Children.Add(pageHost);
-        Content = surface;
-        WindowAppearance.ApplyFrame(this, surface);
-        var scale = GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
-        var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
-        AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(Math.Min((int)(ContentWidth * scale), area.Width), Math.Min((int)(360 * scale), area.Height)));
-        AppWindow.Move(new Windows.Graphics.PointInt32(area.X + (area.Width - AppWindow.Size.Width) / 2, area.Y + (area.Height - AppWindow.Size.Height) / 2));
-        if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
-        {
-            presenter.PreferredMinimumWidth = (int)(600 * scale);
-            presenter.PreferredMinimumHeight = (int)(140 * scale);
-            presenter.IsMaximizable = false;
-            presenter.IsMinimizable = false;
-            presenter.IsAlwaysOnTop = true;
-        }
-        confirmationTopmost = new ConfirmationTopmost(this);
-        Closed += (_, _) => { closed = true; confirmationTopmost.Dispose(); progress?.Stop(); core.Dispose(); };
-        Activated += (_, _) => progress?.UpdatePollingVisibility();
-        AppWindow.Changed += (_, args) => { if (args.DidVisibilityChange || args.DidPresenterChange) progress?.UpdatePollingVisibility(); };
+        var root = new UserControl { Content = surface, RequestedTheme = WindowAppearance.Theme, IsTabStop = false };
+        Glass = new GlassWindow(root, Strings.Get("Downloads.Add"), ContentWidth, 360, resizable: false, minWidth: 480, minHeight: 140) { IsMinimizable = false };
+        Title = Strings.Get("Downloads.Add");
+        header.ShowMinimize = false;
+        header.MinimizeRequested += Glass.Minimize;
+        header.CloseRequested += Close;
+        Glass.SetCaption(header);
+        confirmationTopmost = new ConfirmationTopmost(Glass);
+        Glass.Closed += (_, _) => { closed = true; confirmationTopmost.Dispose(); progress?.Stop(); core.Dispose(); Closed?.Invoke(this, EventArgs.Empty); };
+        Glass.Activated += (_, _) => progress?.UpdatePollingVisibility();
+        Glass.VisibilityChanged += (_, _) => progress?.UpdatePollingVisibility();
         surface.Loaded += Confirm;
     }
 
@@ -60,12 +62,16 @@ public sealed class DownloadWindow : Window
         TaskId = taskId;
         confirmationTopmost.Dispose();
         Title = Strings.Get("Downloads.Progress");
-        if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
-        {
-            presenter.IsAlwaysOnTop = false;
-            presenter.IsMinimizable = true;
-        }
+        ShowMinimize();
     }
+
+    private void ShowMinimize()
+    {
+        Glass.IsMinimizable = true;
+        header.ShowMinimize = true;
+    }
+
+    public void Close() => Glass.Close();
 
     private async void Confirm(object sender, RoutedEventArgs e)
     {
@@ -92,7 +98,7 @@ public sealed class DownloadWindow : Window
         }
         if (await TryUpdateSource())
             return;
-        var page = new DownloadConfirmationPage(core, request, WinRT.Interop.WindowNative.GetWindowHandle(this), compact);
+        var page = new DownloadConfirmationPage(core, request, Glass.Handle, compact);
         preferredHeight = page.PreferredHeight;
         page.LayoutChanged += RequestFit;
         page.Started += ShowProgress;
@@ -152,17 +158,13 @@ public sealed class DownloadWindow : Window
         TaskId = id;
         Title = Strings.Get("Downloads.Progress");
         pageHost.Children.Clear();
-        progress = new DownloadProgressPage(core, id, Close, () => AppWindow.IsVisible
-            && AppWindow.Presenter is not Microsoft.UI.Windowing.OverlappedPresenter { State: Microsoft.UI.Windowing.OverlappedPresenterState.Minimized });
+        progress = new DownloadProgressPage(core, id, Close, () => Glass.IsVisible);
         preferredHeight = progress.PreferredHeight;
         progress.LayoutChanged += RequestFit;
         progress.TitleChanged += title => Title = title;
         pageHost.Children.Add(progress);
-        if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
-        {
-            presenter.IsAlwaysOnTop = false;
-            presenter.IsMinimizable = true;
-        }
+        WindowActivation.SetTopmost(Glass, false);
+        ShowMinimize();
         RequestFit();
     }
 
@@ -174,34 +176,22 @@ public sealed class DownloadWindow : Window
         surface.DispatcherQueue.TryEnqueue(() =>
         {
             fitQueued = false;
-            if (closed || preferredHeight is null)
+            if (closed || preferredHeight is null || surface.XamlRoot is null)
                 return;
             var scale = surface.XamlRoot.RasterizationScale;
-            var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
+            var area = Glass.WorkArea;
             var width = Math.Min(ContentWidth, area.Width / scale - 24);
-            var height = Math.Clamp(preferredHeight(width), 140, Math.Min(MaximumContentHeight, area.Height / scale - 48));
-            var size = new Windows.Graphics.SizeInt32((int)Math.Round(width * scale), (int)Math.Ceiling(height * scale));
-            if (size.Width == lastClientSize.Width && size.Height == lastClientSize.Height)
+            header.Measure(new Windows.Foundation.Size(width, double.PositiveInfinity));
+            var height = Math.Clamp(preferredHeight(width) + header.DesiredSize.Height, 140, Math.Min(MaximumContentHeight, area.Height / scale - 48));
+            int w = (int)Math.Round(width * scale), h = (int)Math.Ceiling(height * scale);
+            var current = Glass.Bounds;
+            if (w == lastBounds.Width && h == lastBounds.Height && current.X == lastBounds.X && current.Y == lastBounds.Y)
                 return;
-            var position = AppWindow.Position;
-            var previousSize = AppWindow.Size;
-            var centerX = position.X + previousSize.Width / 2.0;
-            var centerY = position.Y + previousSize.Height / 2.0;
-            if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
-                presenter.IsResizable = true;
-            AppWindow.ResizeClient(size);
-            lastClientSize = size;
-            position.X = (int)Math.Round(centerX - AppWindow.Size.Width / 2.0);
-            position.Y = (int)Math.Round(centerY - AppWindow.Size.Height / 2.0);
-            position.X = Math.Clamp(position.X, area.X, area.X + area.Width - AppWindow.Size.Width);
-            position.Y = Math.Clamp(position.Y, area.Y, area.Y + area.Height - AppWindow.Size.Height);
-            AppWindow.Move(position);
-            if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter fixedPresenter)
-                fixedPresenter.IsResizable = false;
+            // Grow and shrink around the current center, kept inside the work area.
+            var x = Math.Clamp((int)Math.Round(current.X + current.Width / 2.0 - w / 2.0), area.X, area.X + area.Width - w);
+            var y = Math.Clamp((int)Math.Round(current.Y + current.Height / 2.0 - h / 2.0), area.Y, area.Y + area.Height - h);
+            Glass.Bounds = lastBounds = new Windows.Graphics.RectInt32(x, y, w, h);
             confirmationTopmost.Refresh();
         });
     }
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern uint GetDpiForWindow(nint hwnd);
 }

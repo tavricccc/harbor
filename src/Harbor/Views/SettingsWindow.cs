@@ -1,36 +1,28 @@
+using Harbor.Glass;
 using Harbor.Localization;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Harbor.Services;
 using Harbor.ViewModels;
 
 namespace Harbor.Views;
 
-public sealed class SettingsWindow : Window
+public sealed class SettingsWindow
 {
+    internal GlassWindow Glass { get; }
+    public event EventHandler? Closed;
+
     public SettingsWindow(DownloadsViewModel viewModel)
     {
-        Title = Strings.Get("Settings.WindowTitle");
-        var handle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        var root = new Grid { RequestedTheme = WindowAppearance.Theme };
-        var page = new SettingsPage(viewModel, handle);
-        page.CloseRequested += Close;
-        root.Children.Add(page);
-        Content = root;
-        WindowAppearance.ApplyFrame(this, root);
-
-        var scale = GetDpiForWindow(handle) / 96.0;
-        var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-        AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(Math.Min((int)(820 * scale), area.Width - 32), Math.Min((int)(760 * scale), area.Height - 64)));
-        AppWindow.Move(new Windows.Graphics.PointInt32(area.X + (area.Width - AppWindow.Size.Width) / 2, area.Y + (area.Height - AppWindow.Size.Height) / 2));
-        if (AppWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.PreferredMinimumWidth = (int)(720 * scale);
-            presenter.PreferredMinimumHeight = (int)(560 * scale);
-        }
+        var root = new UserControl { RequestedTheme = WindowAppearance.Theme, IsTabStop = false };
+        Glass = new GlassWindow(root, Strings.Get("Settings.WindowTitle"), 860, 680, resizable: true, minWidth: 720, minHeight: 520);
+        var page = new SettingsPage(viewModel, Glass.Handle);
+        page.CloseRequested += Glass.Close;
+        page.MinimizeRequested += Glass.Minimize;
+        root.Content = page;
+        Glass.SetCaption(page.TitleBar);
+        Glass.Closed += (_, _) => Closed?.Invoke(this, EventArgs.Empty);
     }
 
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern uint GetDpiForWindow(nint hwnd);
+    public void Activate() => Glass.Activate();
+    public void Close() => Glass.Close();
 }

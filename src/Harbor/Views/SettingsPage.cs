@@ -29,6 +29,8 @@ public sealed partial class SettingsPage : Page
     private readonly ComboBox proxyMode = new() { Header = Strings.Get("Proxy.Mode"), HorizontalAlignment = HorizontalAlignment.Stretch, Items = { Strings.Get("Common.FollowSystem"), Strings.Get("Request.Direct"), Strings.Get("Common.Custom") }, SelectedIndex = 0 };
 
     public event Action? CloseRequested;
+    public event Action? MinimizeRequested;
+    internal FrameworkElement TitleBar { get; private set; } = null!;
 
     public SettingsPage(DownloadsViewModel viewModel, nint ownerHandle)
     {
@@ -47,7 +49,11 @@ public sealed partial class SettingsPage : Page
         surface.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         surface.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         var header = new StackPanel { Spacing = 16 };
-        header.Children.Add(new TextBlock { Text = Strings.Get("Common.Settings"), Style = (Style)Application.Current.Resources["TitleTextBlockStyle"] });
+        var title = new WindowHeader { Title = Strings.Get("Common.Settings"), Margin = new Thickness(-24, -16, -24, 0) };
+        title.MinimizeRequested += () => MinimizeRequested?.Invoke();
+        title.CloseRequested += () => CloseRequested?.Invoke();
+        TitleBar = title;
+        header.Children.Add(title);
         header.Children.Add(message);
         surface.Children.Add(header);
         NativeInfoBars.CollapseWhenClosed(message);
@@ -163,8 +169,8 @@ public sealed partial class SettingsPage : Page
                 2 => ElementTheme.Dark,
                 _ => ElementTheme.Default
             };
-            ((FrameworkElement)App.Window.Content).RequestedTheme = selectedTheme;
-            ((FrameworkElement)XamlRoot.Content).RequestedTheme = selectedTheme;
+            foreach (var window in Glass.GlassWindow.All)
+                window.Content.RequestedTheme = selectedTheme;
             await File.WriteAllTextAsync(Path.Combine(CoreClient.DataDirectory, "theme.txt"), theme.SelectedIndex.ToString());
             if (portChanged || languageChanged)
                 await NativeDialogs.ShowAsync(new ContentDialog

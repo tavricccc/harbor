@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Windowing;
 
 namespace Harbor;
 
@@ -25,8 +24,7 @@ public sealed partial class MainPage
         };
     }
 
-    private static bool WindowVisible() => App.Window?.AppWindow is { IsVisible: true } window
-        && window.Presenter is not OverlappedPresenter { State: OverlappedPresenterState.Minimized };
+    private static bool WindowVisible() => App.Window?.Glass.IsVisible == true;
 
     public async void UpdatePollingVisibility()
     {

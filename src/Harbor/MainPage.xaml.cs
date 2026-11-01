@@ -299,4 +299,9 @@ public sealed partial class MainPage : Page
         settingsWindow.Activate();
     }
     private void ShowExtensions(object sender, RoutedEventArgs args) => OpenSection(new ExtensionsPage(ViewModel));
+    internal FrameworkElement TitleBar => TitleBarArea;
+    public event Action? MinimizeRequested;
+    public event Action? CloseRequested;
+    private void MinimizeClicked(object sender, RoutedEventArgs args) => MinimizeRequested?.Invoke();
+    private void CloseClicked(object sender, RoutedEventArgs args) => CloseRequested?.Invoke();
 }

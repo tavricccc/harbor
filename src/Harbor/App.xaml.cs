@@ -19,11 +19,8 @@ public partial class App : Application
 {
     private AppInstance? registeredInstance;
     private readonly HashSet<Views.DownloadWindow> downloadWindows = [];
-    /// <summary>
-    /// The main application window. Use <c>App.Window</c> from any class that needs
-    /// the window reference (for dialogs, pickers, interop, etc.).
-    /// </summary>
-    public static Window Window { get; private set; } = null!;
+    /// <summary>The download list's window, or null while it is closed.</summary>
+    public static MainWindow? Window { get; private set; }
 
     /// <summary>
     /// The UI thread dispatcher. Use <c>App.DispatcherQueue</c> to marshal calls
@@ -32,13 +29,8 @@ public partial class App : Application
     /// </summary>
     public static Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue { get; private set; } = null!;
 
-    /// <summary>
-    /// The native window handle (HWND). Use for file pickers,
-    /// <c>DataTransferManager</c>, and any WinRT interop that requires
-    /// <c>InitializeWithWindow</c>.
-    /// </summary>
-    public static nint WindowHandle =>
-        WinRT.Interop.WindowNative.GetWindowHandle(Window);
+    /// <summary>The download list's native window handle (HWND) for pickers and sharing.</summary>
+    public static nint WindowHandle => Window?.Glass.Handle ?? 0;
 
     /// <summary>
     /// Initializes the singleton application object.
@@ -62,6 +54,8 @@ public partial class App : Application
         Services.LegacyMigration.Run();
         Strings.Initialize(Services.UiPreferences.Load().Language, Windows.System.UserProfile.GlobalizationPreferences.Languages);
         Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = Strings.Language;
+        // Popups (menus, tooltips, dialogs) do not inherit a window's font; the theme font reaches them all.
+        Resources["ContentControlThemeFontFamily"] = Services.UiFont.For(Strings.Language);
         if (Environment.GetEnvironmentVariable("HARBOR_DATA_DIRECTORY") is null)
         {
             Services.WindowsIntegration.SetStartup(Services.UiPreferences.Load().StartWithWindows);
@@ -117,7 +111,7 @@ public partial class App : Application
             }
             EnsureMainWindow().Activate();
             if (link is not null)
-                ((MainWindow)Window).OpenProtocol(link);
+                Window!.OpenProtocol(link);
         }
         catch (Exception error)
         {
@@ -131,15 +125,15 @@ public partial class App : Application
         if (Window is null)
         {
             Window = new MainWindow();
-            Window.Closed += (_, _) => { Window = null!; ReleaseRegistration(); };
+            Window.Closed += (_, _) => { Window = null; ReleaseRegistration(); };
         }
-        return (MainWindow)Window;
+        return Window;
     }
     internal void OpenDownloadWindow(System.Text.Json.Nodes.JsonObject request, bool compact = true)
     {
         var window = new Views.DownloadWindow(request, compact);
         TrackDownloadWindow(window);
-        Services.WindowActivation.ShowConfirmation(window);
+        Services.WindowActivation.ShowConfirmation(window.Glass);
     }
     internal void OpenProgressWindow(string taskId)
     {
@@ -149,10 +143,8 @@ public partial class App : Application
             window = new Views.DownloadWindow(taskId);
             TrackDownloadWindow(window);
         }
-        if (window.AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
-            presenter.Restore();
-        window.AppWindow.Show(true);
-        window.Activate();
+        window.Glass.Show();
+        window.Glass.Activate();
     }
     private void TrackDownloadWindow(Views.DownloadWindow window)
     {
