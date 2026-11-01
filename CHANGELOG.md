@@ -2,6 +2,10 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.12.2 — 2026-11-01
+
+- Extensions and browser capture pages now match the glass design. Extensions switch between the store and installed list, show each extension as a card, and install from another source in a dialog. Browser capture shows whether it is on, the one action to take, and numbered setup steps; Settings uses the same layout.
+
 ## 0.12.1 — 2026-11-01
 
 - The main window can be maximized from a new title bar button or by double-clicking the title bar.
