@@ -137,7 +137,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="32"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="168"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="84"/>
                                 <ColumnDefinition Width="64"/>
                             </Grid.ColumnDefinitions>
@@ -152,13 +152,13 @@
                                            Foreground="{ThemeResource PaneText3Brush}"/>
                             </StackPanel>
                             <Grid Grid.Column="2" ColumnSpacing="10" VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <ProgressBar Value="{x:Bind Percent, Mode=OneWay}" Maximum="100" CornerRadius="2" MinHeight="4"
                                              Visibility="{x:Bind ProgressVisibility, Mode=OneWay}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{x:Bind RowProgressText, Mode=OneWay}" FontSize="12" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1" Text="{x:Bind RowProgressText, Mode=OneWay}" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis"
                                            Foreground="{ThemeResource PaneText2Brush}"/>
                             </Grid>
-                            <TextBlock Grid.Column="3" Text="{x:Bind SpeedText, Mode=OneWay}" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"
+                            <TextBlock Grid.Column="3" Text="{x:Bind RowSpeedText, Mode=OneWay}" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"
                                        Foreground="{ThemeResource PaneText2Brush}"/>
                             <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Button Tag="{x:Bind Id}" Click="RowPrimary" Style="{StaticResource PaneIconButton}"

@@ -63,6 +63,7 @@ public sealed partial class DownloadItem
             OnPropertyChanged(nameof(Speed));
             OnPropertyChanged(nameof(UploadSpeed));
             OnPropertyChanged(nameof(SpeedText));
+            OnPropertyChanged(nameof(RowSpeedText));
         }
         if ((changed & Metrics.Transfer) != 0)
         {

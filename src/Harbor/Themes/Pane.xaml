@@ -450,8 +450,8 @@
     </Style>
     <Style TargetType="InfoBar"><Setter Property="CornerRadius" Value="12"/></Style>
     <Style TargetType="Expander" BasedOn="{StaticResource DefaultExpanderStyle}"><Setter Property="CornerRadius" Value="12"/></Style>
-    <Style TargetType="CalendarDatePicker" BasedOn="{StaticResource DefaultCalendarDatePickerStyle}"><Setter Property="CornerRadius" Value="10"/></Style>
-    <Style TargetType="TimePicker" BasedOn="{StaticResource DefaultTimePickerStyle}"><Setter Property="CornerRadius" Value="10"/></Style>
+    <Style TargetType="CalendarDatePicker"><Setter Property="CornerRadius" Value="10"/></Style>
+    <Style TargetType="TimePicker"><Setter Property="CornerRadius" Value="10"/></Style>
     <Style TargetType="PasswordBox" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
         <Setter Property="CornerRadius" Value="10"/><Setter Property="MinHeight" Value="32"/><Setter Property="FontSize" Value="12"/>
     </Style>

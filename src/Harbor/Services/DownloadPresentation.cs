@@ -17,7 +17,7 @@ public static class DownloadPresentation
 
     public static string FileGlyph(string name) => Path.GetExtension(name).ToLowerInvariant() switch
     {
-        ".zip" or ".7z" or ".rar" or ".tar" or ".gz" => "archive",
+        ".zip" or ".7z" or ".rar" or ".tar" or ".gz" or ".iso" => "archive",
         ".exe" or ".msi" or ".msix" => "app",
         ".mp3" or ".flac" or ".wav" or ".m4a" => "music",
         ".mp4" or ".mkv" or ".webm" or ".mov" => "video",
