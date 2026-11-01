@@ -1,4 +1,4 @@
-name: Windows native build
+name: Windows CI
 on:
   push:
     branches: [harbor]
@@ -31,19 +31,6 @@ jobs:
         env:
           CORE_CHANNEL: ${{ inputs.core-channel }}
         run: ./scripts/update-core.ps1 -Channel $env:CORE_CHANNEL
-      - name: Build and verify
+      - name: Build and test
         shell: pwsh
         run: ./scripts/build.ps1 -Test
-      - name: Package installer
-        shell: pwsh
-        run: |
-          ./scripts/package.ps1 -SkipBuild
-          ./scripts/source.ps1
-      - uses: actions/upload-artifact@v7.0.1
-        with:
-          name: Harbor-windows-x64
-          path: |
-            artifacts/Harbor-Setup-*-x64.exe
-            artifacts/Harbor-Setup-*-x64.exe.sha256
-            artifacts/Harbor-Source-*.zip
-          compression-level: 0
