@@ -5,6 +5,7 @@
 ## 0.12.2 — 2026-11-01
 
 - Extensions and browser capture pages now match the glass design. Extensions switch between the store and installed list, show each extension as a card, and install from another source in a dialog. Browser capture shows whether it is on, the one action to take, and numbered setup steps; Settings uses the same layout.
+- Opening a section no longer leaves the download filters, search box and Harbor title showing underneath it.
 
 ## 0.12.1 — 2026-11-01
 
