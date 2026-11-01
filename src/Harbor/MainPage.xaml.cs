@@ -305,6 +305,17 @@ public sealed partial class MainPage : Page
     internal FrameworkElement TitleBar => TitleBarArea;
     public event Action? MinimizeRequested;
     public event Action? CloseRequested;
+    public event Action? MaximizeRequested;
+    /// <summary>Shows the maximize button as restore while the window is maximized.</summary>
+    public bool Maximized
+    {
+        set
+        {
+            MaximizeIcon.Glyph = value ? "restore" : "maximize";
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(MaximizeButton, Strings.Get(value ? "Common.Restore" : "Common.Maximize"));
+        }
+    }
     private void MinimizeClicked(object sender, RoutedEventArgs args) => MinimizeRequested?.Invoke();
+    private void MaximizeClicked(object sender, RoutedEventArgs args) => MaximizeRequested?.Invoke();
     private void CloseClicked(object sender, RoutedEventArgs args) => CloseRequested?.Invoke();
 }

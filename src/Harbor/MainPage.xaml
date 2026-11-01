@@ -83,6 +83,9 @@
                 <Button Style="{StaticResource UiIconButton}" Click="MinimizeClicked" AutomationProperties.Name="{loc:Localize Key=Common.Minimize}">
                     <controls:Icon Glyph="minus" Width="16" Height="16"/>
                 </Button>
+                <Button x:Name="MaximizeButton" Style="{StaticResource UiIconButton}" Click="MaximizeClicked" AutomationProperties.Name="{loc:Localize Key=Common.Maximize}">
+                    <controls:Icon x:Name="MaximizeIcon" Glyph="maximize" Width="16" Height="16"/>
+                </Button>
                 <Button Style="{StaticResource UiIconButton}" Click="CloseClicked" AutomationProperties.Name="{loc:Localize Key=Common.Close}">
                     <controls:Icon Glyph="close" Width="16" Height="16"/>
                 </Button>

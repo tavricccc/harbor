@@ -15,6 +15,8 @@ public sealed class MainWindow
         Glass = new GlassWindow(page, "Harbor", 1120, 720, resizable: true, minWidth: 780, minHeight: 520);
         Glass.SetCaption(page.TitleBar);
         page.MinimizeRequested += Glass.Minimize;
+        page.MaximizeRequested += Glass.ToggleMaximize;
+        Glass.MaximizedChanged += (_, _) => page.Maximized = Glass.IsMaximized;
         page.CloseRequested += Glass.Close;
         Glass.Closed += (_, _) => { Services.ShareFiles.Release(Glass.Handle); Closed?.Invoke(this, EventArgs.Empty); };
         Glass.Activated += (_, _) => page.UpdatePollingVisibility();
