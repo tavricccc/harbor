@@ -5,7 +5,7 @@
 ## 0.13.0 — 2026-11-16
 
 - Fix a torrent failing with "torrent is already active" after checking its link: the task is now created from the checked result instead of loading the torrent a second time. This covers dropped, picked and pasted `.torrent` files and magnet links.
-- A failed torrent task no longer shows as seeding, and the progress window shows the upload speed once instead of "Upload: ↑".
+- A seeding torrent shows only its total upload, not a speed. In the progress window, a completed torrent that is still seeding now offers Close instead of Cancel, which used to remove the task; Stop seeding is its own button. A failed torrent no longer shows as seeding.
 - Update Gopeed to v2.0.0-beta.4 (`ebfd113`).
 
 ## 0.12.2 — 2026-11-01

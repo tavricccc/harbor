@@ -124,7 +124,7 @@ public sealed partial class DownloadProgressPage : Page
     {
         if (item is null || cancelling)
             return;
-        if (item.IsComplete && !item.IsProcessing && !item.Uploading)
+        if (item.IsComplete && !item.IsProcessing)
         {
             close();
             return;

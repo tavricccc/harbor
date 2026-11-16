@@ -57,7 +57,10 @@ public sealed partial class DownloadItem
             OnPropertyChanged(nameof(Percent));
         }
         if ((changed & Metrics.Uploaded) != 0)
+        {
             OnPropertyChanged(nameof(Uploaded));
+            OnPropertyChanged(nameof(RowSpeedText));
+        }
         if ((changed & Metrics.Speed) != 0)
         {
             OnPropertyChanged(nameof(Speed));

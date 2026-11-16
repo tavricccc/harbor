@@ -66,6 +66,15 @@ internal static class DownloadChecks
         var seeding = renamed.DeepClone().AsObject(); seeding["status"] = "done"; seeding["uploading"] = true;
         if ((item.Update(seeding) & DownloadChanges.Content) == 0 || !item.CanPause || item.Percent != 100)
             throw new Exception("Completed torrents must still expose active seeding controls");
+        var uploaded = seeding.DeepClone().AsObject(); uploaded["progress"]!["uploaded"] = 3L * 1024 * 1024; uploaded["progress"]!["uploadSpeed"] = 500000L;
+        item.Update(uploaded);
+        if (!item.IsSeeding || item.RowSpeedText != "↑ " + DownloadItem.FormatBytes(3L * 1024 * 1024) || item.SpeedText != "—")
+            throw new Exception("A seeding task must show only its total upload");
+        var failedSeed = uploaded.DeepClone().AsObject(); failedSeed["status"] = "error";
+        item.Update(failedSeed);
+        if (item.IsSeeding || item.RowSpeedText.Length != 0)
+            throw new Exception("A failed torrent must not show as seeding");
+        item.Update(seeding);
 
         var extracting = seeding.DeepClone().AsObject(); extracting["progress"]!["extractStatus"] = "extracting";
         if ((item.Update(extracting) & DownloadChanges.Content) == 0 || !item.IsProcessing)
