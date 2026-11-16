@@ -115,8 +115,9 @@ public sealed partial class DownloadProgressPage : Page
     {
         try
         {
-            await core.SendAsync(HttpMethod.Put, $"tasks/{id}/pause");
-            await Refresh();
+            // Gopeed cannot pause a finished task: stopping a seed removes the record and keeps the files.
+            await core.SendAsync(HttpMethod.Delete, $"tasks?id={Uri.EscapeDataString(id)}&force=false");
+            close();
         }
         catch (Exception failure) { ShowError(failure); }
     }

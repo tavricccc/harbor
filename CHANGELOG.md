@@ -2,6 +2,10 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.14.0 — 2026-11-16
+
+- Fix Stop seeding failing with "source or record not found" on a finished torrent. Stop seeding now removes the task from the list and keeps the downloaded files.
+
 ## 0.13.0 — 2026-11-16
 
 - Fix a torrent failing with "torrent is already active" after checking its link: the task is now created from the checked result instead of loading the torrent a second time. This covers dropped, picked and pasted `.torrent` files and magnet links.
