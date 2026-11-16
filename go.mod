@@ -3,7 +3,7 @@ module harbor
 go 1.25.4
 
 require (
-	github.com/GopeedLab/gopeed v1.9.4-0.20261031095156-fc0a1e0ef97f
+	github.com/GopeedLab/gopeed v1.9.4-0.20261103012730-ebfd113360cc
 	github.com/anacrolix/torrent v1.60.1-0.20251217073903-486bcbe758e0
 	github.com/getlantern/systray v1.2.2
 	golang.org/x/sys v0.44.0
