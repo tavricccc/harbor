@@ -70,6 +70,9 @@ public sealed partial class DownloadForm
                     if (Files.Items.Count > 1 && Files.SelectedItems.Count == 0)
                         throw new FormatException(Strings.Get("Errors.SelectFile"));
                 }
+                // The probe already loaded a torrent into the engine; creating it again from the request is refused as "already active".
+                if (resolved is not null && DownloadSources.IsTorrent(links[0]))
+                    request["rid"] = resolved;
                 CreatedTaskId = (await core.SendAsync(HttpMethod.Post, "tasks", request))!.GetValue<string>();
                 complete = true;
             }
