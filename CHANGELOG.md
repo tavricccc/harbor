@@ -2,6 +2,12 @@
 
 [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.13.0 — 2026-11-16
+
+- Fix a torrent failing with "torrent is already active" after checking its link: the task is now created from the checked result instead of loading the torrent a second time. This covers dropped, picked and pasted `.torrent` files and magnet links.
+- A failed torrent task no longer shows as seeding, and the progress window shows the upload speed once instead of "Upload: ↑".
+- Update Gopeed to v2.0.0-beta.4 (`ebfd113`).
+
 ## 0.12.2 — 2026-11-01
 
 - Extensions and browser capture pages now match the glass design. Extensions switch between the store and installed list, show each extension as a card, and install from another source in a dialog. Browser capture shows whether it is on, the one action to take, and numbered setup steps; Settings uses the same layout.
