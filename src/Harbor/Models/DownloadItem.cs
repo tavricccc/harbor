@@ -87,9 +87,11 @@ public sealed partial class DownloadItem : ObservableObject
     public string SubText => IsDeferred ? DeferredError.Length > 0 ? DeferredError : Url : Status == "running" && RemainingText != "—" ? $"{TransferSizeText} · {RemainingText}" : TransferSizeText;
     public long Uploaded { get; private set; }
     public long UploadSpeed { get; private set; }
-    public string SpeedText => Status == "running" ? FormatBytes(Speed) + "/s" : Uploading ? "↑ " + FormatBytes(UploadSpeed) + "/s" : "—";
+    // A failed task can still hold the torrent; it is not seeding.
+    public bool IsSeeding => Uploading && Status != "error";
+    public string SpeedText => Status == "running" ? FormatBytes(Speed) + "/s" : IsSeeding ? "↑ " + FormatBytes(UploadSpeed) + "/s" : "—";
     // The list leaves the speed column empty while nothing moves.
-    public string RowSpeedText => Status == "running" || Uploading ? SpeedText : "";
+    public string RowSpeedText => Status == "running" || IsSeeding ? SpeedText : "";
     public string RemainingText => Status == "running" && Speed > 0 && Size > Downloaded ? FormatTime((Size - Downloaded) / Speed) : "—";
     // Opening checks the disk each time; the row action keeps its check until the next snapshot.
     public string OpenPath => ExtractionStatus == "done" && !File.Exists(FilePath) && !Directory.Exists(FilePath) ? Folder : FilePath;

@@ -20,7 +20,7 @@ public sealed partial class DownloadProgressPage
         ToolTipService.SetToolTip(SourceLink, task.Url);
         SourceLink.Visibility = task.Url.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         Transfer.Text = task.TransferSizeText;
-        Speed.Text = task.Uploading ? Strings.Format("Progress.Speed", Strings.Get("Common.Upload"), task.SpeedText) : task.SpeedText;
+        Speed.Text = task.IsSeeding ? Strings.Format("Progress.Speed", Strings.Get("Common.Upload"), DownloadItem.FormatBytes(task.UploadSpeed) + "/s") : task.SpeedText;
         Remaining.Text = task.RemainingText == "—" ? task.Status == "running" ? Strings.Get("Progress.Calculating") : "" : task.RemainingText;
 
         var finished = task.IsComplete && !task.IsProcessing && !task.Uploading;
@@ -30,11 +30,11 @@ public sealed partial class DownloadProgressPage
         var style = (Style)Application.Current.Resources[finished || task.Status == "error" ? "UiPrimaryButton" : "UiTextButton"];
         if (Primary.Style != style)
             Primary.Style = style;
-        Speed.Visibility = task.Status == "running" || task.Uploading ? Visibility.Visible : Visibility.Collapsed;
+        Speed.Visibility = task.Status == "running" || task.IsSeeding ? Visibility.Visible : Visibility.Collapsed;
         Folder.Visibility = task.IsComplete ? Visibility.Visible : Visibility.Collapsed;
         Remaining.Visibility = task.IsComplete ? Visibility.Collapsed : Visibility.Visible;
         Status.Text = task.IsProcessing ? task.ExtractionText : task.ExtractionStatus == "error"
-            ? Strings.Get("Progress.ExtractFailed") : task.Uploading ? Strings.Format("Progress.Seeding", DownloadItem.FormatBytes(task.Uploaded)) : task.StatusText;
+            ? Strings.Get("Progress.ExtractFailed") : task.IsSeeding ? Strings.Format("Progress.Seeding", DownloadItem.FormatBytes(task.Uploaded)) : task.StatusText;
         Percent.Text = task.Size > 0 && !task.IsComplete ? $"{task.Percent:0}%" : "";
         Progress.Value = task.IsProcessing ? task.Data["progress"]?["extractProgress"]?.GetValue<double>() ?? 0 : task.Percent;
         Progress.IsIndeterminate = task.IsIndeterminate && !task.IsProcessing;
